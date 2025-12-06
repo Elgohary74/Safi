@@ -1,8 +1,11 @@
 from flask import Flask
 
-from app.config import DevelopmentConfig
-from app.logging_config import configure_logging
-from .routes import auth_bp, groups_bp, users_bp
+from .config import DevelopmentConfig
+from .logging_config import configure_logging
+from .routes.auth import auth_bp
+from .routes.auth import auth_bp
+from .routes.groups import groups_bp
+from .routes.users import users_bp
 
 
 def create_app(config_class=DevelopmentConfig):
