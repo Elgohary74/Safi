@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -10,7 +10,7 @@ class Debt:
     amount: float
     currency: str = "EGP"
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "from_user": self.from_user,
             "to_user": self.to_user,
@@ -19,7 +19,7 @@ class Debt:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict):
+    def from_dict(cls, data: Dict[str, Any]):
         return cls(
             from_user=data.get("from_user"),
             to_user=data.get("to_user"),
@@ -38,7 +38,7 @@ class Group:
     invites: List[str] = field(default_factory=list)
     debts: List[Debt] = field(default_factory=list)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "_id": self.group_id,
             "group_name": self.group_name,
@@ -50,10 +50,10 @@ class Group:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict):
+    def from_dict(cls, data: Dict[str, Any]):
         raw_debts = data.get("debts", [])
         return cls(
-            group_id=data.get("_id"),
+            group_id=data.get("_id") or str(uuid.uuid4()),
             group_name=data.get("group_name"),
             description=data.get("description"),
             admin_id=data.get("admin_id"),
