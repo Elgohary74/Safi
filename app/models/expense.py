@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -26,13 +26,13 @@ class Expense:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict):
+    def from_dict(cls, data: Dict[str, Any]):
         return cls(
-            expense_id=data.get("_id"),
+            expense_id=data.get("_id") or str(uuid.uuid4()),
             description=data.get("description"),
             total_amount=data.get("total_amount"),
             payer_id=data.get("payer_id"),
             group_id=data.get("group_id"),
             splits=data.get("splits", []),
-            date=data.get("date"),
+            date=data.get("date") or datetime.now(timezone.utc),
         )

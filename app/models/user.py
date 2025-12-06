@@ -8,6 +8,7 @@ class User:
     email: str
     password_hash: str
     name: str
+    username: str
     user_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     phone_number: Optional[str] = None
     payment_info: List[Dict] = field(default_factory=list)
@@ -15,6 +16,7 @@ class User:
     def to_dict(self) -> Dict:
         return {
             "_id": self.user_id,
+            "username": self.username,
             "name": self.name,
             "email": self.email,
             "password_hash": self.password_hash,
@@ -25,7 +27,8 @@ class User:
     @classmethod
     def from_dict(cls, data: Dict):
         return cls(
-            user_id=data.get("_id"),
+            user_id=data.get("_id") or str(uuid.uuid4()),
+            username=data.get("username"),
             email=data.get("email"),
             password_hash=data.get("password_hash"),
             name=data.get("name"),
