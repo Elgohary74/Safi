@@ -2,9 +2,7 @@ from flask import Flask
 
 from app.logging_config import configure_logging
 from config import DevelopmentConfig
-from .routes.auth import auth_bp
-from .routes.groups import groups_bp
-from .routes.users import users_bp
+from .routes import auth_bp, groups_bp, users_bp
 
 
 def create_app(config_class=DevelopmentConfig):
