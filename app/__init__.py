@@ -3,7 +3,6 @@ from flask import Flask
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
 from .routes.auth import auth_bp
-from .routes.auth import auth_bp
 from .routes.groups import groups_bp
 from .routes.users import users_bp
 
