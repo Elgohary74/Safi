@@ -1,9 +1,29 @@
 import os
 
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
-# Load .env file (only affects local development)
 load_dotenv()
+
+
+class Settings(BaseSettings):
+    APP_NAME: str
+    APP_VERSION: str
+
+    MONGODB_URI: str
+    MONGODB_DATABASE: str
+
+    INVITE_CODE_LENGTH: int
+
+    model_config = {
+        "env_file": os.path.join(os.path.dirname(__file__), "../.env"),
+        "env_file_encoding": "utf-8",
+        "extra": "ignore"
+    }
+
+
+def get_settings() -> Settings:
+    return Settings()
 
 
 class Config:
@@ -21,17 +41,13 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-
     DEBUG = True
-    # Allow HTTP in dev
-    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False  # Allow HTTP in dev
 
 
 class ProductionConfig(Config):
-
     DEBUG = False
-    # Enforce HTTPS in prod
-    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True  # Enforce HTTPS in prod
 
 
 # Note: TestingConfig inherits from DevelopmentConfig (not directly from Config)

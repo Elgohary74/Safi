@@ -5,7 +5,6 @@ from pymongo.errors import ConnectionFailure
 
 
 class MongoDatabase:
-
     _instance = None
     _client = None
     _db = None
