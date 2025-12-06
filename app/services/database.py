@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
@@ -13,10 +14,11 @@ class MongoDatabase:
         if cls._instance is None:
             cls._instance = super(MongoDatabase, cls).__new__(cls)
             try:
-                mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/safi_db")
+                mongo_uri = os.getenv("MONGODB_URL")
+                parsed = urlparse(mongo_uri)
+                db_name = parsed.path[1:] or "safi_db"
                 cls._client = MongoClient(mongo_uri)
                 cls._client.admin.command("ping")
-                db_name = mongo_uri.rsplit("/", 1)[-1] or "safi_db"
                 cls._db = cls._client[db_name]
                 print(f"connected to MongoDB at {mongo_uri}")
             except ConnectionFailure as e:
