@@ -6,36 +6,33 @@ from typing import Dict, List
 
 @dataclass
 class Expense:
-    payer_id: str
-    amount: float
     description: str
+    total_amount: float
+    payer_id: str
     group_id: str
-    involved_users: List[str]
+    splits: List[Dict] = field(default_factory=list)
     expense_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    currency: str = "EGP"
+    date: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def to_dict(self) -> Dict:
         return {
             "_id": self.expense_id,
-            "payer_id": self.payer_id,
-            "amount": self.amount,
             "description": self.description,
+            "total_amount": self.total_amount,
+            "payer_id": self.payer_id,
             "group_id": self.group_id,
-            "involved_users": self.involved_users,
-            "timestamp": self.timestamp,
-            "currency": self.currency,
+            "splits": self.splits,
+            "date": self.date,
         }
 
     @classmethod
     def from_dict(cls, data: Dict):
         return cls(
             expense_id=data.get("_id"),
-            payer_id=data.get("payer_id"),
-            amount=data.get("amount"),
             description=data.get("description"),
+            total_amount=data.get("total_amount"),
+            payer_id=data.get("payer_id"),
             group_id=data.get("group_id"),
-            involved_users=data.get("involved_users", []),
-            timestamp=data.get("timestamp"),
-            currency=data.get("currency"),
+            splits=data.get("splits", []),
+            date=data.get("date"),
         )
