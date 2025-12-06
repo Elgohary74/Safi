@@ -11,7 +11,7 @@ class Config:
 
     # MongoDB Connection
     MONGODB_SETTINGS = {
-        "host": os.environ.get("MONGO_URI"),
+        "host": os.environ.get("MONGODB_URL"),
         "connect": False,  # We use connect=False to avoid connection issues with Gunicorn workers
     }
 
