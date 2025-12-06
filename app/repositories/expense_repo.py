@@ -11,6 +11,9 @@ class ExpenseRepository(IRepository):
         self.collection = self.db["expenses"]
 
     def add(self, expense: Expense) -> str:
+        self.logger.info(
+            f"recording expense: {expense.description} ({expense.total_amount})"
+        )
         self.collection.insert_one(expense.to_dict())
         return expense.expense_id
 
@@ -18,6 +21,7 @@ class ExpenseRepository(IRepository):
         return self.collection.find_one({"_id": expense_id})
 
     def get_all_by_group(self, group_id: str) -> List[dict]:
+        self.logger.debug(f"fetching all expenses for group {group_id}")
         cursor = self.collection.find({"group_id": group_id})
         return list(cursor)
 
