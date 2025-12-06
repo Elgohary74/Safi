@@ -1,7 +1,6 @@
 from typing import Optional
 
 from app.models.group import Group
-
 from .base import IRepository
 
 
@@ -18,7 +17,7 @@ class GroupRepository(IRepository):
         return self.collection.find_one({"_id": group_id})
 
     def get_by_invite_code(self, invite_code: str) -> Optional[dict]:
-        return self.collection.find_one({"invites": invite_code})
+        return self.collection.find_one({"working_invites": invite_code})
 
     def add_member(self, group_id: str, user_id: str):
         self.collection.update_one(

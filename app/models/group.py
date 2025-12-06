@@ -11,7 +11,7 @@ class Group:
     group_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     members: List[str] = field(default_factory=list)
     debts: List[dict] = field(default_factory=list)
-    invites: List[str] = field(default_factory=list)
+    working_invites: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict:
         return {
@@ -21,7 +21,7 @@ class Group:
             "admin_id": self.admin_id,
             "members": self.members,
             "debts": self.debts,
-            "invites": self.invites,
+            "working_invites": self.working_invites,
         }
 
     @classmethod
@@ -33,5 +33,5 @@ class Group:
             admin_id=data.get("admin_id"),
             members=data.get("members", []),
             debts=data.get("debts", []),
-            invites=data.get("invites", []),
+            working_invites=data.get("working_invites", []),
         )
