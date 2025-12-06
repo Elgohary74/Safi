@@ -1,7 +1,7 @@
 from flask import Flask
 
+from app.config import DevelopmentConfig
 from app.logging_config import configure_logging
-from config import DevelopmentConfig
 from .routes import auth_bp, groups_bp, users_bp
 
 
