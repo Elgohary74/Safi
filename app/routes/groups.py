@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 
 from app.controllers.GroupController import GroupController
 

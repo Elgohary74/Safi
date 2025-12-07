@@ -1,12 +1,13 @@
-from flask import Flask
 import os
+
+from flask import Flask
 
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
 from .routes.auth import auth_bp
-from .routes.groups import groups_bp
-from .routes.users import users_bp, dashboard_bp
 from .routes.expenses import expenses_bp
+from .routes.groups import groups_bp
+from .routes.users import dashboard_bp, users_bp
 
 
 def create_app(config_class=DevelopmentConfig):

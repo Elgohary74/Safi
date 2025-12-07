@@ -1,6 +1,5 @@
-from flask import Blueprint, render_template, g
+from flask import Blueprint, g, render_template
 from pymongo import MongoClient
-from bson.objectid import ObjectId
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")

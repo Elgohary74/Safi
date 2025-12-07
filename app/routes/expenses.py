@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template
-
+from flask import Blueprint
 
 expenses_bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 
