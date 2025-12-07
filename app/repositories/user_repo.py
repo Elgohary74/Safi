@@ -1,6 +1,7 @@
 from typing import Optional
 
 from app.models.user import User
+
 from .base import IRepository
 
 
