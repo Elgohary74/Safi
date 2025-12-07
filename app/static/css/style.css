@@ -472,3 +472,67 @@ body {
 .payment-radio:checked + div .check-icon {
     display: block;
 }
+.landing-bg-dark {
+    background-color: #111827;
+    position: relative;
+    overflow: hidden;
+}
+
+.landing-blob-dark {
+    position: absolute;
+    width: 45rem;
+    height: 45rem;
+    background-color: #00E6C3;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.1;
+    top: -15rem;
+    right: -10rem;
+    animation: float 15s infinite ease-in-out;
+    z-index: 0;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, 30px) scale(1.05); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+
+.btn-landing-login {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    background-color: #00E6C3;
+    color: #111827;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid #00E6C3;
+    box-shadow: 0 0 20px rgba(0, 230, 195, 0.2);
+    text-decoration: none;
+}
+
+.btn-landing-login:hover {
+    background-color: transparent;
+    color: #00E6C3;
+    box-shadow: 0 0 30px rgba(0, 230, 195, 0.4);
+    transform: translateY(-2px);
+}
+
+.link-landing-create {
+    color: #9CA3AF;
+    font-size: 0.875rem;
+    text-decoration: none;
+    margin-top: 1.5rem;
+    display: inline-block;
+    transition: color 0.2s;
+}
+
+.link-landing-create:hover {
+    color: white;
+    text-decoration: underline;
+}
