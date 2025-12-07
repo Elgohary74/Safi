@@ -1,8 +1,14 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
+
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@auth_bp.get("/")
-def list_users():
-    return {"message": "User authentication endpoint"}
+@auth_bp.route("/login")
+def login():
+    return render_template("auth_login.html")
+
+
+@auth_bp.route("/register")
+def register():
+    return render_template("auth_register.html")
