@@ -133,3 +133,20 @@ class GroupController:
                 return {"error": "User is not a member of this group"}, 404
         except InvalidId:
             return {"error": "Invalid group ID format"}, 400
+
+    def list_groups(self, user_id: str):
+        if not user_id:
+            return {"error": "Missing user_id"}, 400
+
+        groups_cursor = self.db.groups.find({"members": user_id})
+        groups = [
+            {
+                "group_id": group_data["_id"],
+                "group_name": group_data["group_name"],
+                "description": group_data["description"],
+                "admin_id": group_data["admin_id"],
+            }
+            for group_data in groups_cursor
+        ]
+
+        return {"groups": groups}, 200

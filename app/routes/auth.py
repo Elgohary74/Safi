@@ -11,3 +11,8 @@ def login():
 @auth_bp.route("/register")
 def register():
     return render_template("auth_register.html")
+
+
+@auth_bp.route("/logout")
+def logout():
+    pass

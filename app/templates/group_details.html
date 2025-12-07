@@ -4,51 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safi - Group Details</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+    <!-- Use url_for for static files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fa-solid fa-bolt fa-2xl" style="color: #00E6C3;"></i>
-                <h2 class="text-xl font-bold">Safi</h2>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-bolt fa-2xl" style="color: #00E6C3;"></i>
+            <h2 class="text-xl font-bold">Safi</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.index') }}" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="{{ url_for('groups.list_groups', user_id=current_user_id) }}" class="nav-link active"><i
+                    class="fas fa-users"></i> My Groups</a>
+            <a href="{{ url_for('dashboard.activity') }}" class="nav-link"><i class="fas fa-chart-line"></i>
+                Activity</a>
+            <a href="{{ url_for('dashboard.settings') }}" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+
+        <div class="user-profile">
+            <div class="w-8 h-8 rounded-full bg-gray-600"></div>
+            <div>
+                <p class="text-sm font-bold">{{ current_user.name if current_user else 'Mohamed' }}</p>
+                <a href="{{ url_for('auth.login') }}" class="text-xs text-gray-500 hover:text-white">Logout</a>
             </div>
-            
-            <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-                <a href="groups.html" class="nav-link active"><i class="fas fa-users"></i> My Groups</a>
-                <a href="activity.html" class="nav-link"><i class="fas fa-chart-line"></i> Activity</a>
-                <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-            </nav>
+        </div>
+    </aside>
 
-            <div class="user-profile">
-                <div class="w-8 h-8 rounded-full bg-gray-600"></div>
-                <div>
-                    <p class="text-sm font-bold">Mohamed</p>
-                    <a href="auth_login.html" class="text-xs text-gray-500 hover:text-white">Logout</a>
-                </div>
+    <main class="main-content">
+        <header class="page-header">
+            <div class="flex items-center gap-4">
+                <a href="{{ url_for('groups.list_groups', user_id=current_user_id) }}"
+                   class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h2 class="page-title">{{ group.group_name }}</h2>
             </div>
-        </aside>
+            <div class="flex gap-2">
+                <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
+                <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
+            </div>
+        </header>
 
-        <main class="main-content">
-            <header class="page-header">
-                <div class="flex items-center gap-4">
-                    <a href="groups.html" class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    <h2 class="page-title">Dahab Trip</h2>
-                </div>
-                <div class="flex gap-2">
-                    <button class="btn btn-white" >Add Expense</button>
-                    <button class="btn btn-accent" >Settle Up</button>
-                </div>
-            </header>
+        <div class="content-padding grid grid-cols-3 gap-8">
+            <div class="col-span-2 feed-list">
+                <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
-            <div class="content-padding grid grid-cols-3 gap-8">
-                <div class="col-span-2 feed-list">
-                    <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
-                    
-                    <!-- NOTE: Render expenses list dynamically from DB -->
+                <!-- Render expenses list dynamically from DB -->
+                {% if expenses %}
+                    {% for expense in expenses %}
+                        <div class="feed-item card">
+                            <div class="flex gap-4">
+                                <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
+                                    <p class="text-muted-sm">{{ expense.paid_by }} paid {{ expense.amount }} EGP</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-{% if expense.your_share < 0 %}status-danger{% else %}status-success{% endif %} text-base">
+                                    {{ '+' if expense.your_share > 0 else '' }}{{ expense.your_share }} EGP
+                                </p>
+                                <p class="text-xs text-gray-400">
+                                    You {{ 'lent' if expense.your_share > 0 else 'borrowed' }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Placeholder data -->
                     <div class="feed-item card">
                         <div class="flex gap-4">
                             <div class="feed-icon"><i class="fas fa-gas-pump"></i></div>
@@ -76,195 +104,241 @@
                             <p class="text-xs text-gray-400">You lent</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-span-1 flex flex-col gap-6">
-                    <div class="card">
-                        <p class="stat-label">Your Position</p>
-                        <h2 class="text-status-success text-3xl mb-4">+450 <span class="text-sm text-gray-400 font-normal">EGP</span></h2>
-                        <hr class="border-gray-100 my-4">
-                        <h4 class="font-bold text-sm mb-3">Members (7)</h4>
-                        
-                        <!-- NOTE: Render group members list dynamically -->
-                        <ul class="space-y-3 text-sm text-gray-600">
-                            <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="../static/assets/user.png" class="w-6 h-6 rounded-full object-cover">
-                                    <span>You</span>
-                                </div>
-                                <span class="text-green-500 font-bold">Gets 450</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="../static/assets/user.png" class="w-6 h-6 rounded-full object-cover">
-                                    <span>Omar</span>
-                                </div>
-                                <span class="text-red-500 font-bold">Owes 200</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="../static/assets/user.png" class="w-6 h-6 rounded-full object-cover">
-                                    <span>Ahmed</span>
-                                </div>
-                                <span class="text-red-500 font-bold">Owes 150</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="../static/assets/user.png" class="w-6 h-6 rounded-full object-cover">
-                                    <span>Sarah</span>
-                                </div>
-                                <span class="text-green-500 font-bold">Gets 100</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="../static/assets/user.png" class="w-6 h-6 rounded-full object-cover">
-                                    <span>Khaled</span>
-                                </div>
-                                <span class="text-gray-400 font-bold">Settled</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="../static/assets/user.png" class="w-6 h-6 rounded-full object-cover">
-                                    <span>Laila</span>
-                                </div>
-                                <span class="text-red-500 font-bold">Owes 50</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="../static/assets/user.png" class="w-6 h-6 rounded-full object-cover">
-                                    <span>Youssef</span>
-                                </div>
-                                <span class="text-green-500 font-bold">Gets 300</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                {% endif %}
             </div>
 
-            <!-- MODAL: ADD EXPENSE -->
-            <div id="expenseModal" class="modal-overlay">
-                <div class="modal-content">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="section-title">Add New Expense</h3>
-                        <button class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+            <div class="col-span-1 flex flex-col gap-6">
+                <div class="card">
+                    <p class="stat-label">Your Position</p>
+                    <h2 class="text-{% if your_balance >= 0 %}status-success{% else %}status-danger{% endif %} text-3xl mb-4">
+                        {{ '+' if your_balance >= 0 else '' }}{{ your_balance }} <span
+                            class="text-sm text-gray-400 font-normal">EGP</span>
+                    </h2>
+                    <hr class="border-gray-100 my-4">
+                    <h4 class="font-bold text-sm mb-3">Members ({{ group.members|length if group.members else 0 }})</h4>
+
+                    <!-- Render group members list dynamically -->
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        {% if members %}
+                            {% for member in members %}
+                                <li class="flex justify-between items-center">
+                                    <div class="flex items-center gap-2">
+                                        <img src="{{ url_for('static', filename='assets/' + (member.avatar if member.avatar else 'user.png')) }}"
+                                             class="w-6 h-6 rounded-full object-cover">
+                                        <span>{{ member.name }}</span>
+                                    </div>
+                                    <span class="{% if member.balance > 0 %}text-green-500{% elif member.balance < 0 %}text-red-500{% else %}text-gray-400{% endif %} font-bold">
+                                        {% if member.balance > 0 %}
+                                            Gets {{ member.balance }}
+                                        {% elif member.balance < 0 %}
+                                            Owes {{ member.balance|abs }}
+                                        {% else %}
+                                            Settled
+                                        {% endif %}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <!-- Display group members without balance info -->
+                            {% if group and group.members %}
+                                {% for member_id in group.members %}
+                                    <li class="flex justify-between items-center">
+                                        <div class="flex items-center gap-2">
+                                            <img src="{{ url_for('static', filename='assets/user.png') }}"
+                                                 class="w-6 h-6 rounded-full object-cover">
+                                            <span>{{ member_id }}</span>
+                                        </div>
+                                        <span class="text-gray-400 font-bold">Not calculated</span>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <!-- Fallback placeholder data -->
+                                <li class="flex justify-between items-center">
+                                    <div class="flex items-center gap-2">
+                                        <img src="{{ url_for('static', filename='assets/user.png') }}"
+                                             class="w-6 h-6 rounded-full object-cover">
+                                        <span>No members found</span>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: ADD EXPENSE -->
+        <div id="expenseModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="section-title">Add New Expense</h3>
+                    <button onclick="closeModal('expenseModal')" class="text-gray-400 hover:text-red-500"><i
+                            class="fas fa-times"></i></button>
+                </div>
+                <!-- Connect to backend endpoint -->
+                <form action="{{ url_for('expenses.create', group_id=group._id) if group else '#' }}"
+                      method="POST"
+                      class="space-y-4">
+                    <div>
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="auth-input" placeholder="e.g. Dinner, Taxi"
+                               required>
                     </div>
-                    <!-- NOTE: Connect to backend endpoint -->
-                    <form class="space-y-4">
-                        <div>
-                            <label class="form-label">Description</label>
-                            <input type="text" class="auth-input" placeholder="e.g. Dinner, Taxi">
-                        </div>
-                        <div>
-                            <label class="form-label">Amount</label>
-                            <input type="number" class="auth-input" placeholder="0.00 EGP">
-                        </div>
-                        <div>
-                            <label class="form-label">Paid By</label>
-                            <!-- NOTE: Populate members dynamically -->
-                            <select class="auth-input">
+                    <div>
+                        <label class="form-label">Amount</label>
+                        <input type="number" name="amount" step="0.01" class="auth-input" placeholder="0.00 EGP"
+                               required>
+                    </div>
+                    <div>
+                        <label class="form-label">Paid By</label>
+                        <!-- Populate members dynamically -->
+                        <select name="paid_by" class="auth-input" required>
+                            {% if group and group.members %}
+                                {% for member_id in group.members %}
+                                    <option value="{{ member_id }}">{{ member_id }}</option>
+                                {% endfor %}
+                            {% else %}
                                 <option>You</option>
                                 <option>Omar</option>
                                 <option>Ahmed</option>
                                 <option>Sarah</option>
-                                <option>Khaled</option>
-                                <option>Laila</option>
-                                <option>Youssef</option>
-                            </select>
-                        </div>
-                        <button type="button" class="btn-signin">Save Expense</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- MODAL: SETTLE UP -->
-            <div id="settleModal" class="modal-overlay">
-                <div class="modal-content" style="max-width: 500px;">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="section-title">Settle Up</h3>
-                        <button class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+                            {% endif %}
+                        </select>
                     </div>
-                    <!-- NOTE: Connect transaction logic to backend -->
-                    <form class="space-y-4">
-                        <div>
-                            <label class="form-label">Pay To</label>
-                            <select class="auth-input">
+                    <button type="submit" class="btn-signin">Save Expense</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: SETTLE UP -->
+        <div id="settleModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="section-title">Settle Up</h3>
+                    <button onclick="closeModal('settleModal')" class="text-gray-400 hover:text-red-500"><i
+                            class="fas fa-times"></i></button>
+                </div>
+                <!-- Connect transaction logic to backend -->
+                <form action="{{ url_for('settlements.create', group_id=group._id) if group else '#' }}" method="POST"
+                      class="space-y-4">
+                    <div>
+                        <label class="form-label">Pay To</label>
+                        <select name="pay_to" class="auth-input" required>
+                            {% if group and group.members %}
+                                {% for member_id in group.members %}
+                                    <option value="{{ member_id }}">{{ member_id }}</option>
+                                {% endfor %}
+                            {% else %}
                                 <option>Omar</option>
                                 <option>Ahmed</option>
                                 <option>Sarah</option>
                                 <option>Khaled</option>
-                                <option>Laila</option>
-                                <option>Youssef</option>
-                            </select>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Amount</label>
+                        <input type="number" name="amount" step="0.01" class="auth-input" placeholder="0.00 EGP"
+                               required>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Payment Method</label>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="payment_method" value="cash" class="payment-radio hidden"
+                                       checked>
+                                <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">Cash</p>
+                                    </div>
+                                    <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon"></i>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="payment_method" value="instapay" class="payment-radio hidden">
+                                <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">InstaPay</p>
+                                    </div>
+                                    <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="payment_method" value="mobile_wallet"
+                                       class="payment-radio hidden">
+                                <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                    <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">Mobile Wallet</p>
+                                    </div>
+                                    <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="payment_method" value="card" class="payment-radio hidden">
+                                <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                                        <img src="{{ url_for('static', filename='assets/payment.png') }}"
+                                             class="w-6 h-6 object-contain">
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800">Card</p>
+                                    </div>
+                                    <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
+                                </div>
+                            </label>
                         </div>
-                        
-                        <div>
-                            <label class="form-label">Amount</label>
-                            <input type="number" class="auth-input" placeholder="0.00 EGP">
-                        </div>
-                        
-                        <div>
-                            <label class="form-label">Payment Method</label>
-                            <div class="grid grid-cols-2 gap-3 mt-2">
-                                <label class="cursor-pointer relative">
-                                    <input type="radio" name="payment_method" class="payment-radio hidden" checked>
-                                    <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-800">Cash</p>
-                                        </div>
-                                        <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
-                                    </div>
-                                </label>
+                    </div>
 
-                                <label class="cursor-pointer relative">
-                                    <input type="radio" name="payment_method" class="payment-radio hidden">
-                                    <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                                            <i class="fas fa-university"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-800">InstaPay</p>
-                                        </div>
-                                        <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
-                                    </div>
-                                </label>
-
-                                <label class="cursor-pointer relative">
-                                    <input type="radio" name="payment_method" class="payment-radio hidden">
-                                    <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
-                                            <i class="fas fa-mobile-alt"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-800">Mobile Wallet</p>
-                                        </div>
-                                        <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
-                                    </div>
-                                </label>
-
-                                <label class="cursor-pointer relative">
-                                    <input type="radio" name="payment_method" class="payment-radio hidden">
-                                    <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                                            <img src="../static/assets/payment.png" class="w-6 h-6 object-contain">
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-800">Card</p>
-                                        </div>
-                                        <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <button type="button" class="btn-signin bg-green-600 border-green-600 hover:text-green-600">Confirm Payment</button>
-                    </form>
-                </div>
+                    <button type="submit" class="btn-signin bg-green-600 border-green-600 hover:text-green-600">Confirm
+                        Payment
+                    </button>
+                </form>
             </div>
+        </div>
 
-        </main>
-    </div>
+    </main>
+</div>
+
+<!-- JavaScript for modal functionality -->
+<script>
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function (event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
+        }
+    }
+
+    // Handle payment method radio selection
+    document.querySelectorAll('.payment-radio').forEach(radio => {
+        radio.addEventListener('change', function () {
+            document.querySelectorAll('.check-icon').forEach(icon => icon.classList.add('hidden'));
+            if (this.checked) {
+                this.parentElement.querySelector('.check-icon').classList.remove('hidden');
+            }
+        });
+    });
+</script>
 </body>
 </html>
