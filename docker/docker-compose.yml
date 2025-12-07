@@ -14,7 +14,7 @@ services:
     environment:
       - FLASK_APP=run.py
       - FLASK_DEBUG=1
-      - MONGO_URI=mongodb://${ROOT_USERNAME}:${ROOT_PASSWORD}@mongo:27017/safi_db?authSource=admin
+      - MONGODB_URL=mongodb://${MONGODB_ROOT_USERNAME}:${MONGODB_ROOT_PASSWORD}@mongo:27017/safi_db?authSource=admin
     volumes:
       - ..:/app
     depends_on:
@@ -32,7 +32,7 @@ services:
       - ..:/app
     environment:
       - FLASK_DEBUG=1
-      - MONGO_URI=mongodb://${ROOT_USERNAME}:${ROOT_PASSWORD}@mongo:27017/safi_test_db?authSource=admin
+      - MONGODB_URL=mongodb://${MONGODB_ROOT_USERNAME}:${MONGODB_ROOT_PASSWORD}@mongo:27017/safi_test_db?authSource=admin
     depends_on:
       - mongo
     networks:
@@ -40,14 +40,14 @@ services:
 
   mongo:
     image: mongo:7
-    container_name: safi_mongo
+    container_name: safi_db
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
     networks:
       - backend
     restart: always

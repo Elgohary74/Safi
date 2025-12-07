@@ -23,15 +23,15 @@ class MongoDatabase:
                 logger.info("attempting to connect to MongoDB")
                 mongo_url = os.getenv("MONGODB_URL")
 
-                root_user = os.environ.get("ROOT_USERNAME")
-                root_pass = os.environ.get("ROOT_PASSWORD")
-                db_name = os.environ.get("MONGODB_DATABASE", "safi_mongo")
+                root_user = os.environ.get("MONGODB_ROOT_USERNAME")
+                root_pass = os.environ.get("MONGODB_ROOT_PASSWORD")
+                db_name = os.environ.get("MONGODB_DATABASE", "safi_db")
 
                 if root_user and root_pass and (not mongo_url or "@" not in mongo_url):
                     mongo_url = f"mongodb://{root_user}:{root_pass}@localhost:27017/{db_name}?authSource=admin"
                     logger.info("Using constructed authenticated connection string")
                 elif not mongo_url:
-                    mongo_url = "mongodb://localhost:27017/safi_mongo"
+                    mongo_url = "mongodb://localhost:27017/safi_db"
                     logger.warning("Using default unauthenticated connection string")
 
                 parsed = urlparse(mongo_url)
