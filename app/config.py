@@ -9,6 +9,8 @@ load_dotenv()
 class Config:
     """Base configuration."""
 
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+
     # MongoDB Connection
     MONGODB_SETTINGS = {
         "host": os.environ.get("MONGO_URI"),

@@ -1,8 +1,13 @@
 from flask import Flask
+from flask_login import LoginManager
+
+from app.controllers.auth_controller import auth_bp
+from app.repositories.user_repo import UserRepository
 
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
-from .routes.auth import auth_bp
+
+# from .routes.auth import auth_bp
 from .routes.groups import groups_bp
 from .routes.users import users_bp
 
@@ -11,10 +16,20 @@ def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+
+    # This function is used by Flask-Login to reload the user object
+    # from the user ID stored in the session
+    @login_manager.user_loader
+    def load_user(user_id):
+        repo = UserRepository()
+        return repo.get_by_id(user_id)
+
     # register blueprints
     app.register_blueprint(users_bp)
     app.register_blueprint(groups_bp)
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix="/auth")
 
     configure_logging(app)
     app.logger.info("Starting up the application...")
