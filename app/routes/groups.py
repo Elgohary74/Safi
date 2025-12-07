@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-
 from app.controllers.GroupController import GroupController
 
 groups_bp = Blueprint("groups", __name__, url_prefix="/groups")
