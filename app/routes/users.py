@@ -1,43 +1,51 @@
-from flask import Blueprint, g, render_template
+from flask import Blueprint, g, render_template, jsonify, request
+
+from app.models.user import User
+from app.repositories.user_repo import UserRepository
+
 from pymongo import MongoClient
 
 users_bp = Blueprint("users", __name__, url_prefix="/users")
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 
-@users_bp.get("/")
-def list_users():
-    return {"message": "list all users"}
+@users_bp.post("/")
+def add_user():
+    data = request.get_json()
+
+    new_user = User(
+        name=data.get("name"),
+        email=data.get("email"),
+        password_hash=data.get("password_hash"),
+        phone_number=data.get("phone_number"),
+    )
+
+    user_repository = UserRepository()
+    user_id = user_repository.add(new_user)
+
+    return jsonify({"id": str(user_id)}), 201
 
 
 @dashboard_bp.route("/")
 def index():
-    # Get the current user ID (adjust based on your authentication system)
     user_id = g.current_user["_id"] if hasattr(g, "current_user") else None
 
-    # Initialize empty variables for the dashboard stats
     net_balance = 0
     amount_owed = 0
     amount_owing = 0
 
-    # Fetch groups from MongoDB where the current user is a member
     groups = []
     if user_id:
-        # Connect to MongoDB (adjust based on your app's configuration)
         client = MongoClient("mongodb://localhost:27017/")
         db = client.your_database_name
 
-        # Find all groups where the user is a member
         groups_cursor = db.groups.find({"members": user_id})
 
         for group in groups_cursor:
-            # Calculate the user's balance for this group
-            # This is just an example, you'll need to adapt based on your data model
             user_balance = 0
             if "balances" in group and user_id in group["balances"]:
                 user_balance = group["balances"][user_id]
 
-            # Format the group data for the template
             groups.append(
                 {
                     "id": str(group["_id"]),
