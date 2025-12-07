@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     model_config = {
         "env_file": os.path.join(os.path.dirname(__file__), "../.env"),
         "env_file_encoding": "utf-8",
-        "extra": "ignore"
+        "extra": "ignore",
     }
 
 
