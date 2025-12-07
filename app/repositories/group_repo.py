@@ -20,7 +20,7 @@ class GroupRepository(IRepository):
 
     def get_by_invite_code(self, invite_code: str) -> Optional[dict]:
         self.logger.debug(f"searching group by invite code: {invite_code}")
-        return self.collection.find_one({"invites": invite_code})
+        return self.collection.find_one({"working_invites": invite_code})
 
     def add_member(self, group_id: str, user_id: str):
         self.logger.info(f"adding user {user_id} to group {group_id}")

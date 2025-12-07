@@ -10,8 +10,10 @@ class Settings(BaseSettings):
     APP_NAME: str
     APP_VERSION: str
 
-    MONGODB_URI: str
+    MONGODB_URL: str
     MONGODB_DATABASE: str
+    MONGODB_ROOT_USERNAME: str
+    MONGODB_ROOT_PASSWORD: str
 
     INVITE_CODE_LENGTH: int
 

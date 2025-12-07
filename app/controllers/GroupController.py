@@ -11,7 +11,15 @@ from app.services.database import MongoDatabase
 
 class GroupController:
     def __init__(self):
-        self.db = MongoDatabase().get_db()
+        self._db_instance = MongoDatabase()
+        self._db = None
+
+    @property
+    def db(self):
+        """Lazy initialization of database connection"""
+        if self._db is None:
+            self._db = self._db_instance.get_db()
+        return self._db
 
     @classmethod
     def generate_invite_code(cls) -> str:
