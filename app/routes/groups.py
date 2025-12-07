@@ -143,7 +143,7 @@ def remove_member(group_id, user_id):
         requestor_id = request.json.get("requestor_id")
 
         if not requestor_id or (
-                requestor_id != group.admin_id and requestor_id != user_id
+            requestor_id != group.admin_id and requestor_id != user_id
         ):
             return jsonify({"error": "Unauthorized to remove this member"}), 403
 
