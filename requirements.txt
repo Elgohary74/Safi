@@ -24,6 +24,7 @@ platformdirs==4.5.1
 pluggy==1.6.0
 pre_commit==4.5.0
 pycodestyle==2.14.0
+pydantic==2.12.5
 pyflakes==3.4.0
 Pygments==2.19.2
 pymongo==4.6.3
