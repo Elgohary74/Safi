@@ -3,14 +3,15 @@ import os
 from flask import Flask
 from flask_login import LoginManager
 
-from app.controllers.auth_controller import auth_bp
 from app.repositories.user_repo import UserRepository
 
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
+from .routes.auth import auth_bp
+from .routes.dashboard import dashboard_bp
 from .routes.expenses import expenses_bp
 from .routes.groups import groups_bp
-from .routes.users import dashboard_bp, users_bp
+from .routes.users import users_bp
 
 
 def create_app(config_class=DevelopmentConfig):

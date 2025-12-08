@@ -42,21 +42,25 @@
             {% endwith %}
 
             <!-- Form submits to Flask login route -->
-            <form action="{{ url_for('auth.login') }}" method="POST" class="space-y-5">
+            <form action="{{ url_for('auth.login') }}" method="POST" class="space-y-4">
                 <div>
                     <label class="form-label">Email</label>
                     <input type="email" name="email" class="auth-input" placeholder="name@example.com" required>
                 </div>
                 <div>
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="auth-input" placeholder="••••••••" required>
+                    <input type="password" name="password" class="auth-input" placeholder="Enter your password"
+                           required>
                 </div>
-                <button type="submit" class="btn-signin">Sign in</button>
-            </form>
 
-            <p class="text-center text-gray-500 text-sm mt-6">
-                Don't have an account? <a href="{{ url_for('auth.register') }}" class="link-teal">Sign up</a>
-            </p>
+                <div class="pt-2">
+                    <button type="submit" class="btn-signin">Login</button>
+                </div>
+
+                <p class="text-center text-gray-500 text-sm mt-6">
+                    Don't have an account? <a href="{{ url_for('auth.register') }}" class="link-teal">Sign up</a>
+                </p>
+            </form>
         </div>
     </div>
 </div>

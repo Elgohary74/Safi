@@ -19,8 +19,9 @@
 
         <nav class="sidebar-nav">
             <a href="{{ url_for('dashboard.index') }}" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="{{ url_for('groups.list_groups', user_id="new_admin123") }}" class="nav-link"><i
+            <a href="{{ url_for('groups.list_groups', user_id=current_user.user_id) }}" class="nav-link"><i
                     class="fas fa-users"></i> My Groups</a>
+
             <a href="{{ url_for('dashboard.activity') }}" class="nav-link"><i class="fas fa-chart-line"></i>
                 Activity</a>
             <a href="{{ url_for('dashboard.settings') }}" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
@@ -31,9 +32,15 @@
             <div class="w-8 h-8 rounded-full bg-gray-600"></div>
             <div>
                 <p class="text-sm font-bold">{{ current_user.name if current_user else 'Guest' }}</p>
-                <a href="{{ url_for('auth.login') }}" class="text-xs text-gray-500 hover:text-white">Logout</a>
+                <form action="{{ url_for('auth.logout') }}" method="POST" class="inline">
+                    <button type="submit"
+                            class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
+                        Logout
+                    </button>
+                </form>
             </div>
         </div>
+
     </aside>
 
     <!-- Main Content -->
@@ -67,7 +74,7 @@
             <div class="data-table-container">
                 <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
                     <h3 class="font-bold text-gray-800">Active Groups</h3>
-                    <a href="{{ url_for('groups.list_groups', user_id="new_admin123") }}"
+                    <a href="{{ url_for('groups.list_groups', user_id=current_user.user_id) }}"
                        class="text-xs font-bold text-brand-blue hover:underline">View
                         All</a>
                 </div>
