@@ -62,31 +62,6 @@ def get_group_details(group_id):
     return redirect(url_for("groups.list_groups", user_id=current_user.user_id))
 
 
-@groups_bp.post("/<string:group_id>/invite")
-def generate_new_invite(group_id):
-    user_id = request.json.get("user_id")
-    result, status_code = group_controller.generate_new_invite(group_id, user_id)
-    return jsonify(result), status_code
-
-
-@groups_bp.post("/join")
-def join_group():
-    data = request.get_json()
-    invite_code = data.get("invite_code")
-    user_id = data.get("user_id")
-    result, status_code = group_controller.join_group(invite_code, user_id)
-    return jsonify(result), status_code
-
-
-@groups_bp.delete("/<string:group_id>/members/<string:user_id>")
-def remove_member(group_id, user_id):
-    requestor_id = request.json.get("requestor_id")
-    result, status_code = group_controller.remove_member(
-        group_id, user_id, requestor_id
-    )
-    return jsonify(result), status_code
-
-
 @groups_bp.get("/list")
 @login_required
 def list_groups():
