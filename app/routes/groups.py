@@ -1,36 +1,44 @@
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 
 from app.controllers.GroupController import GroupController
+from app.models import GroupCreationRequest
 
 groups_bp = Blueprint("groups", __name__, url_prefix="/groups")
 group_controller = GroupController()
 
 
 @groups_bp.route("/create", methods=["POST"])
+@login_required
 def create_group():
     if request.form:
-        data = {
-            "group_name": request.form.get("group_name"),
-            "description": request.form.get("description"),
-            "admin_id": request.args.get("admin_id"),
-        }
-        result, status_code = group_controller.create_group(data)
+        group_request = GroupCreationRequest(
+            group_name=request.form.get("group_name"),
+            description=request.form.get("description"),
+        )
+        result, status_code = group_controller.create_group(
+            group_request, current_user.user_id
+        )
 
         if status_code == 201:
             flash("Group created successfully!", "success")
         else:
             flash(result.get("error", "Failed to create group"), "error")
 
-        return redirect(url_for("groups.list_groups", user_id=data["admin_id"]))
+        return redirect(url_for("groups.list_groups", user_id=current_user.user_id))
 
     data = request.get_json()
-    result, status_code = group_controller.create_group(data)
+    group_request = GroupCreationRequest(
+        group_name=data.get("group_name"), description=data.get("description")
+    )
+    result, status_code = group_controller.create_group(
+        group_request, current_user.user_id
+    )
     return jsonify(result), status_code
 
 
 @groups_bp.get("/<string:group_id>/details")
 def get_group_details(group_id):
-    user_id = request.args.get("user_id")
     result, status_code = group_controller.get_group_details(group_id)
 
     if status_code == 200:
@@ -46,12 +54,12 @@ def get_group_details(group_id):
             expenses=expenses,
             members=members,
             your_balance=your_balance,
-            current_user_id=user_id,
+            current_user_id=current_user.user_id,
         )
 
     # If there's an error, flash it and redirect to groups list
     flash(result.get("error", "Group not found"), "error")
-    return redirect(url_for("groups.list_groups", user_id=user_id))
+    return redirect(url_for("groups.list_groups", user_id=current_user.user_id))
 
 
 @groups_bp.post("/<string:group_id>/invite")
@@ -80,16 +88,16 @@ def remove_member(group_id, user_id):
 
 
 @groups_bp.get("/list")
+@login_required
 def list_groups():
-    user_id = request.args.get("user_id")
-    result, status_code = group_controller.list_groups(user_id)
+    result, status_code = group_controller.list_groups(current_user.user_id)
 
     if status_code == 200:
         return render_template(
             "groups.html",
-            user_id=user_id,
+            user_id=current_user.user_id,
             groups=result.get("groups", []),
-            current_user_id=user_id,
+            current_user_id=current_user.user_id,
         )
 
     return jsonify(result), status_code

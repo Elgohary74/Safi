@@ -1,11 +1,11 @@
 import random
 import string
-from typing import Any, Dict
 
 from bson.errors import InvalidId
 
 from app.config import get_settings
-from app.models.group import Group
+from app.models.group import Group, GroupCreationRequest
+from app.services import GroupService
 from app.services.database import MongoDatabase
 
 
@@ -13,6 +13,7 @@ class GroupController:
     def __init__(self):
         self._db_instance = MongoDatabase()
         self._db = None
+        self.group_service = GroupService()
 
     @property
     def db(self):
@@ -28,44 +29,74 @@ class GroupController:
         characters = string.ascii_letters + string.digits
         return "".join(random.choice(characters) for _ in range(length))
 
-    def create_group(self, data: Dict[str, Any]):
-        required_fields = ["group_name", "description", "admin_id"]
-        for field in required_fields:
-            if field not in data:
-                return {"error": f"Missing required field: {field}"}, 400
+    def create_group(
+        self, group_request: GroupCreationRequest, first_member_id: str
+    ) -> tuple[dict, int]:
+        """
+        Create a new group with the specified name and add the first member.
 
-        # Check if admin already has a group with the same name
-        existing_group = self.db.groups.find_one(
-            {"group_name": data["group_name"], "admin_id": data["admin_id"]}
-        )
-        if existing_group:
+        This method validates that the first member (typically the admin) does not already
+        have a group with the same name, creates a new group, and persists it to storage.
+
+        Args:
+            group_request (GroupCreationRequest): An object containing the group details
+                including the group name and other configuration.
+            first_member_id (str): The user ID of the first member (admin) of the group.
+
+        Returns:
+            tuple: A tuple containing:
+                - dict: A response object with:
+                    - On success (201): Contains 'message', 'group' (model dump), and 'group_id'
+                    - On failure (400): Contains an 'error' message
+                - int: HTTP status code (201 for success, 400 for failure)
+
+        Raises:
+            None explicitly, but may return 400 error if:
+                - A group with the same name already exists for the first member
+                - Group creation or persistence fails
+        """
+        # Check for existing group with the same name for the first member
+        if self.group_service.is_user_first_member_of_group_with_name(
+            first_member_id, group_request.group_name
+        ):
             return {"error": "Group with this name already exists for the admin"}, 400
 
         # Create new group
-        group = Group(
-            group_name=data["group_name"],
-            description=data["description"],
-            admin_id=data["admin_id"],
+        new_group = self.group_service.create_new_group(
+            group_request, first_member_id=first_member_id
         )
-        group.members.append(data["admin_id"])
-        self.db.groups.insert_one(group.to_dict())
+        group_id = self.group_service.save_new_group(new_group)
+
+        if not group_id:
+            return {"error": "Failed to create group"}, 400
 
         return {
             "message": "Group created successfully",
-            "group": group.to_dict(),
-            "group_id": group.group_id,
+            "group": new_group.model_dump(),
+            "group_id": group_id,
         }, 201
 
     def get_group_details(self, group_id: str):
-        try:
-            group_data = self.db.groups.find_one({"_id": group_id})
-            if not group_data:
-                return {"error": "Group not found"}, 404
+        """
+        Retrieve the details of a specific group by its ID.
 
-            group = Group.from_dict(group_data)
-            return {"group": group.to_dict()}, 200
-        except InvalidId:
-            return {"error": "Invalid group ID format"}, 400
+        This method fetches the group information from the group service. If the group
+        is not found, it returns an error response with a 404 status code. Otherwise,
+        it returns the group's details in a dictionary format with a 200 status code.
+
+        Args:
+            group_id (str): The unique identifier of the group to retrieve.
+
+        Returns:
+            tuple: A tuple containing a dictionary with either the group details or an
+                   error message, and an HTTP status code (200 for success, 404 for not found).
+                   - On success: ({"group": group_data}, 200)
+                   - On failure: ({"error": "Group not found"}, 404)
+        """
+        group = self.group_service.get_group(group_id)
+        if not group:
+            return {"error": "Group not found"}, 404
+        return {"group": group.model_dump()}, 200
 
     def generate_new_invite(self, group_id: str, user_id: str):
         try:
@@ -135,18 +166,20 @@ class GroupController:
             return {"error": "Invalid group ID format"}, 400
 
     def list_groups(self, user_id: str):
-        if not user_id:
-            return {"error": "Missing user_id"}, 400
+        """
+        Retrieve and return a list of groups associated with a specific user.
 
-        groups_cursor = self.db.groups.find({"members": user_id})
-        groups = [
-            {
-                "group_id": group_data["_id"],
-                "group_name": group_data["group_name"],
-                "description": group_data["description"],
-                "admin_id": group_data["admin_id"],
-            }
-            for group_data in groups_cursor
-        ]
+        This method fetches the groups for the given user ID from the group service,
+        serializes each group to a dictionary using model_dump(), and returns them
+        in a JSON-compatible response format with a 200 status code.
 
+        Args:
+            user_id (str): The unique identifier of the user whose groups are to be retrieved.
+
+        Returns:
+            tuple: A tuple containing a dictionary with the key "groups" mapping to a list
+                   of group dictionaries, and an HTTP status code of 200.
+        """
+        groups = self.group_service.get_user_groups(user_id)
+        groups = [group.model_dump() for group in groups]
         return {"groups": groups}, 200
