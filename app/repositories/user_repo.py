@@ -15,19 +15,21 @@ class UserRepository(IRepository):
         self.collection.insert_one(user.model_dump(by_alias=True))
         return user.user_id
 
-    def get_by_id(self, user_id: str) -> Optional[dict]:
+    def get_by_id(self, user_id: str) -> Optional[User]:
         self.logger.debug(f"fetching user id: {user_id}")
         data = self.collection.find_one({"_id": user_id})
         return User(**data) if data else None
 
-    def get_by_email(self, email: str) -> Optional[dict]:
+    def get_by_email(self, email: str) -> Optional[User]:
         self.logger.debug(f" get user by email: {email}")
         data = self.collection.find_one({"email": email})
         return User(**data) if data else None
 
-    def update(self, user_id: str, data: dict):
+    def update(self, user_id: str, data: User):
         self.logger.info(f"updating user {user_id}")
-        self.collection.update_one({"_id": user_id}, {"$set": data})
+        self.collection.update_one(
+            {"_id": user_id}, {"$set": data.model_dump(by_alias=True)}
+        )
 
     def delete(self, user_id: str):
         self.logger.warning(f"deleting user {user_id}")

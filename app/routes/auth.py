@@ -3,7 +3,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from pydantic import ValidationError
 
 from app.models.user import UserLogin, UserRegister
-from app.services.auth_service import AuthService
+from app.services import AuthService
 
 auth_bp = Blueprint("auth", __name__)
 auth_service = AuthService()

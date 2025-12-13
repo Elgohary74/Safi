@@ -3,7 +3,7 @@ from typing import Optional
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.user import User, UserRegister
-from app.repositories.user_repo import UserRepository
+from app.repositories import UserRepository
 
 
 class AuthService:
@@ -27,7 +27,7 @@ class AuthService:
         return new_user
 
     def authenticate_user(self, email: str, password: str) -> Optional[User]:
-        user = self.user_repo.get_by_email(email)
+        user: User = self.user_repo.get_by_email(email)
         if not user:
             return None
 
