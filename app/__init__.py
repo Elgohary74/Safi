@@ -12,6 +12,7 @@ from .routes.dashboard import dashboard_bp
 from .routes.expenses import expenses_bp
 from .routes.groups import groups_bp
 from .routes.users import users_bp
+from .routes.view import view_bp
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -35,6 +36,7 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(expenses_bp)
+    app.register_blueprint(view_bp)
 
     configure_logging(app)
     app.logger.info("Starting up the application...")

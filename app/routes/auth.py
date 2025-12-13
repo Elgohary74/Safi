@@ -1,19 +1,16 @@
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
-from flask_login import current_user, login_required, login_user, logout_user
+from flask_login import current_user, login_required, login_user
 from pydantic import ValidationError
 
+from app.controllers import AuthController
 from app.models.user import UserLogin, UserRegister
-from app.services import AuthService
 
 auth_bp = Blueprint("auth", __name__)
-auth_service = AuthService()
+auth_controller = AuthController()
 
 
-@auth_bp.route("/register", methods=["POST", "GET"])
+@auth_bp.route("/register", methods=["POST"])
 def register():
-    if request.method == "GET":
-        return render_template("auth_register.html")
-
     is_json_request = request.is_json
     try:
         if is_json_request:
@@ -26,7 +23,7 @@ def register():
                 phone_number=request.form.get("phone", None),
             )
 
-        user = auth_service.register_user(data)
+        user = auth_controller.register_user(data)
 
         if is_json_request:
             return jsonify({"message": "User created", "user_id": user.user_id}), 201
@@ -49,11 +46,8 @@ def register():
             return render_template("auth_register.html")
 
 
-@auth_bp.route("/login", methods=["POST", "GET"])
+@auth_bp.route("/login", methods=["POST"])
 def login():
-    if request.method == "GET":
-        return render_template("auth_login.html")
-
     is_json_request = request.is_json
 
     try:
@@ -65,7 +59,7 @@ def login():
             email = request.form.get("email")
             password = request.form.get("password")
 
-        user = auth_service.authenticate_user(email, password)
+        user = auth_controller.login_user(email, password)
 
         if user:
             login_user(user)
@@ -93,7 +87,7 @@ def login():
 @auth_bp.route("/logout", methods=["POST"])
 @login_required
 def logout():
-    logout_user()
+    auth_controller.logout_user()
     return jsonify({"message": "Logged out"}), 200
 
 
