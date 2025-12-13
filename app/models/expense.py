@@ -4,7 +4,9 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from app.models import Group, SharedExpense, SharedExpenseSchema, User
+from app.models.group import Group
+from app.models.shared_expense import SharedExpense, SharedExpenseSchema
+from app.models.user import User
 
 
 class ExpenseBase(BaseModel):
