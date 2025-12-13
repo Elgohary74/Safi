@@ -4,6 +4,7 @@ from flask import Flask
 from flask_login import LoginManager
 
 from app.repositories.user_repo import UserRepository
+from app.utils import register_error_handlers
 
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
@@ -19,6 +20,9 @@ def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.secret_key = os.urandom(24)
     app.config.from_object(config_class)
+
+    configure_logging(app)
+    register_error_handlers(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -38,7 +42,6 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(expenses_bp)
     app.register_blueprint(view_bp)
 
-    configure_logging(app)
     app.logger.info("Starting up the application...")
 
     return app
