@@ -30,7 +30,7 @@ class AuthService:
     def authenticate_user(self, email: str, password: str) -> Optional[User]:
         user: User = self.user_repo.get_by_email(email)
         if not user:
-            return AuthenticationError("Invalid email or password")
+            raise AuthenticationError("Invalid email or password")
 
         if check_password_hash(user.password_hash, password):
             return user
