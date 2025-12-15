@@ -34,3 +34,10 @@ class ResourceAlreadyExists(AppError):
 class AuthenticationError(AppError):
     def __init__(self, message="Authentication failed", status_code=401, payload=None):
         super().__init__(message, status_code, payload)
+
+
+class CreationError(AppError):
+    def __init__(
+        self, message="Failed to create resource", status_code=400, payload=None
+    ):
+        super().__init__(message, status_code, payload)

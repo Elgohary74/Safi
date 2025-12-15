@@ -1,4 +1,4 @@
-from .AuthController import AuthController
-from .GroupController import GroupController
+from app.controllers.auth_controller import AuthController
+from app.controllers.group_controller import GroupController
 
-__all__ = ["GroupController", "AuthController"]
+__all__ = ["AuthController", "GroupController"]

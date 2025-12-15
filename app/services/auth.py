@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.user import User, UserRegister
 from app.repositories import UserRepository
+from app.utils.exceptions import AuthenticationError
 
 
 class AuthService:
@@ -12,7 +13,7 @@ class AuthService:
 
     def register_user(self, data: UserRegister) -> User:
         if self.user_repo.get_by_email(data.email):
-            raise ValueError("User with this email already exists")
+            raise AuthenticationError("User with this email already exists")
 
         hashed_pw = generate_password_hash(data.password)
 
@@ -29,7 +30,7 @@ class AuthService:
     def authenticate_user(self, email: str, password: str) -> Optional[User]:
         user: User = self.user_repo.get_by_email(email)
         if not user:
-            return None
+            return AuthenticationError("Invalid email or password")
 
         if check_password_hash(user.password_hash, password):
             return user

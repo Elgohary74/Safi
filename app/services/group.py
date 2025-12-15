@@ -2,6 +2,7 @@ from typing import Optional
 
 from app.models import Group, GroupCreationRequest, GroupSchema
 from app.repositories import GroupRepository, UserRepository
+from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceNotFound
 
 
 class GroupService:
@@ -80,6 +81,14 @@ class GroupService:
             Exception: If the user with the given first_member_id does not exist in
                 the repository.
         """
+
+        if self.is_user_first_member_of_group_with_name(
+            first_member_id, request.group_name
+        ):
+            raise ResourceAlreadyExists(
+                message="Group with this name already exists for the admin"
+            )
+
         first_member = self.user_repo.get_by_id(first_member_id)
         new_group = Group(
             group_name=request.group_name,
@@ -105,7 +114,10 @@ class GroupService:
             str: The identifier of the newly saved group.
         """
         group_schema = self._convert_group_to_schema(new_group)
-        return self.group_repo.add(group_schema)
+        group_id = self.group_repo.add(group_schema)
+        if not group_id:
+            raise CreationError(message="Failed to create group")
+        return group_id
 
     def get_user_groups(self, user_id: str) -> list[Group]:
         """
@@ -180,6 +192,6 @@ class GroupService:
     def get_group(self, group_id):
         group_data = self.group_repo.get_by_id(group_id)
         if not group_data:
-            return None
+            raise ResourceNotFound(message="Group not found")
         group = self._convert_schema_to_group(group_data)
         return group

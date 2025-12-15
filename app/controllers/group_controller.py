@@ -1,14 +1,20 @@
+from flask import flash, redirect, render_template, request, url_for
+from flask_classful import route
+
+from app.controllers.base_controller import BaseController
 from app.models.group import GroupCreationRequest
 from app.services import GroupService
 
 
-class GroupController:
+class GroupController(BaseController):
+    route_prefix = "/groups"
+
     def __init__(self):
+        super().__init__()
         self.group_service = GroupService()
 
-    def create_group(
-        self, group_request: GroupCreationRequest, first_member_id: str
-    ) -> tuple[dict, int]:
+    @route("/create", methods=["POST"])
+    def create_group(self):
         """
         Create a new group with the specified name and add the first member.
 
@@ -32,27 +38,19 @@ class GroupController:
                 - A group with the same name already exists for the first member
                 - Group creation or persistence fails
         """
-        # Check for existing group with the same name for the first member
-        if self.group_service.is_user_first_member_of_group_with_name(
-            first_member_id, group_request.group_name
-        ):
-            return {"error": "Group with this name already exists for the admin"}, 400
-
-        # Create new group
+        group_request = GroupCreationRequest(**request.form.to_dict())
         new_group = self.group_service.create_new_group(
-            group_request, first_member_id=first_member_id
+            group_request, first_member_id=self.current_user.user_id
         )
-        group_id = self.group_service.save_new_group(new_group)
+        self.group_service.save_new_group(new_group)
 
-        if not group_id:
-            return {"error": "Failed to create group"}, 400
+        flash("Group created successfully!", "success")
 
-        return {
-            "message": "Group created successfully",
-            "group": new_group.model_dump(),
-            "group_id": group_id,
-        }, 201
+        return redirect(
+            url_for("GroupController:list_groups", user_id=self.current_user.user_id)
+        )
 
+    @route("/<string:group_id>/details", methods=["GET"])
     def get_group_details(self, group_id: str):
         """
         Retrieve the details of a specific group by its ID.
@@ -71,10 +69,16 @@ class GroupController:
                    - On failure: ({"error": "Group not found"}, 404)
         """
         group = self.group_service.get_group(group_id)
-        if not group:
-            return {"error": "Group not found"}, 404
-        return {"group": group.model_dump()}, 200
+        return render_template(
+            "group_details.html",
+            group=group.model_dump(),
+            expenses=[],
+            members=[],
+            your_balance=450,
+            current_user_id=self.current_user.user_id,
+        )
 
+    @route("/list/<user_id>", methods=["GET"])
     def list_groups(self, user_id: str):
         """
         Retrieve and return a list of groups associated with a specific user.
@@ -92,4 +96,9 @@ class GroupController:
         """
         groups = self.group_service.get_user_groups(user_id)
         groups = [group.model_dump() for group in groups]
-        return {"groups": groups}, 200
+        return render_template(
+            "groups.html",
+            user_id=self.current_user.user_id,
+            groups=groups,
+            current_user_id=self.current_user.user_id,
+        )
