@@ -41,7 +41,7 @@ class AuthController(IController):
         return redirect(url_for("view.login_view"))
 
     @route("/login", methods=["POST"])
-    def login_user(self):
+    def handle_login(self):
         """
         Authenticate a user with the provided email and password.
 
