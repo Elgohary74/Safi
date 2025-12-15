@@ -66,7 +66,7 @@ class AuthController(IController):
         return redirect(url_for("dashboard.index"))
 
     @route("/logout", methods=["POST"])
-    def logout_user(self):
+    def handle_logout(self):
         """
         Log out the specified user.
 
