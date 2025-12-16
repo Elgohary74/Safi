@@ -19,7 +19,8 @@
 
         <nav class="sidebar-nav">
             <a href="{{ url_for('dashboard.index') }}" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="{{ url_for('GroupController:list_groups', user_id=current_user.user_id) }}" class="nav-link active"><i
+            <a href="{{ url_for('GroupController:list_groups') }}"
+               class="nav-link active"><i
                     class="fas fa-users"></i> My Groups</a>
             <a href="{{ url_for('dashboard.activity') }}" class="nav-link"><i class="fas fa-chart-line"></i>
                 Activity</a>
@@ -30,7 +31,7 @@
             <div class="w-8 h-8 rounded-full bg-gray-600"></div>
             <div>
                 <p class="text-sm font-bold">{{ current_user.name if current_user else 'Mohamed' }}</p>
-                <a href="{{ url_for('AuthController:logout_user') }}" class="text-xs text-gray-500 hover:text-white">Logout</a>
+                <a href="{{ url_for('AuthController:handle_logout') }}" class="text-xs text-gray-500 hover:text-white">Logout</a>
             </div>
         </div>
     </aside>
@@ -38,7 +39,7 @@
     <main class="main-content">
         <header class="page-header">
             <div class="flex items-center gap-4">
-                <a href="{{ url_for('GroupController:list_groups', user_id=current_user.user_id) }}"
+                <a href="{{ url_for('GroupController:list_groups') }}"
                    class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100">
                     <i class="fas fa-arrow-left"></i>
                 </a>
@@ -55,56 +56,26 @@
                 <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
                 <!-- Render expenses list dynamically from DB -->
-                {% if expenses %}
-                    {% for expense in expenses %}
-                        <div class="feed-item card">
-                            <div class="flex gap-4">
-                                <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
-                                    <p class="text-muted-sm">{{ expense.paid_by }} paid {{ expense.amount }} EGP</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-{% if expense.your_share < 0 %}status-danger{% else %}status-success{% endif %} text-base">
-                                    {{ '+' if expense.your_share > 0 else '' }}{{ expense.your_share }} EGP
-                                </p>
-                                <p class="text-xs text-gray-400">
-                                    You {{ 'lent' if expense.your_share > 0 else 'borrowed' }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <!-- Placeholder data -->
+                {% for expense in expenses %}
                     <div class="feed-item card">
                         <div class="flex gap-4">
-                            <div class="feed-icon"><i class="fas fa-gas-pump"></i></div>
+                            <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
+                            </div>
                             <div>
-                                <h4 class="font-bold text-gray-800">Gas for Car</h4>
-                                <p class="text-muted-sm">Omar paid 800 EGP</p>
+                                <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
+                                <p class="text-muted-sm">{{ expense.payer.name }} paid {{ expense.total_amount }}
+                                    EGP</p>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <p class="text-status-danger text-base">- 200 EGP</p>
-                            <p class="text-xs text-gray-400">You borrowed</p>
-                        </div>
+                        {#                        <div class="text-right">#}
+                        {#                            <p class="text-{% if expense.your_share < 0 %}status-danger{% else %}status-success{% endif %} text-base">#}
+                        {#                                {{ '+' if expense.your_share > 0 else '' }}{{ expense.your_share }} EGP#}
+                        {#                            </p>#}
+                        {#                            <p class="text-xs text-gray-400">#}
+                        {#                                You {{ 'lent' if expense.your_share > 0 else 'borrowed' }}</p>#}
+                        {#                        </div>#}
                     </div>
-
-                    <div class="feed-item card">
-                        <div class="flex gap-4">
-                            <div class="feed-icon text-blue-500"><i class="fas fa-shopping-cart"></i></div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Supermarket Supplies</h4>
-                                <p class="text-muted-sm">You paid 1,500 EGP</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-status-success text-base">+ 1,200 EGP</p>
-                            <p class="text-xs text-gray-400">You lent</p>
-                        </div>
-                    </div>
-                {% endif %}
+                {% endfor %}
             </div>
 
             <div class="col-span-1 flex flex-col gap-6">
@@ -141,12 +112,12 @@
                         {% else %}
                             <!-- Display group members without balance info -->
                             {% if group and group.members %}
-                                {% for member_id in group.members %}
+                                {% for member in group.members %}
                                     <li class="flex justify-between items-center">
                                         <div class="flex items-center gap-2">
                                             <img src="{{ url_for('static', filename='assets/user.png') }}"
                                                  class="w-6 h-6 rounded-full object-cover">
-                                            <span>{{ member_id }}</span>
+                                            <span>{{ member.name }}</span>
                                         </div>
                                         <span class="text-gray-400 font-bold">Not calculated</span>
                                     </li>
@@ -176,7 +147,7 @@
                             class="fas fa-times"></i></button>
                 </div>
                 <!-- Connect to backend endpoint -->
-                <form action="{{ url_for('expenses.create', group_id=group._id) if group else '#' }}"
+                <form action="{{ url_for('ExpenseController:create_expense') }}"
                       method="POST"
                       class="space-y-4">
                     <div>
@@ -193,16 +164,9 @@
                         <label class="form-label">Paid By</label>
                         <!-- Populate members dynamically -->
                         <select name="paid_by" class="auth-input" required>
-                            {% if group and group.members %}
-                                {% for member_id in group.members %}
-                                    <option value="{{ member_id }}">{{ member_id }}</option>
-                                {% endfor %}
-                            {% else %}
-                                <option>You</option>
-                                <option>Omar</option>
-                                <option>Ahmed</option>
-                                <option>Sarah</option>
-                            {% endif %}
+                            {% for member_id in group.members %}
+                                <option value="{{ member_id }}">{{ member_id }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <button type="submit" class="btn-signin">Save Expense</button>
@@ -225,16 +189,9 @@
                     <div>
                         <label class="form-label">Pay To</label>
                         <select name="pay_to" class="auth-input" required>
-                            {% if group and group.members %}
-                                {% for member_id in group.members %}
-                                    <option value="{{ member_id }}">{{ member_id }}</option>
-                                {% endfor %}
-                            {% else %}
-                                <option>Omar</option>
-                                <option>Ahmed</option>
-                                <option>Sarah</option>
-                                <option>Khaled</option>
-                            {% endif %}
+                            {% for member_id in group.members %}
+                                <option value="{{ member_id }}">{{ member_id }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 
