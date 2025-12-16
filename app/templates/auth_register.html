@@ -42,7 +42,7 @@
             {% endwith %}
 
             <!-- Form submits to Flask register route -->
-            <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-4">
+            <form action="{{ url_for('AuthController:register_user') }}" method="POST" class="space-y-4">
                 <div>
                     <label class="form-label">Full Name</label>
                     <input type="text" name="name" class="auth-input" placeholder="e.g. Mohamed Ahmed" required>
@@ -66,7 +66,7 @@
                 </div>
 
                 <p class="text-center text-gray-500 text-sm mt-6">
-                    Already have an account? <a href="{{ url_for('auth.login') }}" class="link-teal">Log in</a>
+                    Already have an account? <a href="{{ url_for('view.login_view') }}" class="link-teal">Log in</a>
                 </p>
             </form>
         </div>

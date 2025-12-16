@@ -3,21 +3,24 @@ import os
 from flask import Flask
 from flask_login import LoginManager
 
+from app.controllers import AuthController, GroupController
 from app.repositories.user_repo import UserRepository
+from app.utils import register_error_handlers
 
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
-from .routes.auth import auth_bp
 from .routes.dashboard import dashboard_bp
 from .routes.expenses import expenses_bp
-from .routes.groups import groups_bp
-from .routes.users import users_bp
+from .routes.view import view_bp
 
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.secret_key = os.urandom(24)
     app.config.from_object(config_class)
+
+    configure_logging(app)
+    register_error_handlers(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -30,13 +33,12 @@ def create_app(config_class=DevelopmentConfig):
         return repo.get_by_id(user_id)
 
     # register blueprints
-    app.register_blueprint(users_bp)
-    app.register_blueprint(groups_bp)
-    app.register_blueprint(auth_bp, url_prefix="/auth")
+    AuthController.register(app)
+    GroupController.register(app)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(expenses_bp)
+    app.register_blueprint(view_bp)
 
-    configure_logging(app)
     app.logger.info("Starting up the application...")
 
     return app

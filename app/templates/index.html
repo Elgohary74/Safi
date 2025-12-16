@@ -25,11 +25,11 @@
     </p>
     <div class="flex flex-col items-center w-full">
         <!-- Use url_for to link to Flask routes -->
-        <a href="{{ url_for('auth.login') }}" class="btn-landing-login">
+        <a href="{{ url_for('view.login_view') }}" class="btn-landing-login">
             Login
         </a>
 
-        <a href="{{ url_for('auth.register') }}" class="link-landing-create">
+        <a href="{{ url_for('view.register_view') }}" class="link-landing-create">
             Create an account
         </a>
     </div>

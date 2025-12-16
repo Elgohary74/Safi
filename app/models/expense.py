@@ -1,38 +1,28 @@
 import uuid
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import List
+
+from pydantic import BaseModel, Field
+
+from app.models.group import Group
+from app.models.shared_expense import SharedExpense, SharedExpenseSchema
+from app.models.user import User
 
 
-@dataclass
-class Expense:
+class ExpenseBase(BaseModel):
+    expense_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     description: str
     total_amount: float
+    date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class Expense(ExpenseBase):
+    payer: User
+    group: Group
+    splits: List[SharedExpense] = Field(default_factory=list)
+
+
+class ExpenseSchema(ExpenseBase):
     payer_id: str
     group_id: str
-    splits: List[Dict] = field(default_factory=list)
-    expense_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    date: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-
-    def to_dict(self) -> Dict:
-        return {
-            "_id": self.expense_id,
-            "description": self.description,
-            "total_amount": self.total_amount,
-            "payer_id": self.payer_id,
-            "group_id": self.group_id,
-            "splits": self.splits,
-            "date": self.date,
-        }
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]):
-        return cls(
-            expense_id=data.get("_id") or str(uuid.uuid4()),
-            description=data.get("description"),
-            total_amount=data.get("total_amount"),
-            payer_id=data.get("payer_id"),
-            group_id=data.get("group_id"),
-            splits=data.get("splits", []),
-            date=data.get("date") or datetime.now(timezone.utc),
-        )
+    splits: List[SharedExpenseSchema] = Field(default_factory=list)

@@ -18,7 +18,7 @@
 
         <nav class="sidebar-nav">
             <a href="{{ url_for('dashboard.index') }}" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="{{ url_for('groups.list_groups', user_id=current_user.user_id) }}" class="nav-link active"><i
+            <a href="{{ url_for('GroupController:list_groups', user_id=current_user.user_id) }}" class="nav-link active"><i
                     class="fas fa-users"></i> My Groups</a>
             <a href="{{ url_for('dashboard.activity') }}" class="nav-link"><i class="fas fa-chart-line"></i>
                 Activity</a>
@@ -29,7 +29,7 @@
             <div class="w-8 h-8 rounded-full bg-gray-600"></div>
             <div>
                 <p class="text-sm font-bold">{{ current_user.name if current_user else 'User' }}</p>
-                <a href="{{ url_for('auth.login') }}" class="text-xs text-gray-500 hover:text-white">Logout</a>
+                <a href="{{ url_for('AuthController:logout_user') }}" class="text-xs text-gray-500 hover:text-white">Logout</a>
             </div>
         </div>
     </aside>
@@ -67,7 +67,7 @@
                 {% if groups %}
                     {% for group in groups %}
                         <div class="group-card searchable-card"
-                             onclick="window.location.href='{{ url_for('groups.get_group_details', group_id=group.group_id) }}'">
+                             onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.group_id) }}'">
                             <div>
                                 <div class="group-icon {{ ['text-orange-500', 'text-blue-500', 'text-green-500', 'text-purple-500']|random }}">
                                     <i class="fas fa-group-arrows-rotate"></i>
@@ -114,8 +114,7 @@
                 </div>
 
                 <!-- Form submits to Flask route -->
-                <form action="{{ url_for('groups.create_group') }}?admin_id={{ user_id }}" method="POST"
-                      class="space-y-4">
+                <form action="{{ url_for('GroupController:create_group') }}" method="POST" class="space-y-4">
                     <div>
                         <label class="form-label">Name</label>
                         <input type="text" name="group_name" class="auth-input" placeholder="Trip Name" required>
