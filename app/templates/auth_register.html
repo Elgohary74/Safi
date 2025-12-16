@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safi - Register</title>
+    <!-- Use url_for for static files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="app-container">
+    <div class="auth-brand-panel">
+        <div class="auth-bg-overlay"></div>
+        <div class="auth-blob"></div>
+
+        <div class="relative z-10">
+            <div class="auth-logo-box">
+                <i class="fas fa-bolt text-brand-teal text-3xl" style="color: #00E6C3;"></i>
+            </div>
+            <h1 class="text-5xl font-bold mb-6 leading-tight">Start splitting<br>today.</h1>
+            <p class="text-gray-400 text-lg leading-relaxed">Create an account to manage shared expenses
+                effortlessly.</p>
+        </div>
+    </div>
+
+    <div class="auth-form-panel">
+        <div class="auth-form-container">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+            <p class="text-gray-500 mb-6">Join Safi to get started.</p>
+
+            <!-- Flash messages for errors/success -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Form submits to Flask register route -->
+            <form action="{{ url_for('AuthController:register_user') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="auth-input" placeholder="e.g. Mohamed Ahmed" required>
+                </div>
+                <div>
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="auth-input" placeholder="name@example.com" required>
+                </div>
+                <div>
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" name="phone" class="auth-input" placeholder="+20 1xxxxxxxxx">
+                </div>
+                <div>
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="auth-input" placeholder="Create a strong password"
+                           required>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="btn-signin">Sign Up</button>
+                </div>
+
+                <p class="text-center text-gray-500 text-sm mt-6">
+                    Already have an account? <a href="{{ url_for('view.login_view') }}" class="link-teal">Log in</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safi - Activity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-bolt fa-2xl" style="color: #00E6C3;"></i>
+            <h2 class="text-xl font-bold">Safi</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.index') }}" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="{{ url_for('groups.list_groups', user_id=current_user.user_id) }}" class="nav-link"><i
+                    class="fas fa-users"></i> My Groups</a>
+            <a href="{{ url_for('dashboard.activity') }}" class="nav-link active"><i class="fas fa-chart-line"></i>
+                Activity</a>
+            <a href="{{ url_for('dashboard.settings') }}" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+
+        <div class="user-profile">
+            <div class="w-8 h-8 rounded-full bg-gray-600"></div>
+            <div>
+                <p class="text-sm font-bold">Mohamed</p>
+                <a href="{{ url_for('auth.login') }}" class="text-xs text-gray-500 hover:text-white">Logout</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h2 class="page-title">Activity Log</h2>
+        </header>
+
+        <div class="content-padding">
+            <div class="card space-y-6">
+                <!-- NOTE: Loop through activity log entries -->
+                <div class="flex gap-4 items-center border-b border-gray-100 pb-4">
+                    <div class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-brand-teal shrink-0">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-900">Omar added expense "Gas Station"</p>
+                        <p class="text-muted-sm">2 hours ago in <span class="text-blue-500">Dahab Trip</span></p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 items-center border-b border-gray-100 pb-4">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-900">You settled 120 EGP with Osama</p>
+                        <p class="text-muted-sm">Yesterday in <span class="text-blue-500">Roommates</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

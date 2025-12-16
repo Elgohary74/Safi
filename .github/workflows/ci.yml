@@ -13,40 +13,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Download the code
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      # 1. Download the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    # 2. Install Python 3.13
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.13"
-        cache: 'pip' # Caches dependencies to make subsequent runs faster
+      # 2. Install Python 3.13
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+          cache: 'pip' # Caches dependencies to make subsequent runs faster
 
-    # 3. Install Dependencies
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      # 3. Install Dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
 
+      # 4. Check Formatting (Black)
+      # The '--check' flag fails the pipeline if code isn't formatted correctly
+      - name: Check Formatting (Black)
+        run: black . --check
 
-    # 4. Check Formatting (Black)
-    # The '--check' flag fails the pipeline if code isn't formatted correctly
-    - name: Check Formatting (Black)
-      run: black . --check
+      # 5. Check Syntax (Flake8)
+      - name: Lint Code (Flake8)
+        run: flake8 .
 
-    # 5. Check Syntax (Flake8)
-    - name: Lint Code (Flake8)
-      run: flake8 .
-
-    # 6. Run Tests (Pytest)
-    # We set the Secret Key dummy value so Flask doesn't crash on startup
-    - name: Run Tests
-      env:
-        SECRET_KEY: "ci_test_key"
-        MONGO_URI: "mongomock://localhost"
-      run: PYTHONPATH=$(pwd) pytest
+      # 6. Run Tests (Pytest)
+      # We set the Secret Key dummy value so Flask doesn't crash on startup
+      - name: Run Tests
+        env:
+          SECRET_KEY: "ci_test_key"
+          MONGODB_URL: "mongomock://localhost"
+        run: PYTHONPATH=$(pwd) pytest
 
   # JOB 2: Docker Verification
   # Runs only if 'quality-check' passes. Ensures the Dockerfile actually builds.
@@ -55,8 +55,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Build Docker Image
-      run: docker build . --file docker/Dockerfile --tag myapp:test
+      - name: Build Docker Image
+        run: docker build . --file docker/Dockerfile --tag myapp:test
