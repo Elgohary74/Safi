@@ -99,12 +99,12 @@ We run tests **inside** the Docker container to match the environment using the 
 
 - Run all tests
 ```bash
-$ docker-compose exec web pytest
+$ docker-compose -f docker/docker-compose.yml run --rm test_runner
 ```
 
 - Run only unit tests
 ```bash
-$ docker-compose exec web pytest tests/unit
+$ docker-compose -f docker/docker-compose.yml run --rm test_runner pytest tests/unit
 ```
 
 ### Installing New Dependencies
