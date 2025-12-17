@@ -21,6 +21,8 @@ class BaseService:
             debts=group.debts,
             invite_code=group.invite_code,
             invite_code_expiry=group.invite_code_expiry,
+            pending_members=group.pending_members,
+            past_members=group.past_members,
         )
 
     def _convert_schema_to_group(self, schema: GroupSchema) -> Group:
@@ -36,6 +38,8 @@ class BaseService:
             debts=schema.debts,
             invite_code=schema.invite_code,
             invite_code_expiry=schema.invite_code_expiry,
+            pending_members=schema.pending_members_ids,
+            past_members=schema.past_members_ids,
         )
 
     def get_group(self, group_id):
