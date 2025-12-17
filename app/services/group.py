@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from app.models import Group, GroupCreationRequest
+from app.repositories import NotificationRepository
 from app.services.base import BaseService
 from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceNotFound
 
@@ -10,6 +11,9 @@ from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceN
 class GroupService(BaseService):
     def __init__(self):
         super().__init__()
+        from app.repositories import NotificationRepository
+
+        self.notification_repo = NotificationRepository()
 
     def create_new_group(
         self, request: GroupCreationRequest, first_member_id: str
@@ -174,3 +178,74 @@ class GroupService(BaseService):
         if group_id:
             return self._is_user_first_member_of_group(user_id, group_id)
         return False
+
+    def invite_member(self, admin_id: str, group_id: str, email: str):
+        # verify admin
+        if not self._is_user_first_member_of_group(admin_id, group_id):
+            raise CreationError(message="Only the admin can invite members")
+
+        # find user
+        user = self.user_repo.get_by_email(email)
+        if not user:
+            raise ResourceNotFound(message="User with this email does not exist")
+
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        # check if already member
+        if user.user_id in group_schema.members_ids:
+            raise ResourceAlreadyExists(message="User is already a member")
+
+        # check if already pending
+        if user.user_id in group_schema.pending_members_ids:
+            raise ResourceAlreadyExists(message="User is already invited")
+
+        # add to pending
+        self.group_repo.add_pending_member(group_id, user.user_id)
+
+        # Send notification
+        from app.models.notification import NotificationSchema
+
+        self.notification_repo = (
+            self.notification_repo
+            if hasattr(self, "notification_repo")
+            else NotificationRepository()
+        )
+
+        notification = NotificationSchema(
+            user_id=user.user_id,
+            message=f"You have been invited to join group '{group_schema.group_name}'",
+            type="invite",
+            payload={"group_id": group_id, "group_name": group_schema.group_name},
+        )
+        self.notification_repo.add(notification)
+
+    def respond_to_invite(self, user_id: str, group_id: str, action: str):
+        if action not in ["accept", "reject"]:
+            raise ValueError("Invalid action")
+
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        if user_id not in group_schema.pending_members_ids:
+            raise ResourceNotFound(message="No pending invite found for this group")
+
+        if action == "accept":
+            self.group_repo.move_pending_to_member(group_id, user_id)
+        else:
+            self.group_repo.remove_pending_member(group_id, user_id)
+
+    def leave_group(self, user_id: str, group_id: str):
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        if user_id not in group_schema.members_ids:
+            raise ResourceNotFound(message="User is not a member of this group")
+
+        if user_id == group_schema.first_member_id:
+            raise CreationError(message="Admin cannot leave the group")
+
+        self.group_repo.move_member_to_past(group_id, user_id)
