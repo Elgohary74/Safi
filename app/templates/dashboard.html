@@ -19,7 +19,7 @@
 
         <nav class="sidebar-nav">
             <a href="{{ url_for('dashboard.index') }}" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="/groups/group-controller/list/{{ current_user.user_id }}" class="nav-link"><i
+            <a href="{{ url_for('GroupController:list_groups') }}" class="nav-link"><i
                     class="fas fa-users"></i> My Groups</a>
 
             <a href="{{ url_for('dashboard.activity') }}" class="nav-link"><i class="fas fa-chart-line"></i>
@@ -32,7 +32,7 @@
             <div class="w-8 h-8 rounded-full bg-gray-600"></div>
             <div>
                 <p class="text-sm font-bold">{{ current_user.name if current_user else 'Guest' }}</p>
-                <form action="{{ url_for('AuthController:logout_user') }}" method="POST" class="inline">
+                <form action="{{ url_for('AuthController:handle_logout') }}" method="POST" class="inline">
                     <button type="submit"
                             class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
                         Logout
@@ -48,11 +48,21 @@
         <header class="page-header">
             <h2 class="page-title">Dashboard Overview</h2>
             <!-- Modal trigger or link to add expense -->
-            <a href="{{ url_for('expenses.create') }}" class="btn btn-primary">+ New Expense</a>
+            <a href="{{ url_for('ExpenseController:create_expense') }}" class="btn btn-primary">+ New Expense</a>
         </header>
 
         <!-- Dynamic statistics from backend -->
         <div class="content-padding">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
             <div class="grid grid-cols-3 gap-6 mb-8">
                 <div class="card stat-card">
                     <span class="stat-label">Net Balance</span>
@@ -74,7 +84,7 @@
             <div class="data-table-container">
                 <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
                     <h3 class="font-bold text-gray-800">Active Groups</h3>
-                    <a href="{{ url_for('GroupController:list_groups', user_id=current_user.user_id) }}"
+                    <a href="{{ url_for('GroupController:list_groups') }}"
                        class="text-xs font-bold text-brand-blue hover:underline">View
                         All</a>
                 </div>
@@ -91,22 +101,23 @@
                     <!-- Loop through user's groups from DB -->
                     {% if groups %}
                         {% for group in groups %}
-                        <tr onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.id) }}'"
-                            style="cursor: pointer;">
+                            <tr onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.id) }}'"
+                                style="cursor: pointer;">
 
-                            <td><i class="fas fa-group-arrows-rotate text-orange-500 mr-2"></i> {{ group.name }}</td>
+                                <td><i class="fas fa-group-arrows-rotate text-orange-500 mr-2"></i> {{ group.name }}
+                                </td>
 
-                            <td>{{ group.member_count }} Members</td>
+                                <td>{{ group.member_count }} Members</td>
 
-                            <td>
-                                {% if group.is_active %}
-                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Active</span>
-                                {% else %}
-                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Inactive</span>
-                                {% endif %}
-                            </td>
+                                <td>
+                                    {% if group.is_active %}
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Active</span>
+                                    {% else %}
+                                        <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Inactive</span>
+                                    {% endif %}
+                                </td>
                             </tr>
-                    {% endfor %}
+                        {% endfor %}
                     {% else %}
                         <tr>
                             <td colspan="4" class="text-center text-gray-500 py-8">

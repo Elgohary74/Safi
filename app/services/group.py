@@ -1,65 +1,13 @@
 from typing import Optional
 
-from app.models import Group, GroupCreationRequest, GroupSchema
-from app.repositories import GroupRepository, UserRepository
-from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceNotFound
+from app.models import Group, GroupCreationRequest
+from app.services.base import BaseService
+from app.utils.exceptions import CreationError, ResourceAlreadyExists
 
 
-class GroupService:
+class GroupService(BaseService):
     def __init__(self):
-        self.group_repo = GroupRepository()
-        self.user_repo = UserRepository()
-
-    def _convert_group_to_schema(self, group: Group) -> GroupSchema:
-        """
-        Converts a Group domain object to its API schema representation.
-
-        This method transforms a Group object into a GroupSchema, extracting relevant
-        attributes including group metadata, member identifiers, and financial information.
-
-        Args:
-            group (Group): The Group object to be converted.
-
-        Returns:
-            GroupSchema: A GroupSchema instance ready for db storage.
-        """
-        return GroupSchema(
-            group_name=group.group_name,
-            description=group.description,
-            first_member_id=group.first_member.user_id,
-            group_id=group.group_id,
-            members_ids=[member.user_id for member in group.members],
-            working_invites=group.working_invites,
-            debts=group.debts,
-        )
-
-    def _convert_schema_to_group(self, schema: GroupSchema) -> Group:
-        """
-        Converts a GroupSchema object to a Group domain object.
-
-        Retrieves the first member and all group members from the user repository
-        based on their IDs stored in the schema, then constructs and returns
-        a Group instance with the complete member information.
-
-        Args:
-            schema (GroupSchema): The group schema object containing group details
-                                 and member IDs.
-
-        Returns:
-            Group: A Group domain object with all members populated from the
-                   user repository.
-        """
-        first_member = self.user_repo.get_by_id(schema.first_member_id)
-        members = [self.user_repo.get_by_id(uid) for uid in schema.members_ids]
-        return Group(
-            group_name=schema.group_name,
-            description=schema.description,
-            first_member=first_member,
-            group_id=schema.group_id,
-            members=members,
-            working_invites=schema.working_invites,
-            debts=schema.debts,
-        )
+        super().__init__()
 
     def create_new_group(
         self, request: GroupCreationRequest, first_member_id: str
@@ -188,10 +136,3 @@ class GroupService:
         if group_id:
             return self._is_user_first_member_of_group(user_id, group_id)
         return False
-
-    def get_group(self, group_id):
-        group_data = self.group_repo.get_by_id(group_id)
-        if not group_data:
-            raise ResourceNotFound(message="Group not found")
-        group = self._convert_schema_to_group(group_data)
-        return group

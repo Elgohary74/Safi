@@ -3,14 +3,13 @@ import os
 from flask import Flask
 from flask_login import LoginManager
 
-from app.controllers import AuthController, GroupController
+from app.controllers import AuthController, GroupController, ExpenseController
 from app.repositories.user_repo import UserRepository
 from app.utils import register_error_handlers
 
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
 from .routes.dashboard import dashboard_bp
-from .routes.expenses import expenses_bp
 from .routes.view import view_bp
 
 
@@ -35,8 +34,9 @@ def create_app(config_class=DevelopmentConfig):
     # register blueprints
     AuthController.register(app)
     GroupController.register(app)
+    ExpenseController.register(app)
+
     app.register_blueprint(dashboard_bp)
-    app.register_blueprint(expenses_bp)
     app.register_blueprint(view_bp)
 
     app.logger.info("Starting up the application...")

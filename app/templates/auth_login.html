@@ -42,7 +42,7 @@
             {% endwith %}
 
             <!-- Form submits to Flask login route -->
-            <form action="{{ url_for('AuthController:login_user') }}" method="POST" class="space-y-4">
+            <form action="{{ url_for('AuthController:handle_login') }}" method="POST" class="space-y-4">
                 <div>
                     <label class="form-label">Email</label>
                     <input type="email" name="email" class="auth-input" placeholder="name@example.com" required>

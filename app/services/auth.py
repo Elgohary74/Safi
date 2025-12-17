@@ -3,13 +3,13 @@ from typing import Optional
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.user import User, UserRegister
-from app.repositories import UserRepository
 from app.utils.exceptions import AuthenticationError
+from app.services.base import BaseService
 
 
-class AuthService:
+class AuthService(BaseService):
     def __init__(self):
-        self.user_repo = UserRepository()
+        super().__init__()
 
     def register_user(self, data: UserRegister) -> User:
         if self.user_repo.get_by_email(data.email):
