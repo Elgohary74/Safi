@@ -40,6 +40,40 @@ class GroupController(BaseController):
 
         return redirect(url_for("GroupController:list_groups"))
 
+    @route("/<group_id>/invite", methods=["POST"])
+    def invite_member(self, group_id):
+        email = request.form.get("email")
+        try:
+            self.group_service.invite_member(self.current_user.user_id, group_id, email)
+            flash("Invitation sent successfully!", "success")
+        except (ResourceNotFound, CreationError, ResourceAlreadyExists) as e:
+            flash(e.message, "danger")
+        return redirect(url_for("GroupController:get_group_details", group_id=group_id))
+
+    @route("/<group_id>/respond", methods=["POST"])
+    def respond_to_invite(self, group_id):
+        action = request.form.get("action")
+        try:
+            self.group_service.respond_to_invite(
+                self.current_user.user_id, group_id, action
+            )
+            flash(f"Invitation {action}ed!", "success")
+        except (ResourceNotFound, ValueError) as e:
+            if hasattr(e, "message"):
+                flash(e.message, "danger")
+            else:
+                flash(str(e), "danger")
+        return redirect(url_for("GroupController:list_groups"))
+
+    @route("/<group_id>/leave", methods=["POST"])
+    def leave_group(self, group_id):
+        try:
+            self.group_service.leave_group(self.current_user.user_id, group_id)
+            flash("You have left the group.", "success")
+        except (ResourceNotFound, CreationError) as e:
+            flash(e.message, "danger")
+        return redirect(url_for("GroupController:list_groups"))
+
     @route("/<string:group_id>/details", methods=["GET"])
     def get_group_details(self, group_id: str):
         group = self.group_service.get_group(group_id)
