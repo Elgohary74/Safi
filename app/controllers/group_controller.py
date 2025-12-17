@@ -4,7 +4,8 @@ from flask_login import current_user
 
 from app.controllers.base_controller import BaseController
 from app.models.group import GroupCreationRequest
-from app.services import GroupService, ExpenseService
+from app.services import ExpenseService, GroupService
+from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceNotFound
 
 
 class GroupController(BaseController):
@@ -24,6 +25,19 @@ class GroupController(BaseController):
         self.group_service.save_new_group(new_group)
 
         flash("Group created successfully!", "success")
+        return redirect(url_for("GroupController:list_groups"))
+
+    @route("/join", methods=["POST"])
+    def join_group(self):
+        invite_code = request.form.get("invite_code")
+        try:
+            self.group_service.join_group_by_code(
+                self.current_user.user_id, invite_code
+            )
+            flash("Joined group successfully!", "success")
+        except (ResourceNotFound, CreationError, ResourceAlreadyExists) as e:
+            flash(e.message, "danger")
+
         return redirect(url_for("GroupController:list_groups"))
 
     @route("/<string:group_id>/details", methods=["GET"])
