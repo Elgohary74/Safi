@@ -1,5 +1,6 @@
 from flask import flash, redirect, request, url_for
 from flask_classful import route
+
 from app.controllers.base_controller import BaseController
 from app.models.expense import ExpenseCreationRequest
 from app.services import ExpenseService

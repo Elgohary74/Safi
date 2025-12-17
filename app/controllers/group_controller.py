@@ -4,7 +4,7 @@ from flask_login import current_user
 
 from app.controllers.base_controller import BaseController
 from app.models.group import GroupCreationRequest
-from app.services import GroupService, ExpenseService
+from app.services import ExpenseService, GroupService
 
 
 class GroupController(BaseController):

@@ -6,7 +6,7 @@
 :root {
     --color-bg: #F8F9FA;
     --color-sidebar: #111827;
-    --color-primary: #00E6C3;  
+    --color-primary: #00E6C3;
     --color-text-main: #1A1A1A;
     --color-text-muted: #9CA3AF;
     --color-success: #10B981;
@@ -164,7 +164,7 @@ body {
 }
 
 .stat-value.positive {
-    color: var(--color-success); 
+    color: var(--color-success);
 }
 .stat-value.negative {
     color: var(--color-danger);
@@ -250,8 +250,8 @@ body {
     background-color: var(--color-text-main);
     color: white;
 }
-.btn-primary:hover { 
-    background-color: var(--color-success); 
+.btn-primary:hover {
+    background-color: var(--color-success);
     color : #ffffff;
 }
 
@@ -259,7 +259,7 @@ body {
     background-color: var(--color-primary);
     color: var(--color-text-main);
 }
-.btn-accent:hover { 
+.btn-accent:hover {
     filter: brightness(0.95);
 }
 

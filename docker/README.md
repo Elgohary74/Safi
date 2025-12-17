@@ -14,7 +14,7 @@ sudo docker rmi $(sudo docker images -q)
 
 # remove all volumes
 sudo docker volume rm $(sudo docker volume ls -q)
- 
+
 sudo docker system prune --all
 
 # After finishing

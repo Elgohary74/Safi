@@ -3,8 +3,8 @@ from typing import Optional
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.user import User, UserRegister
-from app.utils.exceptions import AuthenticationError
 from app.services.base import BaseService
+from app.utils.exceptions import AuthenticationError
 
 
 class AuthService(BaseService):

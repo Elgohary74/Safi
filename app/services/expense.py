@@ -2,8 +2,8 @@ from flask_login import current_user
 
 from app.models import Expense
 from app.models.expense import ExpenseCreationRequest
-from app.utils.exceptions import CreationError
 from app.services.base import BaseService
+from app.utils.exceptions import CreationError
 
 
 class ExpenseService(BaseService):

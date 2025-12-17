@@ -1,5 +1,5 @@
-from app.models import Group, GroupSchema, Expense, ExpenseSchema
-from app.repositories import GroupRepository, UserRepository, ExpenseRepository
+from app.models import Expense, ExpenseSchema, Group, GroupSchema
+from app.repositories import ExpenseRepository, GroupRepository, UserRepository
 from app.utils.exceptions import ResourceNotFound
 
 
