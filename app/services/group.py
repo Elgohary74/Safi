@@ -1,8 +1,10 @@
+import hashlib
+from datetime import datetime, timedelta
 from typing import Optional
 
 from app.models import Group, GroupCreationRequest
 from app.services.base import BaseService
-from app.utils.exceptions import CreationError, ResourceAlreadyExists
+from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceNotFound
 
 
 class GroupService(BaseService):
@@ -38,6 +40,7 @@ class GroupService(BaseService):
             )
 
         first_member = self.user_repo.get_by_id(first_member_id)
+
         new_group = Group(
             group_name=request.group_name,
             description=request.description,
@@ -45,7 +48,14 @@ class GroupService(BaseService):
             members=[first_member],
             working_invites=[],
             debts=[],
+            invite_code="",  # Will be set after group_id is generated
+            invite_code_expiry=datetime.now() + timedelta(days=7),
         )
+
+        new_group.invite_code = self.generate_invite_code(
+            first_member_id, new_group.group_id
+        )
+
         return new_group
 
     def save_new_group(self, new_group: Group) -> str:
@@ -66,6 +76,34 @@ class GroupService(BaseService):
         if not group_id:
             raise CreationError(message="Failed to create group")
         return group_id
+
+    def generate_invite_code(self, admin_id: str, group_id: str) -> str:
+        raw_string = f"{admin_id}{group_id}{datetime.now().timestamp()}"
+        return hashlib.sha256(raw_string.encode()).hexdigest()[:8]
+
+    def join_group_by_code(self, user_id: str, invite_code: str) -> Group:
+        # find group by code
+        group_schema = self.group_repo.get_by_invite_code(invite_code)
+        if not group_schema:
+            raise ResourceNotFound(message="Invalid invite code")
+
+        group = self._convert_schema_to_group(group_schema)
+
+        # check expiry
+        if datetime.now() > group.invite_code_expiry:
+            raise CreationError(message="Invite code has expired")
+
+        # check if already member
+        if any(member.user_id == user_id for member in group.members):
+            raise ResourceAlreadyExists(
+                message="User is already a member of this group"
+            )
+
+        # add member
+        self.group_repo.add_member(group.group_id, user_id)
+
+        # refresh group data
+        return self.get_group(group.group_id)
 
     def get_user_groups(self, user_id: str) -> list[Group]:
         """

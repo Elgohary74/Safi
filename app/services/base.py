@@ -1,5 +1,5 @@
-from app.models import Group, GroupSchema, Expense, ExpenseSchema
-from app.repositories import GroupRepository, UserRepository, ExpenseRepository
+from app.models import Expense, ExpenseSchema, Group, GroupSchema
+from app.repositories import ExpenseRepository, GroupRepository, UserRepository
 from app.utils.exceptions import ResourceNotFound
 
 
@@ -19,6 +19,8 @@ class BaseService:
             members_ids=[member.user_id for member in group.members],
             working_invites=group.working_invites,
             debts=group.debts,
+            invite_code=group.invite_code,
+            invite_code_expiry=group.invite_code_expiry,
         )
 
     def _convert_schema_to_group(self, schema: GroupSchema) -> Group:
@@ -32,6 +34,8 @@ class BaseService:
             members=members,
             working_invites=schema.working_invites,
             debts=schema.debts,
+            invite_code=schema.invite_code,
+            invite_code_expiry=schema.invite_code_expiry,
         )
 
     def get_group(self, group_id):

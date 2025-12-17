@@ -22,7 +22,7 @@ class GroupRepository(IRepository):
 
     def get_by_invite_code(self, invite_code: str) -> Optional[GroupSchema]:
         self.logger.debug(f"searching group by invite code: {invite_code}")
-        data = self.collection.find_one({"working_invites": invite_code})
+        data = self.collection.find_one({"invite_code": invite_code})
         return GroupSchema.model_validate(data) if data else None
 
     def add_member(self, group_id: str, user_id: str):
