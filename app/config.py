@@ -31,8 +31,7 @@ def get_settings() -> Settings:
 class Config:
     """Base configuration."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY")
-
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev_secret_key_fallback")
     # MongoDB Connection
     MONGODB_SETTINGS = {
         "host": os.environ.get("MONGODB_URL"),

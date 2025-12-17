@@ -106,6 +106,104 @@ def test_join_group_already_member(app):
         req = GroupCreationRequest(group_name="Already Member Group")
         group = group_service.create_new_group(req, admin.user_id)
         group_service.save_new_group(group)
-
         with pytest.raises(ResourceAlreadyExists):
             group_service.join_group_by_code(admin.user_id, group.invite_code)
+
+
+def test_invite_member_flow(app):
+    with app.app_context():
+        # Setup
+        auth_service = AuthService()
+        admin = register_random_reader(auth_service, "admin_inv")
+        user = register_random_reader(auth_service, "user_inv")
+
+        group_service = GroupService()
+        req = GroupCreationRequest(group_name="Invite Group")
+        group = group_service.create_new_group(req, admin.user_id)
+        group_service.save_new_group(group)
+
+        # 1. Admin invites user
+        group_service.invite_member(admin.user_id, group.group_id, user.email)
+
+        # Verify pending
+        group = group_service.get_group(group.group_id)
+        assert user.user_id in group.pending_members
+
+        # Verify notification
+        notifs = group_service.notification_repo.get_unread_by_user(user.user_id)
+        assert len(notifs) >= 1
+        assert notifs[0].type == "invite"
+
+        # 2. User accepts
+        group_service.respond_to_invite(user.user_id, group.group_id, "accept")
+
+        # Verify member
+        group = group_service.get_group(group.group_id)
+        assert user.user_id in [m.user_id for m in group.members]
+        assert user.user_id not in group.pending_members
+
+
+def test_leave_group_flow(app):
+    with app.app_context():
+        # Setup
+        auth_service = AuthService()
+        admin = register_random_reader(auth_service, "admin_leave")
+        user = register_random_reader(auth_service, "user_leave")
+
+        group_service = GroupService()
+        req = GroupCreationRequest(group_name="Leave Group")
+        group = group_service.create_new_group(req, admin.user_id)
+        group_service.save_new_group(group)
+
+        # Add user directly (simulating join)
+        group_service.join_group_by_code(user.user_id, group.invite_code)
+
+        # User leaves
+        group_service.leave_group(user.user_id, group.group_id)
+
+        # Verify past member
+        group = group_service.get_group(group.group_id)
+        assert user.user_id not in [m.user_id for m in group.members]
+        assert user.user_id in group.past_members
+
+
+def test_admin_cannot_leave(app):
+    with app.app_context():
+        auth_service = AuthService()
+        admin = register_random_reader(auth_service, "admin_static")
+
+        group_service = GroupService()
+        req = GroupCreationRequest(group_name="Admin Group")
+        group = group_service.create_new_group(req, admin.user_id)
+        group_service.save_new_group(group)
+
+        with pytest.raises(CreationError):
+            group_service.leave_group(admin.user_id, group.group_id)
+
+
+def test_history_access_after_leaving(app):
+    with app.app_context():
+        # Setup
+        auth_service = AuthService()
+        admin = register_random_reader(auth_service, "admin_hist")
+        user = register_random_reader(auth_service, "user_hist")
+
+        group_service = GroupService()
+        req = GroupCreationRequest(group_name="History Group")
+        group = group_service.create_new_group(req, admin.user_id)
+        group_service.save_new_group(group)
+
+        # User joins then leaves
+        group_service.join_group_by_code(user.user_id, group.invite_code)
+        group_service.leave_group(user.user_id, group.group_id)
+
+        # Verify user can still "see" the group (it returns in their list)
+        user_groups = group_service.get_user_groups(user.user_id)
+
+        assert len(user_groups) >= 1
+        # Find the specific group
+        found_group = next(
+            (g for g in user_groups if g.group_id == group.group_id), None
+        )
+        assert found_group is not None
+        assert user.user_id in found_group.past_members
