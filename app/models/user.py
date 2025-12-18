@@ -1,7 +1,10 @@
+import re
 import uuid
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
+from app.utils.exceptions import InvalidPasswordFormat
 
 
 class User(BaseModel):
@@ -13,27 +16,33 @@ class User(BaseModel):
     password_hash: str
     phone_number: Optional[str] = None
 
-    @property
-    def is_active(self):
-        return True
-
-    @property
-    def is_authenticated(self):
-        return True
-
-    @property
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return self.user_id
-
 
 class UserRegister(BaseModel):
     name: str
     email: EmailStr
     password: str
     phone_number: Optional[str] = None
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        if len(v) < 8:
+            raise InvalidPasswordFormat("Password must be at least 8 characters long")
+        if not re.search(r"[A-Z]", v):
+            raise InvalidPasswordFormat(
+                "Password must contain at least one uppercase letter"
+            )
+        if not re.search(r"[a-z]", v):
+            raise InvalidPasswordFormat(
+                "Password must contain at least one lowercase letter"
+            )
+        if not re.search(r"\d", v):
+            raise InvalidPasswordFormat("Password must contain at least one digit")
+        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", v):
+            raise InvalidPasswordFormat(
+                "Password must contain at least one special character"
+            )
+        return v
 
 
 class UserLogin(BaseModel):

@@ -1,11 +1,10 @@
 import os
 
 from flask import Flask
-from flask_login import LoginManager
 
 from app.controllers import __all__ as all_controllers
-from app.repositories.user_repo import UserRepository
 from app.utils import register_error_handlers
+from app.utils.jwt_manager import init_jwt
 
 from .config import DevelopmentConfig
 from .logging_config import configure_logging
@@ -15,23 +14,13 @@ from .routes.view import view_bp
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
-    app.secret_key = os.urandom(24)
     app.config.from_object(config_class)
-
+    app.secret_key = os.urandom(24)
     configure_logging(app)
     register_error_handlers(app)
 
-    login_manager = LoginManager()
-    login_manager.init_app(app)
+    init_jwt(app)
 
-    # This function is used by Flask-Login to reload the user object
-    # from the user ID stored in the session
-    @login_manager.user_loader
-    def load_user(user_id):
-        repo = UserRepository()
-        return repo.get_by_id(user_id)
-
-    # register blueprints
     for i in range(len(all_controllers)):
         all_controllers[i].register(app)
 

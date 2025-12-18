@@ -1,5 +1,5 @@
 from flask_classful import FlaskView
-from flask_login import current_user, login_required
+from flask_jwt_extended import current_user, jwt_required
 from flask_pydantic import validate
 
 
@@ -9,7 +9,7 @@ class IController(FlaskView):
 
 class BaseController(IController):
     route_base = ""
-    decorators = IController.decorators + [login_required]
+    decorators = IController.decorators + [jwt_required()]
 
     def __init__(self):
         super().__init__()

@@ -18,7 +18,7 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="{{ url_for('dashboard_index') if 'dashboard_index' in (request.url_rule.endpoint if request.url_rule else '') else (url_for('dashboard.index') if 'dashboard.index' in (request.url_rule.endpoint if request.url_rule else '') else '/dashboard') }}"
+                <a href="{{ url_for('dashboard.dashboard_index') }}"
                    class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
                     <i class="fas fa-th-large"></i> Dashboard
                 </a>

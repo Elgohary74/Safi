@@ -19,7 +19,7 @@ def register_random_reader(auth_service, name_prefix="user"):
         UserRegister(
             name=f"{name_prefix}_{random.randint(1000, 9999)}",
             email=generate_random_email(),
-            password="password",
+            password="1234#Abcd",
         )
     )
 
