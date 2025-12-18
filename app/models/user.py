@@ -39,3 +39,9 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class UpdateUserRequest(BaseModel):
+    new_name: str
+    new_email: EmailStr
+    new_phone_number: Optional[str]

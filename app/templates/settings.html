@@ -29,7 +29,7 @@
         <div class="user-profile">
             <div class="w-8 h-8 rounded-full bg-gray-600"></div>
             <div>
-                <p class="text-sm font-bold">{{ current_user.name if current_user else 'Guest' }}</p>
+                <p class="text-sm font-bold">{{ current_user.name }}</p>
                 <form action="{{ url_for('AuthController:handle_logout') }}" method="POST" class="inline">
                     <button type="submit"
                             class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
@@ -49,6 +49,16 @@
             <!-- Profile Section -->
             <div class="card">
                 <h3 class="section-title mb-4 border-b pb-2">Profile Details</h3>
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
                 <div class="flex items-center gap-4 mb-6">
                     <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl">👤</div>
                     <div class="flex-1">
@@ -64,22 +74,25 @@
                         </div>
                     </div>
                 </div>
-                <!-- NOTE: Form needs to submit changes to backend -->
-                <div class="space-y-4">
+
+                <form action="{{ url_for('UserController:update_profile') }}" method="POST" class="space-y-4">
                     <div>
                         <label class="form-label">Full Name</label>
-                        <input type="text" class="auth-input" value="Omar Badran">
+                        <input type="text" name="new_name" class="auth-input" value="{{ current_user.name }}" required>
                     </div>
                     <div>
                         <label class="form-label">Email Address</label>
-                        <input type="email" class="auth-input" value="s-omar.shehta@zewailcity.edu.eg">
+                        <input type="email" name="new_email" class="auth-input" value="{{ current_user.email }}"
+                               required>
                     </div>
                     <div>
                         <label class="form-label">Phone Number</label>
-                        <input type="tel" class="auth-input" value="+20 xxxxxxxxxx">
+                        <input type="tel" name="new_phone_number" class="auth-input"
+                               value="{{ current_user.phone_number }}">
                     </div>
-                    <button class="btn btn-primary w-full mt-4">Save Changes</button>
-                </div>
+                    {#                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">#}
+                    <button type="submit" class="btn btn-primary w-full mt-4">Save Changes</button>
+                </form>
             </div>
 
             <div class="card">

@@ -3,7 +3,7 @@ import os
 from flask import Flask
 from flask_login import LoginManager
 
-from app.controllers import AuthController, GroupController, ExpenseController
+from app.controllers import __all__ as all_controllers
 from app.repositories.user_repo import UserRepository
 from app.utils import register_error_handlers
 
@@ -32,9 +32,8 @@ def create_app(config_class=DevelopmentConfig):
         return repo.get_by_id(user_id)
 
     # register blueprints
-    AuthController.register(app)
-    GroupController.register(app)
-    ExpenseController.register(app)
+    for i in range(len(all_controllers)):
+        all_controllers[i].register(app)
 
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(view_bp)
