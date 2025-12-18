@@ -252,7 +252,53 @@ class GroupService(BaseService):
         else:
             self.group_repo.remove_pending_member(group_id, user_id)
 
-    def leave_group(self, user_id: str, group_id: str):
+    def update_group_info(
+        self, admin_id: str, group_id: str, new_name: str, new_description: str
+    ):
+        if not self._is_user_first_member_of_group(admin_id, group_id):
+            raise CreationError(message="Only the admin can update group info")
+
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        group_schema.group_name = new_name
+        group_schema.description = new_description
+        self.group_repo.update(group_id, group_schema)
+
+    def remove_member(self, admin_id: str, group_id: str, member_id: str):
+        if not self._is_user_first_member_of_group(admin_id, group_id):
+            raise CreationError(message="Only the admin can remove members")
+
+        if admin_id == member_id:
+            raise CreationError(message="Admin cannot remove themselves")
+
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        if member_id not in group_schema.members_ids:
+            raise ResourceNotFound(message="User is not a member of this group")
+
+        self.group_repo.move_member_to_past(group_id, member_id)
+
+    def assign_new_first_member(
+        self, current_admin_id: str, group_id: str, new_admin_id: str
+    ):
+        if not self._is_user_first_member_of_group(current_admin_id, group_id):
+            raise CreationError(message="Only the admin can assign a new admin")
+
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        if new_admin_id not in group_schema.members_ids:
+            raise ResourceNotFound(message="New admin must be a member of the group")
+
+        group_schema.first_member_id = new_admin_id
+        self.group_repo.update(group_id, group_schema)
+
+    def leave_group(self, user_id: str, group_id: str, successor_id: str = None):
         group_schema = self.group_repo.get_by_id(group_id)
         if not group_schema:
             raise ResourceNotFound(message="Group not found")
@@ -260,7 +306,24 @@ class GroupService(BaseService):
         if user_id not in group_schema.members_ids:
             raise ResourceNotFound(message="User is not a member of this group")
 
+        # admin leaving
         if user_id == group_schema.first_member_id:
-            raise CreationError(message="Admin cannot leave the group")
+            # check if they are the only member
+            if len(group_schema.members_ids) == 1:
+                # If only member, just leave (group effectively abandoned)
+                pass
+            else:
+                if not successor_id:
+                    raise CreationError(
+                        message="Admin must assign a new admin before leaving"
+                    )
+                # Assign new admin
+                if successor_id not in group_schema.members_ids:
+                    raise CreationError(
+                        message="Successor must be a member of the group"
+                    )
+
+                group_schema.first_member_id = successor_id
+                self.group_repo.update(group_id, group_schema)
 
         self.group_repo.move_member_to_past(group_id, user_id)
