@@ -41,3 +41,13 @@ class CreationError(AppError):
         self, message="Failed to create resource", status_code=400, payload=None
     ):
         super().__init__(message, status_code, payload)
+
+
+class InvalidPasswordFormat(AppError):
+    def __init__(
+        self,
+        message="Password does not meet complexity requirements",
+        status_code=422,
+        payload=None,
+    ):
+        super().__init__(message, status_code, payload)
