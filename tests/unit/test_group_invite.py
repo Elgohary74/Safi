@@ -177,6 +177,10 @@ def test_admin_cannot_leave(app):
         group = group_service.create_new_group(req, admin.user_id)
         group_service.save_new_group(group)
 
+        # Add another member so admin is not alone
+        member = register_random_reader(auth_service, "member_temp")
+        group_service.join_group_by_code(member.user_id, group.invite_code)
+
         with pytest.raises(CreationError):
             group_service.leave_group(admin.user_id, group.group_id)
 
