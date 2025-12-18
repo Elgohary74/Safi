@@ -30,8 +30,10 @@ services:
     command: pytest
     volumes:
       - ..:/app
+    working_dir: /app
     environment:
       - FLASK_DEBUG=1
+      - PYTHONPATH=/app
       - MONGODB_URL=mongodb://${MONGODB_ROOT_USERNAME}:${MONGODB_ROOT_PASSWORD}@mongo:27017/safi_test_db?authSource=admin
     depends_on:
       - mongo
