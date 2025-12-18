@@ -53,7 +53,7 @@ class GroupService(BaseService):
             working_invites=[],
             debts=[],
             invite_code="",  # Will be set after group_id is generated
-            invite_code_expiry=datetime.now() + timedelta(days=7),
+            invite_code_expiry=datetime.now() + timedelta(hours=2),
         )
 
         new_group.invite_code = self.generate_invite_code(
@@ -61,6 +61,24 @@ class GroupService(BaseService):
         )
 
         return new_group
+
+    def refresh_invite_code(self, admin_id: str, group_id: str) -> str:
+        if not self._is_user_first_member_of_group(admin_id, group_id):
+            raise CreationError(message="Only the admin can refresh the invite code")
+
+        new_code = self.generate_invite_code(admin_id, group_id)
+        new_expiry = datetime.now() + timedelta(hours=2)
+
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        group_schema.invite_code = new_code
+        group_schema.invite_code_expiry = new_expiry
+
+        self.group_repo.update(group_id, group_schema)
+
+        return new_code
 
     def save_new_group(self, new_group: Group) -> str:
         """
