@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from flask_login import current_user
 
 from app.models import Expense
@@ -17,8 +19,9 @@ class ExpenseService(BaseService):
         new_expense = Expense(
             description=request.description,
             total_amount=request.total_amount,
-            group=group,
+            date=datetime.now(timezone.utc),
             payer=payer,
+            group=group,
         )
         return new_expense
 

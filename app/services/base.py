@@ -61,6 +61,7 @@ class BaseService:
             total_amount=expense.total_amount,
             group_id=expense.group.group_id,
             payer_id=expense.payer.user_id,
+            date=expense.date,
         )
 
     def _convert_schema_to_expense(self, schema: ExpenseSchema) -> Expense:
@@ -73,4 +74,5 @@ class BaseService:
             total_amount=schema.total_amount,
             group=group,
             payer=payer,
+            date=schema.date,
         )

@@ -57,11 +57,21 @@
         </header>
 
         <div class="content-padding grid grid-cols-3 gap-8">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
             <div class="col-span-2 feed-list">
                 <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
                 <!-- Render expenses list dynamically from DB -->
-                {% for expense in expenses %}
+                {% for expense, user_share in expenses %}
                     <div class="feed-item card">
                         <div class="flex gap-4">
                             <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
@@ -69,16 +79,16 @@
                             <div>
                                 <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
                                 <p class="text-muted-sm">{{ expense.payer.name }} paid {{ expense.total_amount }}
-                                    EGP</p>
+                                    EGP <br>{{ expense.date.strftime("%d/%m/%Y at %I:%M %p") }}</p>
                             </div>
                         </div>
-                        {#                        <div class="text-right">#}
-                        {#                            <p class="text-{% if expense.your_share < 0 %}status-danger{% else %}status-success{% endif %} text-base">#}
-                        {#                                {{ '+' if expense.your_share > 0 else '' }}{{ expense.your_share }} EGP#}
-                        {#                            </p>#}
-                        {#                            <p class="text-xs text-gray-400">#}
-                        {#                                You {{ 'lent' if expense.your_share > 0 else 'borrowed' }}</p>#}
-                        {#                        </div>#}
+                        <div class="text-right">
+                            <p class="text-{% if user_share < 0 %}status-danger{% else %}status-success{% endif %} text-base">
+                                {{ '+' if user_share > 0 else '' }}{{ user_share }} EGP
+                            </p>
+                            <p class="text-xs text-gray-400">
+                                You {{ 'lent' if user_share > 0 else 'borrowed' }}</p>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

@@ -1,3 +1,5 @@
+import random
+
 from flask import flash, redirect, render_template, request, url_for
 from flask_classful import route
 from flask_login import current_user
@@ -78,13 +80,16 @@ class GroupController(BaseController):
     def get_group_details(self, group_id: str):
         group = self.group_service.get_group(group_id)
         expenses = self.expense_service.get_group_expenses(group_id)
+        shares = [
+            round(random.random() * 100, 2) * pow(-1, i % 2)
+            for i in range(len(expenses))
+        ]
 
         return render_template(
             "group_details.html",
             group=group.model_dump(),
-            expenses=expenses,
-            members=[],
-            your_balance=-100,
+            expenses=list(zip(expenses, shares)),
+            your_balance=round(sum(shares), 2),
         )
 
     @route("/list", methods=["GET"])
