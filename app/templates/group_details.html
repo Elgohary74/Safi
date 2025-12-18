@@ -14,11 +14,18 @@
                 <h2 class="page-title">{{ group.group_name }}</h2>
 
                 <div class="group relative flex items-center">
-                <span class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
-                      title="Click to Copy">
-                    {{ group.invite_code }}
-                </span>
+                    <span id="inviteCodeSpan"
+                          class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
+                          title="Click to Copy"
+                          onclick="copyInviteCode()">
+                        {{ group.invite_code }}
+                    </span>
+                    <div id="copyNotification"
+                         class="hidden absolute left-0 -bottom-8 text-xs text-white bg-gray-800 px-2 py-1 rounded opacity-0 transition-opacity duration-300">
+                        Copied to clipboard!
+                    </div>
                 </div>
+
             </div>
         </div>
 
@@ -76,39 +83,33 @@
                 </div>
 
                 <ul class="space-y-3 text-sm text-gray-600">
-                    {% if members %}
-                        {% for member in members %}
+                    {% if group.members %}
+                        {% for member in group.members %}
                             <li class="flex justify-between items-center group">
                                 <div class="flex items-center gap-2">
-                                    <img src="{{ url_for('static', filename='assets/' + (member.avatar if member.avatar else 'user.png')) }}"
-                                         class="w-8 h-8 rounded-full object-cover border border-gray-100">
-
+                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                                        <i class="fas fa-user"></i>
+                                    </div>
                                     <div class="flex flex-col">
-                                        <span class="font-medium text-gray-900">{{ member.name }}</span>
-
-                                        <!-- ADMIN LABEL: Logic assumes first member in list is creator/admin -->
-                                        {% if loop.first %}
-                                            <span class="text-[10px] text-brand-teal font-bold uppercase tracking-wider">Admin</span>
+                                        <span class="font-medium">{{ member.name }}</span>
+                                        {% if group.first_member.user_id == member.user_id %}
+                                            <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
                                         {% endif %}
                                     </div>
                                 </div>
 
                                 <div class="flex items-center gap-3">
-                                <span class="{% if member.balance > 0 %}text-green-500{% elif member.balance < 0 %}text-red-500{% else %}text-gray-400{% endif %} font-bold text-xs">
-                                    {% if member.balance > 0 %}
-                                        Gets {{ member.balance }}
-                                    {% elif member.balance < 0 %}
-                                        Owes {{ member.balance|abs }}
-                                    {% else %}
-                                        Settled
-                                    {% endif %}
-                                </span>
-
-                                    <!-- DELETE MEMBER BUTTON -->
-                                    <!-- LOGIC: Show button ONLY if current user is Admin (index 0) AND we are not trying to delete the admin themselves -->
-                                    <!-- Note: This relies on 'members' list order where members[0] is admin -->
-                                    {% if members[0].id == current_user.id and not loop.first %}
-                                        <button onclick="confirmRemoveMember('{{ member.id }}')"
+                                    {#                                <span class="{% if member.balance > 0 %}text-green-500{% elif member.balance < 0 %}text-red-500{% else %}text-gray-400{% endif %} font-bold text-xs">#}
+                                    {#                                    {% if member.balance > 0 %}#}
+                                    {#                                        Gets {{ member.balance }}#}
+                                    {#                                    {% elif member.balance < 0 %}#}
+                                    {#                                        Owes {{ member.balance|abs }}#}
+                                    {#                                    {% else %}#}
+                                    {#                                        Settled#}
+                                    {#                                    {% endif %}#}
+                                    {#                                </span>#}
+                                    {% if group.first_member.user_id != member.user_id %}
+                                        <button onclick="confirmRemoveMember('{{ member.user_id }}')"
                                                 class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
                                                 title="Remove Member">
                                             <i class="fas fa-times text-xs"></i>
@@ -143,4 +144,26 @@
             </div>
         </div>
     </div>
+    <script>
+        function copyInviteCode() {
+            const inviteCode = "{{ group.invite_code }}";
+            navigator.clipboard.writeText(inviteCode)
+                .then(() => {
+                    // Show a temporary "Copied!" tooltip
+                    const span = document.getElementById('inviteCodeSpan');
+                    const originalTitle = span.getAttribute('title');
+                    span.setAttribute('title', 'Copied!');
+                    span.classList.add('bg-green-100', 'border-green-300', 'text-green-700');
+
+                    // Reset after 2 seconds
+                    setTimeout(() => {
+                        span.setAttribute('title', originalTitle);
+                        span.classList.remove('bg-green-100', 'border-green-300', 'text-green-700');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+        }
+    </script>
 {% endblock %}

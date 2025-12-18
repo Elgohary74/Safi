@@ -149,7 +149,7 @@ class GroupController(BaseController):
 
         return render_template(
             "group_details.html",
-            group=group.model_dump(),
+            group=group,
             expenses=list(zip(expenses, shares)),
             your_balance=round(sum(shares), 2),
             current_user=self.current_user,
