@@ -14,13 +14,13 @@ class UserController(BaseController):
 
     @route("/update_profile", methods=["POST"])
     def update_profile(self):
-        # update_profile_request = UpdateUserRequest(**request.form.to_dict())
-        #
-        # result = self.user_service.update_user_data(update_profile_request)
-        #
-        # if result:
-        #     flash("Profile updated successfully!", "success")
-        # else:
-        #     flash("Please Enter a Valid Email or Name", "error")
+        update_profile_request = UpdateUserRequest(**request.form.to_dict())
+
+        result = self.user_service.update_user_data(update_profile_request)
+
+        if result:
+            flash("Profile updated successfully!", "success")
+        else:
+            flash("Please Enter a Valid Email or Name", "error")
 
         return redirect(request.referrer)
