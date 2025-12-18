@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Safi{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    
+    <div class="app-container">
+        {% block sidebar %}
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-bolt fa-2xl" style="color: #00E6C3;"></i>
+                <h2 class="text-xl font-bold">Safi</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard_index') if 'dashboard_index' in (request.url_rule.endpoint if request.url_rule else '') else (url_for('dashboard.index') if 'dashboard.index' in (request.url_rule.endpoint if request.url_rule else '') else '/dashboard') }}" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+                
+                <a href="{{ url_for('list_groups') if 'list_groups' in (request.url_rule.endpoint if request.url_rule else '') else (url_for('GroupController:list_groups') if 'GroupController' in (request.url_rule.endpoint if request.url_rule else '') else '/groups') }}" class="nav-link {% if 'groups' in request.path %}active{% endif %}">
+                    <i class="fas fa-users"></i> My Groups
+                </a>
+
+                <a href="{{ url_for('dashboard_activity') if 'dashboard_activity' in (request.url_rule.endpoint if request.url_rule else '') else '/activity' }}" class="nav-link {% if 'activity' in request.path %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i> Activity
+                </a>
+
+                <a href="{{ url_for('dashboard_settings') if 'dashboard_settings' in (request.url_rule.endpoint if request.url_rule else '') else '/settings' }}" class="nav-link {% if 'settings' in request.path %}active{% endif %}">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+
+                <div class="mt-4 pt-4 border-t border-gray-700">
+                    <a href="/info/about" class="nav-link {% if 'about' in request.path %}active{% endif %}">
+                        <i class="fas fa-info-circle"></i> About Us
+                    </a>
+                    <a href="/info/faq" class="nav-link {% if 'faq' in request.path %}active{% endif %}">
+                        <i class="fas fa-question-circle"></i> FAQ
+                    </a>
+                    <a href="/info/contact" class="nav-link {% if 'contact' in request.path %}active{% endif %}">
+                        <i class="fas fa-envelope"></i> Contact
+                    </a>
+                </div>
+            </nav>
+
+            <div class="user-profile">
+                <div class="w-8 h-8 rounded-full bg-gray-600"></div>
+                <div>
+                    <p class="text-sm font-bold">{{ current_user.name if current_user is defined and current_user else 'Guest' }}</p>
+                    <form action="/auth/logout" method="POST" class="inline">
+                        <button type="submit" class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+        {% endblock %}
+
+
+        {% block main_layout %}
+        <main class="main-content">
+            <div class="moving-blob blob-teal"></div>
+            <div class="moving-blob blob-blue"></div>
+            {% block header %}{% endblock %}
+
+            <div class="content-padding">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+        {% endblock %}
+    </div>
+
+  
+    
+    <!-- 1. CREATE GROUP MODAL -->
+    <div id="createGroupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Create Group</h3>
+                <button type="button" onclick="closeModal('createGroupModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="/groups/create" method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label">Name</label>
+                    <input type="text" name="group_name" class="auth-input" placeholder="Trip Name" required>
+                </div>
+                <div>
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" class="auth-input" placeholder="Short description">
+                </div>
+                <button type="submit" class="btn-signin">Create</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. ADD EXPENSE MODAL -->
+    <div id="expenseModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Add New Expense</h3>
+                <button type="button" onclick="closeModal('expenseModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="/expenses/create" method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" class="auth-input" placeholder="e.g. Dinner, Taxi" required>
+                </div>
+                <div>
+                    <label class="form-label">Amount</label>
+                    <input type="number" name="amount" step="0.01" class="auth-input" placeholder="0.00 EGP" required>
+                </div>
+                
+                {% if group is defined and group and group.members %}
+                    <input type="hidden" name="group_id" value="{{ group.group_id }}">
+                    <div>
+                        <label class="form-label">Paid By</label>
+                        <select name="paid_by" class="auth-input" required>
+                            {% for member in group.members %}
+                                <option value="{{ member.id if member.id else member }}">{{ member.name if member.name else member }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% else %}
+                    <div>
+                        <label class="form-label">Group</label>
+                        <select name="group_id" class="auth-input" required>
+                            <option value="" disabled selected>Select a group</option>
+                            {% if groups is defined and groups %}
+                                {% for g in groups %}
+                                    <option value="{{ g.group_id }}">{{ g.group_name }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Paid By</label>
+                        <select name="paid_by" class="auth-input">
+                            <option value="{{ current_user.id if current_user is defined else '1' }}">Me</option>
+                        </select>
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn-signin">Save Expense</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. SETTLE UP MODAL -->
+    <div id="settleModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Settle Up</h3>
+                <button type="button" onclick="closeModal('settleModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="#" method="POST" class="space-y-4">
+                {% if group is defined and group and group.members %}
+                <div>
+                    <label class="form-label">Pay To</label>
+                    <select name="pay_to" class="auth-input" required>
+                        {% for member in group.members %}
+                            <option value="{{ member.id if member.id else member }}">{{ member.name if member.name else member }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500">Please go to a specific Group page to settle debts.</p>
+                {% endif %}
+
+                <div>
+                    <label class="form-label">Amount</label>
+                    <input type="number" name="amount" step="0.01" class="auth-input" placeholder="0.00 EGP" required>
+                </div>
+
+                <div>
+                    <label class="form-label">Payment Method</label>
+                    <div class="grid grid-cols-2 gap-3 mt-2">
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="payment_method" value="cash" class="payment-radio hidden" checked>
+                            <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <p class="text-sm font-bold text-gray-800">Cash</p>
+                                <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon"></i>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="payment_method" value="instapay" class="payment-radio hidden">
+                            <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <p class="text-sm font-bold text-gray-800">InstaPay</p>
+                                <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-signin bg-green-600 border-green-600 hover:text-green-600">Confirm Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. REMOVE MEMBER MODAL (Global) -->
+    <div id="removeMemberModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                <i class="fas fa-user-times"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Member?</h3>
+            <p class="text-gray-500 mb-6">Are you sure you want to remove this member? This action cannot be undone.</p>
+            
+            <form id="removeMemberForm" action="#" method="POST" class="flex gap-3">
+                <button type="button" onclick="closeModal('removeMemberModal')" class="flex-1 btn btn-white justify-center">Cancel</button>
+                <button type="submit" class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">Remove</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if(modal) {
+                modal.classList.remove('hidden');
+                void modal.offsetWidth; 
+                modal.classList.add('open');
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if(modal) {
+                modal.classList.remove('open');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        function confirmRemoveMember(memberId) {
+            const form = document.getElementById('removeMemberForm');
+            form.action = "/groups/remove_member/" + memberId;
+            openModal('removeMemberModal');
+        }
+
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(event.target.id);
+            }
+        }
+
+        document.querySelectorAll('.payment-radio').forEach(radio => {
+            radio.addEventListener('change', function () {
+                document.querySelectorAll('.check-icon').forEach(icon => icon.classList.add('hidden'));
+                if (this.checked) {
+                    this.parentElement.querySelector('.check-icon').classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

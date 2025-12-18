@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Safi - FAQ{% endblock %}
+
+{% block header %}
+<header class="page-header">
+    <h2 class="page-title">Frequently Asked Questions</h2>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-4">
+    
+    <div class="card hover:shadow-md transition-shadow">
+        <h3 class="font-bold text-gray-900 mb-2">How do I create a group?</h3>
+        <p class="text-gray-500 text-sm">
+            Simply click on the "Create Group" button on your dashboard or the "My Groups" page. Enter a name and description, and you're good to go!
+        </p>
+    </div>
+
+    <div class="card hover:shadow-md transition-shadow">
+        <h3 class="font-bold text-gray-900 mb-2">How do I add expenses?</h3>
+        <p class="text-gray-500 text-sm">
+            Navigate to a group's detail page and click "Add Expense". You can specify the amount, description, and who paid.
+        </p>
+    </div>
+
+    <div class="card hover:shadow-md transition-shadow">
+        <h3 class="font-bold text-gray-900 mb-2">Is Safi free to use?</h3>
+        <p class="text-gray-500 text-sm">
+            Yes! Safi is completely free for managing shared expenses with friends and family.
+        </p>
+    </div>
+
+    <div class="card hover:shadow-md transition-shadow">
+        <h3 class="font-bold text-gray-900 mb-2">Can I settle debts through the app?</h3>
+        <p class="text-gray-500 text-sm">
+            We record settlements, but the actual money transfer happens outside the app (e.g., via InstaPay, Cash, or Bank Transfer). You just mark it as "Settled" here.
+        </p>
+    </div>
+
+</div>
+{% endblock %}

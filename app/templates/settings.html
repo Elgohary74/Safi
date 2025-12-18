@@ -1,108 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safi - Settings</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Add Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-<div class="app-container">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <i class="fa-solid fa-bolt fa-2xl" style="color: #00E6C3;"></i>
-            <h2 class="text-xl font-bold">Safi</h2>
+{% extends "base.html" %}
+
+{% block title %}Safi - Settings{% endblock %}
+
+{% block header %}
+<header class="page-header">
+    <h2 class="page-title">Account Settings</h2>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2 gap-8">
+    <div class="card">
+        <h3 class="section-title mb-4 border-b pb-2">Profile Details</h3>
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl">👤</div>
+            <div class="flex-1">
+                <label class="form-label">Profile Picture</label>
+                <div class="relative">
+                    <select class="auth-input appearance-none cursor-pointer">
+                        <option value="avatar1">Default Avatar</option>
+                        <option value="avatar2">Uploaded Photo</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard.index') }}" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="{{ url_for('GroupController:list_groups') }}" class="nav-link"><i
-                    class="fas fa-users"></i> My Groups</a>
-            <a href="{{ url_for('dashboard.activity') }}" class="nav-link"><i class="fas fa-chart-line"></i>
-                Activity</a>
-            <a href="{{ url_for('dashboard.settings') }}" class="nav-link active"><i class="fas fa-cog"></i>
-                Settings</a>
-        </nav>
-
-        <div class="user-profile">
-            <div class="w-8 h-8 rounded-full bg-gray-600"></div>
+        <div class="space-y-4">
             <div>
-                <p class="text-sm font-bold">{{ current_user.name if current_user else 'Guest' }}</p>
-                <form action="{{ url_for('AuthController:handle_logout') }}" method="POST" class="inline">
-                    <button type="submit"
-                            class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
-                        Logout
-                    </button>
-                </form>
+                <label class="form-label">Full Name</label>
+                <input type="text" class="auth-input" value="Omar Badran">
+            </div>
+            <div>
+                <label class="form-label">Email Address</label>
+                <input type="email" class="auth-input" value="s-omar.shehta@zewailcity.edu.eg">
+            </div>
+            <div>
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="auth-input" value="+20 xxxxxxxxxx">
+            </div>
+            <button class="btn btn-primary w-full mt-4">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="section-title mb-4 border-b pb-2">Payment Methods</h3>
+        <div class="space-y-3 mb-6">
+            <div class="flex items-center justify-between p-3 border rounded-xl bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <i class="fab fa-cc-visa text-blue-800 text-xl"></i>
+                    <div>
+                        <p class="text-sm font-bold">Visa ending in 4242</p>
+                        <p class="text-muted-sm">Expires 12/25</p>
+                    </div>
+                </div>
+                <button class="text-red-500 text-xs font-bold hover:underline">Remove</button>
             </div>
         </div>
-    </aside>
-
-    <main class="main-content">
-        <header class="page-header">
-            <h2 class="page-title">Account Settings</h2>
-        </header>
-
-        <div class="content-padding grid grid-cols-2 gap-8">
-            <!-- Profile Section -->
-            <div class="card">
-                <h3 class="section-title mb-4 border-b pb-2">Profile Details</h3>
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl">👤</div>
-                    <div class="flex-1">
-                        <label class="form-label">Profile Picture</label>
-                        <div class="relative">
-                            <select class="auth-input appearance-none cursor-pointer">
-                                <option value="avatar1">🧑‍🦱 Style 1</option>
-                                <option value="avatar2">👩‍🦰 Style 2</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                                <i class="fas fa-chevron-down text-xs"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- NOTE: Form needs to submit changes to backend -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="form-label">Full Name</label>
-                        <input type="text" class="auth-input" value="Omar Badran">
-                    </div>
-                    <div>
-                        <label class="form-label">Email Address</label>
-                        <input type="email" class="auth-input" value="s-omar.shehta@zewailcity.edu.eg">
-                    </div>
-                    <div>
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" class="auth-input" value="+20 xxxxxxxxxx">
-                    </div>
-                    <button class="btn btn-primary w-full mt-4">Save Changes</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3 class="section-title mb-4 border-b pb-2">Payment Methods</h3>
-                <!-- NOTE: Render saved methods from DB -->
-                <div class="space-y-3 mb-6">
-                    <div class="flex items-center justify-between p-3 border rounded-xl bg-gray-50">
-                        <div class="flex items-center gap-3">
-                            <i class="fab fa-cc-visa text-blue-800 text-xl"></i>
-                            <div>
-                                <p class="text-sm font-bold">Visa ending in 4242</p>
-                                <p class="text-muted-sm">Expires 12/25</p>
-                            </div>
-                        </div>
-                        <button class="text-red-500 text-xs font-bold hover:underline">Remove</button>
-                    </div>
-                </div>
-                <button class="w-full border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition">
-                    + Add Method
-                </button>
-            </div>
-        </div>
-    </main>
+        <button class="w-full border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition">
+            + Add Method
+        </button>
+    </div>
 </div>
-</body>
-</html>
+{% endblock %}
