@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
@@ -33,15 +34,24 @@ class Config:
 
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
+    # JWT Settings
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "jwt-secret-key")
+    JWT_TOKEN_LOCATION = ["headers", "cookies"]
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+
+    # Cookie Security
+    JWT_COOKIE_SECURE = False  # Set to True in Production
+    JWT_COOKIE_CSRF_PROTECT = False
+    JWT_ACCESS_COOKIE_NAME = "access_token_cookie"
+    JWT_REFRESH_COOKIE_NAME = "refresh_token_cookie"
+    JWT_ACCESS_CSRF_COOKIE_NAME = "csrf_access_token"
+
     # MongoDB Connection
     MONGODB_SETTINGS = {
         "host": os.environ.get("MONGODB_URL"),
         "connect": False,  # We use connect=False to avoid connection issues with Gunicorn workers
     }
-
-    # Security Defaults
-    SESSION_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_HTTPONLY = True
 
 
 class DevelopmentConfig(Config):

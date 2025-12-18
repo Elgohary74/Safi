@@ -1,6 +1,6 @@
 from flask import flash, redirect, request, url_for
 from flask_classful import route
-from flask_login import login_user, logout_user
+from flask_jwt_extended import set_access_cookies, unset_jwt_cookies
 
 from app.controllers.base_controller import IController
 from app.models.user import UserLogin, UserRegister
@@ -57,13 +57,14 @@ class AuthController(IController):
             password=request.form.get("password"),
         )
 
-        user = self.auth_service.authenticate_user(
+        user, access_token = self.auth_service.authenticate_user(
             user_login.email, user_login.password
         )
-        login_user(user)
+        response = redirect(url_for("dashboard.dashboard_index"))
+        set_access_cookies(response, access_token)
 
         flash("Login successful!", "success")
-        return redirect(url_for("dashboard.index"))
+        return response
 
     @route("/logout", methods=["POST"])
     def logout_user(self):
@@ -76,5 +77,7 @@ class AuthController(IController):
         Returns:
             None
         """
-        logout_user()
-        return redirect(url_for("view.login_view"))
+        response = redirect(url_for("view.login_view"))
+        unset_jwt_cookies(response)
+        flash("You have been logged out.", "info")
+        return response

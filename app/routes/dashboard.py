@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from flask_login import current_user, login_required
+from flask_jwt_extended import current_user, jwt_required
 
 from app.services import GroupService
 
@@ -7,8 +7,8 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 group_service = GroupService()
 
 
-@dashboard_bp.route("/", methods=["GET"])
-@login_required
+@dashboard_bp.route("/", methods=["GET"], endpoint="dashboard_index")
+@jwt_required()
 def index():
     # Fetch groups as Pydantic models
     raw_groups = group_service.get_user_groups(current_user.user_id)
@@ -51,12 +51,12 @@ def index():
 
 
 @dashboard_bp.route("/activity")
-@login_required
+@jwt_required()
 def activity():
     return render_template("activity.html")
 
 
 @dashboard_bp.route("/settings")
-@login_required
+@jwt_required()
 def settings():
     return render_template("settings.html")

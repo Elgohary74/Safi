@@ -46,9 +46,7 @@ class GroupController(BaseController):
 
         flash("Group created successfully!", "success")
 
-        return redirect(
-            url_for("GroupController:list_groups", user_id=self.current_user.user_id)
-        )
+        return redirect(url_for("GroupController:list_groups"))
 
     @route("/<string:group_id>/details", methods=["GET"])
     def get_group_details(self, group_id: str):
@@ -78,8 +76,8 @@ class GroupController(BaseController):
             current_user_id=self.current_user.user_id,
         )
 
-    @route("/list/<user_id>", methods=["GET"])
-    def list_groups(self, user_id: str):
+    @route("/list", methods=["GET"])
+    def list_groups(self):
         """
         Retrieve and return a list of groups associated with a specific user.
 
@@ -94,7 +92,7 @@ class GroupController(BaseController):
             tuple: A tuple containing a dictionary with the key "groups" mapping to a list
                    of group dictionaries, and an HTTP status code of 200.
         """
-        groups = self.group_service.get_user_groups(user_id)
+        groups = self.group_service.get_user_groups(self.current_user.user_id)
         groups = [group.model_dump() for group in groups]
         return render_template(
             "groups.html",

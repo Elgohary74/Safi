@@ -13,21 +13,6 @@ class User(BaseModel):
     password_hash: str
     phone_number: Optional[str] = None
 
-    @property
-    def is_active(self):
-        return True
-
-    @property
-    def is_authenticated(self):
-        return True
-
-    @property
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return self.user_id
-
 
 class UserRegister(BaseModel):
     name: str
