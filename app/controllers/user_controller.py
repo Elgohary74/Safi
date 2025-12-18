@@ -1,8 +1,9 @@
-from app.controllers.base_controller import BaseController
-from app.services import UserService
+from flask import flash, redirect, request
 from flask_classful import route
-from flask import request, flash, redirect
+
+from app.controllers.base_controller import BaseController
 from app.models.user import UpdateUserRequest
+from app.services import UserService
 
 
 class UserController(BaseController):

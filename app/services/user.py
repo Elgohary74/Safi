@@ -1,7 +1,7 @@
 from flask_login import current_user
 
-from app.services.base import BaseService
 from app.models.user import UpdateUserRequest
+from app.services.base import BaseService
 
 
 class UserService(BaseService):
