@@ -4,47 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safi - Welcome</title>
-    <!-- Use url_for for static files -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="landing-bg-dark h-screen w-full flex flex-col items-center justify-center text-white relative">
 
-<div class="landing-blob-dark"></div>
-<div class="relative z-10 text-center max-w-2xl px-6 flex flex-col items-center">
-    <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center mb-8 border border-white/10 shadow-2xl">
-        <i class="fas fa-bolt text-brand-teal text-5xl"></i>
-    </div>
-    <h1 class="text-6xl font-bold mb-6 tracking-tight text-white">
-        Safi
-    </h1>
-    <p class="text-xl text-gray-400 mb-12 leading-relaxed font-medium">
-        The easiest way to track shared expenses and settle debts. <br>
-        <span class="text-brand-teal font-bold">Simple, fast, and fair.</span>
-    </p>
-    <div class="flex flex-col items-center w-full">
-        <!-- Use url_for to link to Flask routes -->
-        <a href="{{ url_for('view.login_view') }}" class="btn-landing-login">
-            Login
-        </a>
+    <div class="landing-blob-dark"></div>
 
-        <a href="{{ url_for('view.register_view') }}" class="link-landing-create">
-            Create an account
-        </a>
+    <div class="relative z-10 text-center max-w-2xl px-6 flex flex-col items-center">
+        <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center mb-8 border border-white/10 shadow-2xl">
+            <i class="fas fa-bolt text-brand-teal text-5xl" style="color: #00E6C3;"></i>
+        </div>
+        <h1 class="text-6xl font-bold mb-6 tracking-tight text-white">
+            Safi
+        </h1>
+        <p class="text-xl text-gray-400 mb-12 leading-relaxed font-medium">
+            The easiest way to track shared expenses and settle debts. <br>
+            <span class="text-brand-teal font-bold" style="color: #00E6C3;">Simple, fast, and fair.</span>
+        </p>
+        <div class="flex flex-col items-center w-full">
+            <a href="{{ url_for('view.login_view') }}" class="btn-landing-login">
+                Login
+            </a>
+
+            <a href="{{ url_for('view.register_view') }}" class="link-landing-create">
+                Create an account
+            </a>
+        </div>
+        <div class="mt-20 flex justify-center gap-8 text-gray-500 text-sm font-medium">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-check-circle" style="color: #00E6C3;"></i> Free to use
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="fas fa-shield-alt" style="color: #00E6C3;"></i> Secure Data
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="fas fa-bolt" style="color: #00E6C3;"></i> Fast Sync
+            </div>
+        </div>
     </div>
-    <div class="mt-20 flex justify-center gap-8 text-gray-500 text-sm font-medium">
-        <div class="flex items-center gap-2">
-            <i class="fas fa-check-circle text-brand-teal"></i> Free to use
-        </div>
-        <div class="flex items-center gap-2">
-            <i class="fas fa-shield-alt text-brand-teal"></i> Secure Data
-        </div>
-        <div class="flex items-center gap-2">
-            <i class="fas fa-bolt text-brand-teal"></i> Fast Sync
-        </div>
-    </div>
-</div>
 
 </body>
 </html>
