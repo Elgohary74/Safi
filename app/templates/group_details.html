@@ -3,48 +3,39 @@
 {% block title %}Safi - Group Details{% endblock %}
 
 {% block header %}
-<header class="page-header">
-    <div class="flex items-center gap-4">
-        <a href="{{ url_for('GroupController:list_groups') }}"
-           class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100 transition-colors">
-            <i class="fas fa-arrow-left"></i>
-        </a>
+    <header class="page-header">
+        <div class="flex items-center gap-4">
+            <a href="{{ url_for('GroupController:list_groups') }}"
+               class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+            </a>
 
-        <div class="flex items-center gap-3">
-            <h2 class="page-title">{{ group.group_name }}</h2>
+            <div class="flex items-center gap-3">
+                <h2 class="page-title">{{ group.group_name }}</h2>
 
-            <div class="group relative flex items-center">
-                <span class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200" title="Click to Copy">
+                <div class="group relative flex items-center">
+                <span class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
+                      title="Click to Copy">
                     {{ group.invite_code }}
                 </span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="flex gap-2">
-        <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
-        <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
-    </div>
-</header>
+        <div class="flex gap-2">
+            <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
+            <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
+        </div>
+    </header>
 {% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-3 gap-8">
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <div class="col-span-2 feed-list">
-        <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
+    <div class="grid grid-cols-3 gap-8">
+        <div class="col-span-2 feed-list">
+            <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
-        {% if expenses %}
-            {% for expense, user_share in expenses %}
+            {% if expenses %}
+                {% for expense, user_share in expenses %}
                     <div class="feed-item card">
                         <div class="flex gap-4">
                             <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
@@ -64,44 +55,45 @@
                         </div>
                     </div>
                 {% endfor %}
-        {% else %}
-            <div class="text-center py-8 text-gray-400">
-                <p>No expenses recorded yet.</p>
-            </div>
-        {% endif %}
-    </div>
+            {% else %}
+                <div class="text-center py-8 text-gray-400">
+                    <p>No expenses recorded yet.</p>
+                </div>
+            {% endif %}
+        </div>
 
-    <div class="col-span-1 flex flex-col gap-6">
-        <div class="card">
-            <p class="stat-label">Your Position</p>
-            <h2 class="text-{% if your_balance >= 0 %}status-success{% else %}status-danger{% endif %} text-3xl mb-4">
-                {{ '+' if your_balance >= 0 else '' }}{{ your_balance }} <span class="text-sm text-gray-400 font-normal">EGP</span>
-            </h2>
-            <hr class="border-gray-100 my-4">
+        <div class="col-span-1 flex flex-col gap-6">
+            <div class="card">
+                <p class="stat-label">Your Position</p>
+                <h2 class="text-{% if your_balance >= 0 %}status-success{% else %}status-danger{% endif %} text-3xl mb-4">
+                    {{ '+' if your_balance >= 0 else '' }}{{ your_balance }} <span
+                        class="text-sm text-gray-400 font-normal">EGP</span>
+                </h2>
+                <hr class="border-gray-100 my-4">
 
-            <div class="flex justify-between items-center mb-3">
-                <h4 class="font-bold text-sm">Members ({{ group.members|length if group.members else 0 }})</h4>
-            </div>
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-sm">Members ({{ group.members|length if group.members else 0 }})</h4>
+                </div>
 
-            <ul class="space-y-3 text-sm text-gray-600">
-                {% if members %}
-                    {% for member in members %}
-                        <li class="flex justify-between items-center group">
-                            <div class="flex items-center gap-2">
-                                <img src="{{ url_for('static', filename='assets/' + (member.avatar if member.avatar else 'user.png')) }}"
-                                     class="w-8 h-8 rounded-full object-cover border border-gray-100">
+                <ul class="space-y-3 text-sm text-gray-600">
+                    {% if members %}
+                        {% for member in members %}
+                            <li class="flex justify-between items-center group">
+                                <div class="flex items-center gap-2">
+                                    <img src="{{ url_for('static', filename='assets/' + (member.avatar if member.avatar else 'user.png')) }}"
+                                         class="w-8 h-8 rounded-full object-cover border border-gray-100">
 
-                                <div class="flex flex-col">
-                                    <span class="font-medium text-gray-900">{{ member.name }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-900">{{ member.name }}</span>
 
-                                    <!-- ADMIN LABEL: Logic assumes first member in list is creator/admin -->
-                                    {% if loop.first %}
-                                        <span class="text-[10px] text-brand-teal font-bold uppercase tracking-wider">Admin</span>
-                                    {% endif %}
+                                        <!-- ADMIN LABEL: Logic assumes first member in list is creator/admin -->
+                                        {% if loop.first %}
+                                            <span class="text-[10px] text-brand-teal font-bold uppercase tracking-wider">Admin</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3">
                                 <span class="{% if member.balance > 0 %}text-green-500{% elif member.balance < 0 %}text-red-500{% else %}text-gray-400{% endif %} font-bold text-xs">
                                     {% if member.balance > 0 %}
                                         Gets {{ member.balance }}
@@ -112,43 +104,43 @@
                                     {% endif %}
                                 </span>
 
-                                <!-- DELETE MEMBER BUTTON -->
-                                <!-- LOGIC: Show button ONLY if current user is Admin (index 0) AND we are not trying to delete the admin themselves -->
-                                <!-- Note: This relies on 'members' list order where members[0] is admin -->
-                                {% if members[0].id == current_user.id and not loop.first %}
-                                    <button onclick="confirmRemoveMember('{{ member.id }}')"
-                                            class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
-                                            title="Remove Member">
-                                        <i class="fas fa-times text-xs"></i>
-                                    </button>
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% endfor %}
-                {% else %}
-                    <!-- Fallback if members list is empty/loading -->
-                    {% if group and group.members %}
-                        {% for member in group.members %}
-                             <li class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <span class="font-medium">{{ member.name or member }}</span>
-                                        {% if loop.first %}
-                                            <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
-                                        {% endif %}
-                                    </div>
+                                    <!-- DELETE MEMBER BUTTON -->
+                                    <!-- LOGIC: Show button ONLY if current user is Admin (index 0) AND we are not trying to delete the admin themselves -->
+                                    <!-- Note: This relies on 'members' list order where members[0] is admin -->
+                                    {% if members[0].id == current_user.id and not loop.first %}
+                                        <button onclick="confirmRemoveMember('{{ member.id }}')"
+                                                class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
+                                                title="Remove Member">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    {% endif %}
                                 </div>
                             </li>
                         {% endfor %}
                     {% else %}
-                        <li class="text-gray-400 italic">No members found</li>
+                        <!-- Fallback if members list is empty/loading -->
+                        {% if group and group.members %}
+                            {% for member in group.members %}
+                                <li class="flex justify-between items-center">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="font-medium">{{ member.name or member }}</span>
+                                            {% if loop.first %}
+                                                <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="text-gray-400 italic">No members found</li>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            </ul>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

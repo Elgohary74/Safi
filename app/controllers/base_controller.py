@@ -8,6 +8,7 @@ class IController(FlaskView):
 
 
 class BaseController(IController):
+    route_base = ""
     decorators = IController.decorators + [login_required]
 
     def __init__(self):
