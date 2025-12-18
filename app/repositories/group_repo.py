@@ -22,7 +22,7 @@ class GroupRepository(IRepository):
 
     def get_by_invite_code(self, invite_code: str) -> Optional[GroupSchema]:
         self.logger.debug(f"searching group by invite code: {invite_code}")
-        data = self.collection.find_one({"working_invites": invite_code})
+        data = self.collection.find_one({"invite_code": invite_code})
         return GroupSchema.model_validate(data) if data else None
 
     def add_member(self, group_id: str, user_id: str):
@@ -33,7 +33,9 @@ class GroupRepository(IRepository):
 
     def get_groups_by_user(self, user_id: str) -> list[GroupSchema]:
         self.logger.debug(f"fetching groups for user id: {user_id}")
-        groups = self.collection.find({"members": user_id})
+        groups = self.collection.find(
+            {"$or": [{"members": user_id}, {"past_members": user_id}]}
+        )
         return [GroupSchema.model_validate(group) for group in groups]
 
     def update(self, group_id: str, data: GroupSchema):
@@ -43,3 +45,29 @@ class GroupRepository(IRepository):
 
     def delete(self, group_id: str):
         self.collection.delete_one({"_id": group_id})
+
+    def add_pending_member(self, group_id: str, user_id: str):
+        self.logger.info(f"adding pending user {user_id} to group {group_id}")
+        self.collection.update_one(
+            {"_id": group_id}, {"$addToSet": {"pending_members": user_id}}
+        )
+
+    def remove_pending_member(self, group_id: str, user_id: str):
+        self.logger.info(f"removing pending user {user_id} from group {group_id}")
+        self.collection.update_one(
+            {"_id": group_id}, {"$pull": {"pending_members": user_id}}
+        )
+
+    def move_pending_to_member(self, group_id: str, user_id: str):
+        self.logger.info(f"moving pending user {user_id} to member in group {group_id}")
+        self.collection.update_one(
+            {"_id": group_id},
+            {"$pull": {"pending_members": user_id}, "$addToSet": {"members": user_id}},
+        )
+
+    def move_member_to_past(self, group_id: str, user_id: str):
+        self.logger.info(f"moving member {user_id} to past member in group {group_id}")
+        self.collection.update_one(
+            {"_id": group_id},
+            {"$pull": {"members": user_id}, "$addToSet": {"past_members": user_id}},
+        )

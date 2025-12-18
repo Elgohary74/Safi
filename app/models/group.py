@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import List
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -18,6 +19,10 @@ class GroupBase(GroupCreationRequest):
     group_id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
     working_invites: List[str] = Field(default_factory=list)
     debts: List[Debt] = Field(default_factory=list)
+    invite_code: str = Field(default="")
+    invite_code_expiry: datetime = Field(default_factory=lambda: datetime.now())
+    pending_members: List[str] = Field(default_factory=list)
+    past_members: List[str] = Field(default_factory=list)
 
 
 class Group(GroupBase):
@@ -32,3 +37,7 @@ class GroupSchema(GroupBase):
 
     first_member_id: str = Field(alias="first_member")
     members_ids: List[str] = Field(alias="members")
+    pending_members_ids: List[str] = Field(
+        alias="pending_members", default_factory=list
+    )
+    past_members_ids: List[str] = Field(alias="past_members", default_factory=list)
