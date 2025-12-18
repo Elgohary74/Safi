@@ -67,6 +67,15 @@ class GroupController(BaseController):
                 flash(str(e), "danger")
         return redirect(url_for("GroupController:list_groups"))
 
+    @route("/<group_id>/invite/refresh", methods=["POST"])
+    def refresh_invite_code(self, group_id):
+        try:
+            self.group_service.refresh_invite_code(self.current_user.user_id, group_id)
+            flash("Invite code regenerated successfully!", "success")
+        except (ResourceNotFound, CreationError) as e:
+            flash(e.message, "danger")
+        return redirect(url_for("GroupController:get_group_details", group_id=group_id))
+
     @route("/<group_id>/leave", methods=["POST"])
     def leave_group(self, group_id):
         try:

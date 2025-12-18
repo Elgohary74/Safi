@@ -207,3 +207,69 @@ def test_history_access_after_leaving(app):
         )
         assert found_group is not None
         assert user.user_id in found_group.past_members
+
+
+def test_create_group_sets_2_hour_expiry(app):
+    with app.app_context():
+        auth_service = AuthService()
+        user = register_random_reader(auth_service, "creator")
+        group_service = GroupService()
+        req = GroupCreationRequest(group_name="Short Expiry Group")
+
+        group = group_service.create_new_group(req, user.user_id)
+
+        # Check expiry is roughly 2 hours from now
+        now = datetime.now()
+        expected_expiry = now + timedelta(hours=2)
+
+        # Allow small delta for execution time
+        assert abs((group.invite_code_expiry - expected_expiry).total_seconds()) < 10
+
+
+def test_refresh_invite_code_success(app):
+    with app.app_context():
+        auth_service = AuthService()
+        admin = register_random_reader(auth_service, "admin_regen")
+        group_service = GroupService()
+        req = GroupCreationRequest(group_name="Regen Group")
+        group = group_service.create_new_group(req, admin.user_id)
+        group_id = group_service.save_new_group(group)
+
+        old_code = group.invite_code
+        # old_expiry = group.invite_code_expiry
+
+        # Manually set expiry to something old to verify update
+        group.invite_code_expiry = datetime.now() - timedelta(days=1)
+        schema = group_service._convert_group_to_schema(group)
+        group_service.group_repo.update(group_id, schema)
+
+        # Refresh
+        new_code = group_service.refresh_invite_code(admin.user_id, group_id)
+
+        assert new_code != old_code
+
+        updated_group = group_service.get_group(group_id)
+        assert updated_group.invite_code == new_code
+
+        # Check expiry is updated to 2 hours from now
+        now = datetime.now()
+        expected_expiry = now + timedelta(hours=2)
+        assert (
+            abs((updated_group.invite_code_expiry - expected_expiry).total_seconds())
+            < 10
+        )
+
+
+def test_refresh_invite_code_non_admin(app):
+    with app.app_context():
+        auth_service = AuthService()
+        admin = register_random_reader(auth_service, "admin_strict")
+        user = register_random_reader(auth_service, "user_hacker")
+
+        group_service = GroupService()
+        req = GroupCreationRequest(group_name="Secure Group")
+        group = group_service.create_new_group(req, admin.user_id)
+        group_id = group_service.save_new_group(group)
+
+        with pytest.raises(CreationError):
+            group_service.refresh_invite_code(user.user_id, group_id)
