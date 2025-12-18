@@ -1,4 +1,5 @@
 from flask import render_template
+from flask_jwt_extended import current_user, jwt_required
 
 from app import create_app
 
@@ -12,18 +13,21 @@ def index():
 
 # --- Static Pages Routes ---
 @app.route("/info/about")
+@jwt_required()
 def about():
-    return render_template("about.html")
+    return render_template("about.html", current_user=current_user)
 
 
 @app.route("/info/faq")
+@jwt_required()
 def faq():
-    return render_template("faq.html")
+    return render_template("faq.html", current_user=current_user)
 
 
 @app.route("/info/contact")
+@jwt_required()
 def contact():
-    return render_template("contact.html")
+    return render_template("contact.html", current_user=current_user)
 
 
 # --- Error Handlers ---

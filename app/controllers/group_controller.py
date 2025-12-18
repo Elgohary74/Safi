@@ -137,6 +137,7 @@ class GroupController(BaseController):
             group=group.model_dump(),
             expenses=list(zip(expenses, shares)),
             your_balance=round(sum(shares), 2),
+            current_user=self.current_user,
         )
 
     @route("/list", methods=["GET"])
@@ -146,6 +147,5 @@ class GroupController(BaseController):
         groups = [group.model_dump() for group in groups]
 
         return render_template(
-            "groups.html",
-            groups=groups,
+            "groups.html", groups=groups, current_user=self.current_user
         )

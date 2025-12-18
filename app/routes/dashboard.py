@@ -43,20 +43,21 @@ def index():
 
     return render_template(
         "dashboard.html",
-        groups=group_list,  # FIX: Pass the processed 'group_list', not the raw data
+        groups=group_list,
         net_balance=net_balance,
         amount_owed=amount_owed,
         amount_owing=amount_owing,
+        current_user=current_user,
     )
 
 
 @dashboard_bp.route("/activity")
 @jwt_required()
 def activity():
-    return render_template("activity.html")
+    return render_template("activity.html", current_user=current_user)
 
 
 @dashboard_bp.route("/settings")
 @jwt_required()
 def settings():
-    return render_template("settings.html")
+    return render_template("settings.html", current_user=current_user)
