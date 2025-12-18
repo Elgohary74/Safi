@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Optional, Tuple
 
+from flask_jwt_extended import create_access_token
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.user import User, UserRegister
@@ -27,12 +28,14 @@ class AuthService(BaseService):
         self.user_repo.add(new_user)
         return new_user
 
-    def authenticate_user(self, email: str, password: str) -> Optional[User]:
+    def authenticate_user(
+        self, email: str, password: str
+    ) -> Optional[Tuple[User, str]]:
         user: User = self.user_repo.get_by_email(email)
-        if not user:
+
+        if not user or not check_password_hash(user.password_hash, password):
             raise AuthenticationError("Invalid email or password")
 
-        if check_password_hash(user.password_hash, password):
-            return user
+        access_token = create_access_token(identity=user.user_id)
 
-        return None
+        return user, access_token
