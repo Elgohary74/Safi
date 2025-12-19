@@ -3,35 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safi - Welcome</title>
+    <title>Safi - The Best Way to Split Expenses</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="landing-bg-dark h-screen w-full flex flex-col items-center justify-center text-white relative">
+<body class="landing-bg-dark min-h-screen w-full flex flex-col items-center justify-start text-white relative" style="height: auto; overflow-y: auto;">
 
     <div class="landing-blob-dark"></div>
-
-    <div class="relative z-10 text-center max-w-2xl px-6 flex flex-col items-center">
+    <section class="min-h-screen flex flex-col items-center justify-center relative z-10 px-6 text-center w-full">
         <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center mb-8 border border-white/10 shadow-2xl">
             <i class="fas fa-bolt text-brand-teal text-5xl" style="color: #00E6C3;"></i>
         </div>
         <h1 class="text-6xl font-bold mb-6 tracking-tight text-white">
             Safi
         </h1>
-        <p class="text-xl text-gray-400 mb-12 leading-relaxed font-medium">
+        <p class="text-xl text-gray-400 mb-12 leading-relaxed font-medium max-w-2xl">
             The easiest way to track shared expenses and settle debts. <br>
             <span class="text-brand-teal font-bold" style="color: #00E6C3;">Simple, fast, and fair.</span>
+            Stop worrying about who owes who and start enjoying your time together.
         </p>
-        <div class="flex flex-col items-center w-full">
+        
+        <div class="flex flex-col items-center w-full gap-4">
             <a href="{{ url_for('view.login_view') }}" class="btn-landing-login">
                 Login
             </a>
 
-            <a href="{{ url_for('view.register_view') }}" class="link-landing-create">
+            <a href="{{ url_for('view.register_view') }}" class="link-landing-create" style="text-decoration: none;">
                 Create an account
             </a>
         </div>
-        <div class="mt-20 flex justify-center gap-8 text-gray-500 text-sm font-medium">
+
+        <div class="mt-20 flex flex-wrap justify-center gap-8 text-gray-500 text-sm font-medium">
             <div class="flex items-center gap-2">
                 <i class="fas fa-check-circle" style="color: #00E6C3;"></i> Free to use
             </div>
@@ -42,7 +44,194 @@
                 <i class="fas fa-bolt" style="color: #00E6C3;"></i> Fast Sync
             </div>
         </div>
-    </div>
+        <div class="absolute bottom-8 animate-bounce text-gray-500">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+    <section class="py-20 px-6 relative z-10 w-full bg-gray-800 bg-opacity-50">
+        <div class="max-w-6xl mx-auto text-center">
+             <h2 class="text-4xl font-bold mb-16">How It Works</h2>
+             <div class="grid md:grid-cols-3 gap-8 relative">
+                 <div class="hidden md:block absolute top-12 left-0 w-full h-1 bg-gray-700 -z-10 transform scale-x-75"></div>
+                 <div class="flex flex-col items-center">
+                     <div class="w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center border-4 border-gray-700 mb-6 shadow-lg z-10">
+                         <i class="fas fa-user-plus text-3xl text-brand-teal" style="color: #00E6C3;"></i>
+                     </div>
+                     <h3 class="text-xl font-bold mb-2">1. Create a Group</h3>
+                     <p class="text-gray-400 text-sm">Sign up and create a group for your trip, house, or event. Invite friends instantly.</p>
+                 </div>
+                 <div class="flex flex-col items-center">
+                     <div class="w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center border-4 border-gray-700 mb-6 shadow-lg z-10">
+                         <i class="fas fa-receipt text-3xl text-blue-400"></i>
+                     </div>
+                     <h3 class="text-xl font-bold mb-2">2. Add Expenses</h3>
+                     <p class="text-gray-400 text-sm">Add bills as you go. We support splitting equally or by specific amounts.</p>
+                 </div>
+                 <div class="flex flex-col items-center">
+                     <div class="w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center border-4 border-gray-700 mb-6 shadow-lg z-10">
+                         <i class="fas fa-handshake text-3xl text-green-400"></i>
+                     </div>
+                     <h3 class="text-xl font-bold mb-2">3. Settle Up</h3>
+                     <p class="text-gray-400 text-sm">See who owes what. Pay back your friends via cash or app and record it in Safi.</p>
+                 </div>
+             </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 bg-gray-900 relative z-10 w-full">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16"><span class="text-brand-teal" style="color: #00E6C3;">Why Safi?</span></h2>
+            
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="text-center p-6 hover:bg-gray-800 rounded-xl transition duration-300">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-teal text-2xl" style="color: #00E6C3;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Group Management</h3>
+                    <p class="text-gray-400">Create groups for trips, roommates, or events. Add members easily and track expenses specific to each group.</p>
+                </div>
+                <div class="text-center p-6 hover:bg-gray-800 rounded-xl transition duration-300">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-teal text-2xl" style="color: #00E6C3;">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Smart Splitting</h3>
+                    <p class="text-gray-400">We do the math for you. Split expenses equally or by specific amounts. See exactly who owes what in real-time.</p>
+                </div>
+                <div class="text-center p-6 hover:bg-gray-800 rounded-xl transition duration-300">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-teal text-2xl" style="color: #00E6C3;">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Easy Settlement</h3>
+                    <p class="text-gray-400">Record payments via Cash, InstaPay, or Mobile Wallet. Settle debts with a single click.</p>
+                </div>
+                <div class="text-center p-6 hover:bg-gray-800 rounded-xl transition duration-300">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-purple-400 text-2xl">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Activity History</h3>
+                    <p class="text-gray-400">Keep a transparent log of every transaction. Never argue about "who paid when" again.</p>
+                </div>
+                <div class="text-center p-6 hover:bg-gray-800 rounded-xl transition duration-300">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-yellow-400 text-2xl">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Mobile Friendly</h3>
+                    <p class="text-gray-400">Access Safi from anywhere. Our responsive design works perfectly on your phone.</p>
+                </div>
+                <div class="text-center p-6 hover:bg-gray-800 rounded-xl transition duration-300">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-400 text-2xl">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Secure & Private</h3>
+                    <p class="text-gray-400">Your financial data is private. We don't link to bank accounts, keeping your info safe.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 relative z-10 w-full bg-gray-900">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-6">Meet the Team</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    A group of passionate developers dedicated to making shared expenses simple, fair, and stress-free for everyone.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-gray-800 rounded-2xl p-6 flex flex-col items-center text-center hover:-translate-y-2 transition-transform duration-300 border border-gray-700">
+                    <div class="w-32 h-32 mb-4 relative">
+                        <img src="{{ url_for('static', filename='assets/member1.jpeg') }}" alt="Team Member" class="w-32 h-32 rounded-full object-cover border-4 border-gray-700">
+                    </div>
+                    <h4 class="text-xl font-bold">Omar Mohamed</h4>
+                    <p class="text-brand-teal text-sm mb-2" style="color: #00E6C3;">Frontend Developer</p>
+                    <p class="text-gray-500 text-xs mb-4">Building intuitive user interfaces.</p>
+                    <div class="flex gap-3 text-gray-400">
+                        <a href="#" class="hover:text-white"><i class="fab fa-github"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl p-6 flex flex-col items-center text-center hover:-translate-y-2 transition-transform duration-300 border border-gray-700">
+                    <div class="w-32 h-32 mb-4 relative">
+                        <img src="{{ url_for('static', filename='assets/member2.jpeg') }}" alt="Team Member" class="w-32 h-32 rounded-full object-cover border-4 border-gray-700">
+                    </div>
+                    <h4 class="text-xl font-bold">Member Name</h4>
+                    <p class="text-brand-teal text-sm mb-2" style="color: #00E6C3;">Backend Developer</p>
+                    <p class="text-gray-500 text-xs mb-4">Architecting robust APIs.</p>
+                    <div class="flex gap-3 text-gray-400">
+                        <a href="#" class="hover:text-white"><i class="fab fa-github"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl p-6 flex flex-col items-center text-center hover:-translate-y-2 transition-transform duration-300 border border-gray-700">
+                    <div class="w-32 h-32 mb-4 relative">
+                        <img src="{{ url_for('static', filename='assets/member3.jpeg') }}" alt="Team Member" class="w-32 h-32 rounded-full object-cover border-4 border-gray-700">
+                    </div>
+                    <h4 class="text-xl font-bold">Member Name</h4>
+                    <p class="text-brand-teal text-sm mb-2" style="color: #00E6C3;">Full Stack</p>
+                    <p class="text-gray-500 text-xs mb-4">Bridging the gap between UI and API.</p>
+                    <div class="flex gap-3 text-gray-400">
+                        <a href="#" class="hover:text-white"><i class="fab fa-github"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl p-6 flex flex-col items-center text-center hover:-translate-y-2 transition-transform duration-300 border border-gray-700">
+                    <div class="w-32 h-32 mb-4 relative">
+                        <img src="{{ url_for('static', filename='assets/member4.jpeg') }}" alt="Team Member" class="w-32 h-32 rounded-full object-cover border-4 border-gray-700">
+                    </div>
+                    <h4 class="text-xl font-bold">Member Name</h4>
+                    <p class="text-brand-teal text-sm mb-2" style="color: #00E6C3;">UI/UX Designer</p>
+                    <p class="text-gray-500 text-xs mb-4">Designing seamless experiences.</p>
+                    <div class="flex gap-3 text-gray-400">
+                        <a href="#" class="hover:text-white"><i class="fab fa-github"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-20 px-6 relative z-10 w-full">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16">Frequently Asked Questions</h2>
+            
+            <div class="space-y-6">
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                    <h3 class="font-bold text-lg mb-2 text-white">How do I create a group?</h3>
+                    <p class="text-gray-400">Simply sign up, go to your dashboard, and click the "Create Group" button. Give it a name and you're ready to add members!</p>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                    <h3 class="font-bold text-lg mb-2 text-white">How do I add expenses?</h3>
+                    <p class="text-gray-400">Navigate to a specific group's page and click "Add Expense". Enter the amount, description, and who paid. You can now also select specific members to split the cost with.</p>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                    <h3 class="font-bold text-lg mb-2 text-white">Is Safi free to use?</h3>
+                    <p class="text-gray-400">Yes! Safi is completely free for managing shared expenses with friends and family.</p>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                    <h3 class="font-bold text-lg mb-2 text-white">Can I settle debts through the app?</h3>
+                    <p class="text-gray-400">We record settlements to update balances, but the actual money transfer happens outside the app (e.g., via InstaPay, Cash, or Bank Transfer). Just click "Settle Up" to record it.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 relative z-10 w-full text-center">
+        <div class="max-w-4xl mx-auto bg-gradient-to-r from-teal-900 to-blue-900 rounded-3xl p-12 border border-white/10">
+            <h2 class="text-3xl font-bold mb-4">Ready to start?</h2>
+            <p class="text-gray-300 mb-8">Join thousands of users who are managing their shared expenses stress-free.</p>
+            <a href="{{ url_for('view.register_view') }}" class="btn-landing-login mx-auto">Get Started Now</a>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-gray-500 text-sm relative z-10 border-t border-gray-800 w-full">
+        <p>Safi - Team 36 CSAI 203</p>
+    </footer>
 
 </body>
 </html>
