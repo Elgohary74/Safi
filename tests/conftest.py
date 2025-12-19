@@ -1,10 +1,13 @@
 import os
 
 import pytest
+import test_router  # noqa: F401 Ensure test_router is imported first
 
 from app import create_app
 from app.config import TestingConfig
 from app.repositories.user_repo import UserRepository
+
+__all__ = [test_router]
 
 
 @pytest.fixture(scope="session", autouse=True)

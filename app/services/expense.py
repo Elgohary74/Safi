@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from app.events.signals import expense_created
 from app.models import Expense
 from app.models.expense import ExpenseCreationRequest
 from app.services.base import BaseService
@@ -28,6 +29,7 @@ class ExpenseService(BaseService):
         expense_id = self.expense_repo.add(expense_schema)
         if not expense_id:
             raise CreationError(message="Failed to create expense")
+        expense_created.send(self, expense=expense)
         return expense_id
 
     def get_group_expenses(self, group_id: str) -> list[Expense]:

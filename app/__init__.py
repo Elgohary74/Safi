@@ -3,6 +3,7 @@ import os
 from flask import Flask
 
 from app.controllers import __all__ as all_controllers
+from app.events import enable_notifications
 from app.utils import register_error_handlers
 from app.utils.jwt_manager import init_jwt
 
@@ -18,6 +19,7 @@ def create_app(config_class=DevelopmentConfig):
     app.secret_key = os.urandom(24)
     configure_logging(app)
     register_error_handlers(app)
+    enable_notifications(app)
 
     init_jwt(app)
 

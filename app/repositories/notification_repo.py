@@ -16,7 +16,7 @@ class NotificationRepository(IRepository):
 
     def get_by_id(self, notif_id: str) -> Optional[NotificationSchema]:
         self.logger.debug(f"fetching notification id: {notif_id}")
-        data = self.collection.find_one({"_id": notif_id})
+        data = self.collection.find_one({"notification_id": notif_id})
         return NotificationSchema.model_validate(data) if data else None
 
     def get_unread_by_user(self, user_id: str) -> List[NotificationSchema]:
@@ -26,12 +26,14 @@ class NotificationRepository(IRepository):
 
     def mark_as_read(self, notif_id: str):
         self.logger.debug(f"marking notification {notif_id} as read")
-        self.collection.update_one({"_id": notif_id}, {"$set": {"is_read": True}})
+        self.collection.update_one(
+            {"notification_id": notif_id}, {"$set": {"is_read": True}}
+        )
 
     def update(self, id: str, data: NotificationSchema):
         self.logger.info(f"updating notification id: {id}")
-        self.collection.update_one({"_id": id}, {"$set": data.model_dump()})
+        self.collection.update_one({"notification_id": id}, {"$set": data.model_dump()})
 
     def delete(self, id: str):
         self.logger.info(f"deleting notification id: {id}")
-        self.collection.delete_one({"_id": id})
+        self.collection.delete_one({"notification_id": id})

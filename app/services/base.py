@@ -1,6 +1,18 @@
-from app.models import Expense, ExpenseSchema, Group, GroupSchema
-from app.models.shared_expense import SharedExpense
-from app.repositories import ExpenseRepository, GroupRepository, UserRepository
+from app.models import (
+    Expense,
+    ExpenseSchema,
+    Group,
+    GroupSchema,
+    Notification,
+    NotificationSchema,
+    SharedExpense,
+)
+from app.repositories import (
+    ExpenseRepository,
+    GroupRepository,
+    NotificationRepository,
+    UserRepository,
+)
 from app.utils.exceptions import ResourceNotFound
 
 
@@ -9,6 +21,7 @@ class BaseService:
         self.group_repo = GroupRepository()
         self.user_repo = UserRepository()
         self.expense_repo = ExpenseRepository()
+        self.notification_repo = NotificationRepository()
 
     # Group Conversions
     def _convert_group_to_schema(self, group: Group) -> GroupSchema:
@@ -96,4 +109,28 @@ class BaseService:
             payer=payer,
             date=schema.date,
             splits=splits,
+        )
+
+    # Notification Conversions
+    def _convert_notification_to_schema(
+        self, notification: Notification
+    ) -> NotificationSchema:
+        return NotificationSchema(
+            notification_id=notification.notification_id,
+            user_id=notification.user.user_id,
+            message=notification.message,
+            timestamp=notification.timestamp,
+            type=notification.type,
+        )
+
+    def _convert_schema_to_notification(
+        self, schema: NotificationSchema
+    ) -> Notification:
+        user = self.get_user(schema.user_id)
+        return Notification(
+            notification_id=schema.notification_id,
+            user=user,
+            message=schema.message,
+            timestamp=schema.timestamp,
+            type=schema.type,
         )
