@@ -32,6 +32,7 @@ def contact():
 
 # --- Error Handlers ---
 @app.errorhandler(400)
+@jwt_required(optional=True)
 def bad_request(e):
     return (
         render_template(
@@ -45,6 +46,7 @@ def bad_request(e):
 
 
 @app.errorhandler(401)
+@jwt_required(optional=True)
 def unauthorized(e):
     return (
         render_template(
@@ -58,6 +60,7 @@ def unauthorized(e):
 
 
 @app.errorhandler(403)
+@jwt_required(optional=True)
 def forbidden(e):
     return (
         render_template(
@@ -71,6 +74,7 @@ def forbidden(e):
 
 
 @app.errorhandler(404)
+@jwt_required(optional=True)
 def page_not_found(e):
     return (
         render_template(
@@ -84,6 +88,7 @@ def page_not_found(e):
 
 
 @app.errorhandler(500)
+@jwt_required(optional=True)
 def internal_server_error(e):
     return (
         render_template(

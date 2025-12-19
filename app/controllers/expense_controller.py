@@ -1,4 +1,4 @@
-from flask import flash, redirect, request, url_for
+from flask import flash, redirect, request
 from flask_classful import route
 
 from app.controllers.base_controller import BaseController
