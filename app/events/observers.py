@@ -7,7 +7,7 @@ def handle_involved_users(sender, expense: Expense, **extra):
     notify_repo = NotificationRepository()
 
     for shared_expense in expense.splits:
-        if shared_expense.user.user_id != expense.payer.user_id:
+        if shared_expense.participant.user_id != expense.payer.user_id:
             message = (
                 f"{expense.payer.name} has paid a new expense of {expense.total_amount}EGP Total"
                 f"Description: {expense.description}. "
