@@ -36,7 +36,9 @@ def index():
             {
                 "id": group.get("group_id"),
                 "name": group.get("group_name"),
-                "member_count": len(group.get("members", [])) if "members" in group else 1,
+                "member_count": (
+                    len(group.get("members", [])) if "members" in group else 1
+                ),
                 "is_active": True,
                 "user_balance": user_balance,
             }

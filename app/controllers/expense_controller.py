@@ -1,11 +1,12 @@
+from datetime import datetime
+
 from flask import flash, redirect, request
 from flask_classful import route
 
 from app.controllers.base_controller import BaseController
-from app.models.expense import ExpenseCreationRequest, Expense, SharedExpense
 from app.models.debt import Debt
+from app.models.expense import Expense, ExpenseCreationRequest, SharedExpense
 from app.services import ExpenseService, GroupService
-from datetime import datetime
 
 
 class ExpenseController(BaseController):

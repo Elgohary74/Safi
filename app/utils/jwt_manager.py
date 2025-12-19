@@ -7,7 +7,6 @@ jwt = JWTManager()
 
 
 def init_jwt(app):
-
     jwt.init_app(app)
 
     @jwt.user_lookup_loader
