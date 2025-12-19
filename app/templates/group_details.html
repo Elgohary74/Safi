@@ -42,7 +42,7 @@
             <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
             {% if expenses %}
-                {% for expense, user_share in expenses %}
+                {% for expense, user_share in expenses[::-1] %}
                     <div class="feed-item card">
                         <div class="flex gap-4">
                             <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
@@ -108,7 +108,7 @@
                                     {#                                        Settled#}
                                     {#                                    {% endif %}#}
                                     {#                                </span>#}
-                                    {% if group.first_member.user_id != member.user_id %}
+                                    {% if group.first_member.user_id == current_user.user_id and group.first_member.user_id != member.user_id %}
                                         <button onclick="confirmRemoveMember('{{ member.user_id }}')"
                                                 class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
                                                 title="Remove Member">
@@ -119,26 +119,7 @@
                             </li>
                         {% endfor %}
                     {% else %}
-                        <!-- Fallback if members list is empty/loading -->
-                        {% if group and group.members %}
-                            {% for member in group.members %}
-                                <li class="flex justify-between items-center">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <div class="flex flex-col">
-                                            <span class="font-medium">{{ member.name or member }}</span>
-                                            {% if loop.first %}
-                                                <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        {% else %}
-                            <li class="text-gray-400 italic">No members found</li>
-                        {% endif %}
+                        <li class="text-gray-400 italic">No members found</li>
                     {% endif %}
                 </ul>
             </div>

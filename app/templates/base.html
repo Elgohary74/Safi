@@ -124,23 +124,23 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form action="/expenses/create" method="POST" class="space-y-4">
+        <form action="{{ url_for("ExpenseController:create_expense") }}" method="POST" class="space-y-4">
             <div>
                 <label class="form-label">Description</label>
                 <input type="text" name="description" class="auth-input" placeholder="e.g. Dinner, Taxi" required>
             </div>
             <div>
                 <label class="form-label">Amount</label>
-                <input type="number" name="amount" step="0.01" class="auth-input" placeholder="0.00 EGP" required>
+                <input type="number" name="total_amount" step="0.01" class="auth-input" placeholder="0.00 EGP" required>
             </div>
 
             {% if group is defined and group and group.members %}
                 <input type="hidden" name="group_id" value="{{ group.group_id }}">
                 <div>
                     <label class="form-label">Paid By</label>
-                    <select name="paid_by" class="auth-input" required>
+                    <select name="payer_id" class="auth-input" required>
                         {% for member in group.members %}
-                            <option value="{{ member.id if member.id else member }}">{{ member.name if member.name else member }}</option>
+                            <option value="{{ member.user_id }}">{{ member.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -151,15 +151,15 @@
                         <option value="" disabled selected>Select a group</option>
                         {% if groups is defined and groups %}
                             {% for g in groups %}
-                                <option value="{{ g.group_id }}">{{ g.group_name }}</option>
+                                <option value="{{ g.group_id }}">{{ g.name }}</option>
                             {% endfor %}
                         {% endif %}
                     </select>
                 </div>
                 <div>
                     <label class="form-label">Paid By</label>
-                    <select name="paid_by" class="auth-input">
-                        <option value="{{ current_user.id if current_user is defined else '1' }}">Me</option>
+                    <select name="payer_id" class="auth-input">
+                        <option value="{{ current_user.id }}">{{ current_user.name }}</option>
                     </select>
                 </div>
             {% endif %}
@@ -231,25 +231,31 @@
 </div>
 
 <!-- 4. REMOVE MEMBER MODAL (Global) -->
-<div id="removeMemberModal" class="modal-overlay hidden">
-    <div class="modal-content text-center">
-        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
-            <i class="fas fa-user-times"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Member?</h3>
-        <p class="text-gray-500 mb-6">Are you sure you want to remove this member? This action cannot be undone.</p>
+{% if group %}
+    <div id="removeMemberModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                <i class="fas fa-user-times"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Member?</h3>
+            <p class="text-gray-500 mb-6">Are you sure you want to remove this member? This action cannot be undone.</p>
 
-        <form id="removeMemberForm" action="#" method="POST" class="flex gap-3">
-            <button type="button" onclick="closeModal('removeMemberModal')" class="flex-1 btn btn-white justify-center">
-                Cancel
-            </button>
-            <button type="submit"
-                    class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
-                Remove
-            </button>
-        </form>
+            <form id="removeMemberForm" action="{{ url_for('GroupController:remove_member', group_id=group.group_id) }}"
+                  method="POST"
+                  class="flex gap-3">
+                <input type="hidden" name="member_id" id="member_id">
+                <button type="button" onclick="closeModal('removeMemberModal')"
+                        class="flex-1 btn btn-white justify-center">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
+                    Remove
+                </button>
+            </form>
+        </div>
     </div>
-</div>
+{% endif %}
 
 <script>
     function openModal(modalId) {
@@ -275,7 +281,7 @@
 
     function confirmRemoveMember(memberId) {
         const form = document.getElementById('removeMemberForm');
-        form.action = "/groups/remove_member/" + memberId;
+        form.querySelector('#member_id').value = memberId;
         openModal('removeMemberModal');
     }
 

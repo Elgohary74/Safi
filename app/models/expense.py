@@ -13,6 +13,7 @@ class ExpenseCreationRequest(BaseModel):
     group_id: str
     total_amount: float
     description: str = Field(default="")
+    payer_id: str
 
 
 class ExpenseBase(BaseModel):

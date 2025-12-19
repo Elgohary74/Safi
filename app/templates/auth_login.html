@@ -5,50 +5,52 @@
 {% block sidebar %}{% endblock %}
 
 {% block main_layout %}
-<div class="auth-brand-panel">
-    <div class="auth-bg-overlay"></div>
-    <div class="auth-blob"></div>
+    <div class="auth-brand-panel">
+        <div class="auth-bg-overlay"></div>
+        <div class="auth-blob"></div>
 
-    <div class="relative z-10">
-        <div class="auth-logo-box">
-            <i class="fas fa-bolt text-brand-teal text-3xl" style="color: #00E6C3;"></i>
+        <div class="relative z-10">
+            <div class="auth-logo-box">
+                <i class="fas fa-bolt text-brand-teal text-3xl" style="color: #00E6C3;"></i>
+            </div>
+            <h1 class="text-5xl font-bold mb-6 leading-tight">Split expenses,<br>keep friendships.</h1>
+            <p class="text-gray-400 text-lg leading-relaxed">The easiest way to track shared expenses and settle debts
+                with friends, roommates, and family in Egypt.</p>
         </div>
-        <h1 class="text-5xl font-bold mb-6 leading-tight">Split expenses,<br>keep friendships.</h1>
-        <p class="text-gray-400 text-lg leading-relaxed">The easiest way to track shared expenses and settle debts
-            with friends, roommates, and family in Egypt.</p>
     </div>
-</div>
 
-<div class="auth-form-panel">
-    <div class="auth-form-container">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-        <p class="text-gray-500 mb-8">Please enter your details.</p>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <div class="auth-form-panel">
+        <div class="auth-form-container">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+            <p class="text-gray-500 mb-8">Please enter your details.</p>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        <form action="{{ url_for('AuthController:handle_login') }}" method="POST" class="space-y-4">
-            <div>
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="auth-input" placeholder="name@example.com" required>
-            </div>
-            <div>
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="auth-input" placeholder="Enter your password" required>
-            </div>
-            <div class="pt-2">
-                <button type="submit" class="btn-signin">Login</button>
-            </div>
-            <p class="text-center text-gray-500 text-sm mt-6">
-                Don't have an account? <a href="{{ url_for('view.register_view') }}" class="link-teal">Sign up</a>
-            </p>
-        </form>
+            <form action="{{ url_for('AuthController:handle_login') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="auth-input" placeholder="name@example.com" required>
+                </div>
+                <div>
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="auth-input" placeholder="Enter your password"
+                           required>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="btn-signin">Login</button>
+                </div>
+                <p class="text-center text-gray-500 text-sm mt-6">
+                    Don't have an account? <a href="{{ url_for('view.register_view') }}" class="link-teal">Sign
+                    up</a>
+                </p>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock %}

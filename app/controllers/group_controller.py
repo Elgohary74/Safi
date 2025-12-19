@@ -112,9 +112,7 @@ class GroupController(BaseController):
     def remove_member(self, group_id):
         member_id = request.form.get("member_id")
         try:
-            self.group_service.remove_member(
-                self.current_user.user_id, group_id, member_id
-            )
+            self.group_service.remove_member(group_id, member_id)
             flash("Member removed successfully!", "success")
         except (ResourceNotFound, CreationError) as e:
             flash(e.message, "danger")
@@ -144,7 +142,8 @@ class GroupController(BaseController):
 
         # the template needs to know if current user is admin
         is_admin = False
-        if group and group.first_member == self.current_user.user_id:
+        if group.first_member.user_id == self.current_user.user_id:
+            self.group_service.refresh_invite_code(self.current_user.user_id, group_id)
             is_admin = True
 
         return render_template(

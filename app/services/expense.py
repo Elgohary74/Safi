@@ -14,7 +14,7 @@ class ExpenseService(BaseService):
 
     def create_new_expense(self, request: ExpenseCreationRequest) -> Expense:
         group = self.get_group(request.group_id)
-        payer = self.user_repo.get_by_id(current_user.user_id)
+        payer = self.get_user(request.payer_id)
 
         new_expense = Expense(
             description=request.description,

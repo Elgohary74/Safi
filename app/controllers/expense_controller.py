@@ -21,4 +21,4 @@ class ExpenseController(BaseController):
 
         flash("Expense added successfully!", "success")
 
-        return redirect(url_for("GroupController:list_groups"))
+        return redirect(request.referrer)

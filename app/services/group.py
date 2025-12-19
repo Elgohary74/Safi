@@ -60,15 +60,19 @@ class GroupService(BaseService):
         return new_group
 
     def refresh_invite_code(self, admin_id: str, group_id: str) -> str:
-        if not self._is_user_first_member_of_group(admin_id, group_id):
-            raise CreationError(message="Only the admin can refresh the invite code")
-
-        new_code = self.generate_invite_code(admin_id, group_id)
-        new_expiry = datetime.now() + timedelta(hours=2)
+        # if not self._is_user_first_member_of_group(admin_id, group_id):
+        #     raise CreationError(message="Only the admin can refresh the invite code")
 
         group_schema = self.group_repo.get_by_id(group_id)
         if not group_schema:
             raise ResourceNotFound(message="Group not found")
+
+        current_expiry = group_schema.invite_code_expiry
+        if datetime.now() < current_expiry:
+            return group_schema.invite_code
+
+        new_code = self.generate_invite_code(admin_id, group_id)
+        new_expiry = datetime.now() + timedelta(hours=2)
 
         group_schema.invite_code = new_code
         group_schema.invite_code_expiry = new_expiry
@@ -266,13 +270,7 @@ class GroupService(BaseService):
         group_schema.description = new_description
         self.group_repo.update(group_id, group_schema)
 
-    def remove_member(self, admin_id: str, group_id: str, member_id: str):
-        if not self._is_user_first_member_of_group(admin_id, group_id):
-            raise CreationError(message="Only the admin can remove members")
-
-        if admin_id == member_id:
-            raise CreationError(message="Admin cannot remove themselves")
-
+    def remove_member(self, group_id: str, member_id: str):
         group_schema = self.group_repo.get_by_id(group_id)
         if not group_schema:
             raise ResourceNotFound(message="Group not found")

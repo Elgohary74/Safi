@@ -60,7 +60,7 @@ def test_remove_member(app):
         group_service.join_group_by_code(member.user_id, group.invite_code)
 
         # Remove member
-        group_service.remove_member(admin.user_id, group.group_id, member.user_id)
+        group_service.remove_member(group.group_id, member.user_id)
 
         updated_group = group_service.get_group(group.group_id)
         assert member.user_id not in [m.user_id for m in updated_group.members]

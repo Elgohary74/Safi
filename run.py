@@ -34,7 +34,12 @@ def contact():
 @app.errorhandler(400)
 def bad_request(e):
     return (
-        render_template("error.html", error_code=400, error_message="Bad Request"),
+        render_template(
+            "error.html",
+            error_code=400,
+            error_message="Bad Request",
+            current_user=current_user,
+        ),
         400,
     )
 
@@ -43,7 +48,10 @@ def bad_request(e):
 def unauthorized(e):
     return (
         render_template(
-            "error.html", error_code=401, error_message="Unauthorized Access"
+            "error.html",
+            error_code=401,
+            error_message="Unauthorized Access",
+            current_user=current_user,
         ),
         401,
     )
@@ -51,13 +59,26 @@ def unauthorized(e):
 
 @app.errorhandler(403)
 def forbidden(e):
-    return render_template("error.html", error_code=403, error_message="Forbidden"), 403
+    return (
+        render_template(
+            "error.html",
+            error_code=403,
+            error_message="Forbidden",
+            current_user=current_user,
+        ),
+        403,
+    )
 
 
 @app.errorhandler(404)
 def page_not_found(e):
     return (
-        render_template("error.html", error_code=404, error_message="Page Not Found"),
+        render_template(
+            "error.html",
+            error_code=404,
+            error_message="Page Not Found",
+            current_user=current_user,
+        ),
         404,
     )
 
@@ -66,7 +87,10 @@ def page_not_found(e):
 def internal_server_error(e):
     return (
         render_template(
-            "error.html", error_code=500, error_message="Internal Server Error"
+            "error.html",
+            error_code=500,
+            error_message="Internal Server Error",
+            current_user=current_user,
         ),
         500,
     )
