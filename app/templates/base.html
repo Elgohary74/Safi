@@ -138,17 +138,18 @@
                     </select>
                 </div>
                 <div>
-                        <label class="form-label">Split With</label>
-                        <div class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50">
-                            {% for member in group.members %}
-                                <label class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
-                                    <input type="checkbox" name="split_with" value="{{ member.id if member.id else member }}" checked class="form-checkbox text-brand-teal rounded h-4 w-4">
-                                    <span class="text-sm text-gray-700">{{ member.name if member.name else member }}</span>
-                                </label>
-                            {% endfor %}
-                        </div>
-                        <p class="text-xs text-gray-400 mt-1">Uncheck to exclude from split.</p>
+                    <label class="form-label">Split With</label>
+                    <div class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50">
+                        {% for member in group.members %}
+                            <label class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
+                                <input type="checkbox" name="split_with" value="{{ member.user_id }}" checked
+                                       class="form-checkbox text-brand-teal rounded h-4 w-4">
+                                <span class="text-sm text-gray-700">{{ member.name }}</span>
+                            </label>
+                        {% endfor %}
                     </div>
+                    <p class="text-xs text-gray-400 mt-1">Uncheck to exclude from split.</p>
+                </div>
             {% else %}
                 <div>
                     <label class="form-label">Group</label>
@@ -164,7 +165,7 @@
                 <div>
                     <label class="form-label">Paid By</label>
                     <select name="payer_id" class="auth-input">
-                        <option value="{{ current_user.id }}">{{ current_user.name }}</option>
+                        <option value="{{ current_user.user_id }}">{{ current_user.name }}</option>
                     </select>
                 </div>
             {% endif %}
@@ -190,7 +191,7 @@
                     <label class="form-label">Pay To</label>
                     <select name="pay_to" class="auth-input" required>
                         {% for member in group.members %}
-                            <option value="{{ member.id if member.id else member }}">{{ member.name if member.name else member }}</option>
+                            <option value="{{ member.user_id }}">{{ member.name }}</option>
                         {% endfor %}
                     </select>
                 </div>

@@ -1,6 +1,7 @@
 from app.models import Expense, ExpenseSchema, Group, GroupSchema
 from app.repositories import ExpenseRepository, GroupRepository, UserRepository
 from app.utils.exceptions import ResourceNotFound
+from app.models.shared_expense import SharedExpense
 
 
 class BaseService:
@@ -55,6 +56,14 @@ class BaseService:
 
     # Expense Conversions
     def _convert_expense_to_schema(self, expense: Expense) -> ExpenseSchema:
+        # Convert splits to SharedExpenseSchema
+        splits = []
+        for split in getattr(expense, 'splits', []):
+            splits.append({
+                'participant_id': split.participant.user_id,
+                'amount': split.amount,
+                'status': split.status
+            })
         return ExpenseSchema(
             expense_id=expense.expense_id,
             description=expense.description,
@@ -62,12 +71,23 @@ class BaseService:
             group_id=expense.group.group_id,
             payer_id=expense.payer.user_id,
             date=expense.date,
+            splits=splits
         )
 
     def _convert_schema_to_expense(self, schema: ExpenseSchema) -> Expense:
         group = self.get_group(schema.group_id)
         payer = self.get_user(schema.payer_id)
-
+        # Convert splits from SharedExpenseSchema to SharedExpense
+        splits = []
+        for split in getattr(schema, 'splits', []):
+            user = self.get_user(split.participant_id)
+            splits.append(
+                SharedExpense(
+                    participant=user,
+                    amount=split.amount,
+                    status=split.status
+                )
+            )
         return Expense(
             expense_id=schema.expense_id,
             description=schema.description,
@@ -75,4 +95,5 @@ class BaseService:
             group=group,
             payer=payer,
             date=schema.date,
+            splits=splits
         )

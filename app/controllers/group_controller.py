@@ -135,12 +135,19 @@ class GroupController(BaseController):
     def get_group_details(self, group_id: str):
         group = self.group_service.get_group(group_id)
         expenses = self.expense_service.get_group_expenses(group_id)
-        shares = [
-            round(random.random() * 100, 2) * pow(-1, i % 2)
-            for i in range(len(expenses))
-        ]
 
-        # the template needs to know if current user is admin
+        user_shares = []
+        for expense in expenses:
+            involved_users = [split.participant.user_id for split in expense.splits]
+            if self.current_user.user_id not in involved_users:
+                user_shares.append(0.0)
+                continue
+
+            share = -expense.total_amount / len(expense.splits)
+            if expense.payer.user_id == self.current_user.user_id:
+                share += expense.total_amount
+            user_shares.append(round(share, 2))
+
         is_admin = False
         if group.first_member.user_id == self.current_user.user_id:
             self.group_service.refresh_invite_code(self.current_user.user_id, group_id)
@@ -149,8 +156,8 @@ class GroupController(BaseController):
         return render_template(
             "group_details.html",
             group=group,
-            expenses=list(zip(expenses, shares)),
-            your_balance=round(sum(shares), 2),
+            expenses=list(zip(expenses, user_shares)),
+            your_balance=round(sum(user_shares), 2),
             current_user=self.current_user,
             is_admin=is_admin,
         )
