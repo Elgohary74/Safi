@@ -60,8 +60,8 @@ class GroupService(BaseService):
         return new_group
 
     def refresh_invite_code(self, admin_id: str, group_id: str) -> str:
-        # if not self._is_user_first_member_of_group(admin_id, group_id):
-        #     raise CreationError(message="Only the admin can refresh the invite code")
+        if not self._is_user_first_member_of_group(admin_id, group_id):
+            raise CreationError(message="Only the admin can refresh the invite code")
 
         group_schema = self.group_repo.get_by_id(group_id)
         if not group_schema:
