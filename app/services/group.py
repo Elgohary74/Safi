@@ -2,8 +2,8 @@ import hashlib
 from datetime import datetime, timedelta
 from typing import Optional
 
+from app.events.signals import invite_sent
 from app.models import Group, GroupCreationRequest
-from app.repositories import NotificationRepository
 from app.services.base import BaseService
 from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceNotFound
 
@@ -11,7 +11,6 @@ from app.utils.exceptions import CreationError, ResourceAlreadyExists, ResourceN
 class GroupService(BaseService):
     def __init__(self):
         super().__init__()
-        self.notification_repo = NotificationRepository()
 
     def create_new_group(
         self, request: GroupCreationRequest, first_member_id: str
@@ -223,22 +222,7 @@ class GroupService(BaseService):
         # add to pending
         self.group_repo.add_pending_member(group_id, user.user_id)
 
-        # Send notification
-        from app.models.notification import NotificationSchema
-
-        self.notification_repo = (
-            self.notification_repo
-            if hasattr(self, "notification_repo")
-            else NotificationRepository()
-        )
-
-        notification = NotificationSchema(
-            user_id=user.user_id,
-            message=f"You have been invited to join group '{group_schema.group_name}'",
-            type="invite",
-            payload={"group_id": group_id, "group_name": group_schema.group_name},
-        )
-        self.notification_repo.add(notification)
+        invite_sent.send(self, group_schema=group_schema, user=user)
 
     def respond_to_invite(self, user_id: str, group_id: str, action: str):
         if action not in ["accept", "reject"]:
