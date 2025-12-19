@@ -27,7 +27,7 @@
                 </a>
 
                 <a href="{{ url_for('dashboard_activity') if 'dashboard_activity' in (request.url_rule.endpoint if request.url_rule else '') else '/activity' }}" class="nav-link {% if 'activity' in request.path %}active{% endif %}">
-                    <i class="fas fa-chart-line"></i> Activity
+                    <i class="fas fa-chart-line"></i> Notifications
                 </a>
 
                 <a href="{{ url_for('dashboard_settings') if 'dashboard_settings' in (request.url_rule.endpoint if request.url_rule else '') else '/settings' }}" class="nav-link {% if 'settings' in request.path %}active{% endif %}">
@@ -227,7 +227,6 @@
         </div>
     </div>
 
-    <!-- 4. REMOVE MEMBER MODAL (Global) -->
     <div id="removeMemberModal" class="modal-overlay hidden">
         <div class="modal-content text-center">
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
@@ -239,6 +238,107 @@
             <form id="removeMemberForm" action="#" method="POST" class="flex gap-3">
                 <button type="button" onclick="closeModal('removeMemberModal')" class="flex-1 btn btn-white justify-center">Cancel</button>
                 <button type="submit" class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">Remove</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. GENERIC NOTIFICATION MODAL -->
+    <div id="notificationModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-teal text-2xl">
+                <i class="fas fa-bell"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Notification</h3>
+            <p class="text-gray-500 mb-6" id="notifMessage">Details about this action.</p>
+            <button onclick="closeModal('notificationModal')" class="btn-signin w-full">Mark as Read</button>
+        </div>
+    </div>
+
+    <!-- 6. INVITATION MODAL -->
+    <div id="invitationModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600 text-2xl">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Group Invitation</h3>
+            <p class="text-gray-500 mb-6">You have been invited to join <span id="inviteGroupName" class="font-bold text-gray-800">Summer Trip</span>.</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('invitationModal')" class="flex-1 btn btn-white justify-center border-red-200 text-red-500 hover:bg-red-50">Reject</button>
+                <button onclick="closeModal('invitationModal')" class="flex-1 btn btn-signin justify-center">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. EDIT GROUP MODAL-->
+    <div id="editGroupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Edit Group</h3>
+                <button onclick="closeModal('editGroupModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editGroupForm" action="#" method="POST" class="space-y-4">
+                <input type="hidden" id="edit_group_id" name="group_id">
+                <div>
+                    <label class="form-label">Group Name</label>
+                    <input type="text" id="edit_group_name" name="group_name" class="auth-input" required>
+                </div>
+                <button type="submit" class="btn-signin">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 8. DELETE GROUP MODAL-->
+    <div id="deleteGroupModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Group?</h3>
+            <p class="text-gray-500 mb-6">
+                Are you sure you want to delete <strong id="delete_group_name_display">this group</strong>? <br>
+                All expenses and history will be permanently lost.
+            </p>
+            <form id="deleteGroupForm" action="#" method="POST" class="flex gap-3">
+                <input type="hidden" id="delete_group_id" name="group_id">
+                <button type="button" onclick="closeModal('deleteGroupModal')" class="flex-1 btn btn-white justify-center">Cancel</button>
+                <button type="submit" class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 9. EDIT EXPENSE MODAL-->
+    <div id="editExpenseModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Edit Expense</h3>
+                <button onclick="closeModal('editExpenseModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editExpenseForm" action="#" method="POST" class="space-y-4">
+                <input type="hidden" id="edit_expense_id" name="expense_id">
+                <div>
+                    <label class="form-label">Description</label>
+                    <input type="text" id="edit_expense_description" name="description" class="auth-input" required>
+                </div>
+                <div>
+                    <label class="form-label">Amount</label>
+                    <input type="number" id="edit_expense_amount" name="amount" step="0.01" class="auth-input" required>
+                </div>
+                
+                {% if group is defined and group and group.members %}
+                    <div>
+                        <label class="form-label">Paid By</label>
+                        <select id="edit_expense_paid_by" name="paid_by" class="auth-input" required>
+                            {% for member in group.members %}
+                                <option value="{{ member.id if member.id else member }}">{{ member.name if member.name else member }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
+                <button type="submit" class="btn-signin">Save Changes</button>
             </form>
         </div>
     </div>
@@ -264,6 +364,57 @@
                 }, 300);
             }
         }
+
+       function showNotificationDetails(message) {
+            document.getElementById('notifMessage').innerText = message;
+            openModal('notificationModal');
+        }
+
+        function showInvitation(groupName) {
+            document.getElementById('inviteGroupName').innerText = groupName;
+            openModal('invitationModal');
+        }
+
+        function markAsRead(btnElement) {
+            const item = btnElement.closest('.feed-item');
+            if(item) {
+                item.classList.add('read-state');
+                btnElement.innerText = "Read";
+                btnElement.disabled = true;
+                btnElement.classList.add('opacity-50', 'cursor-default');
+            }
+        }
+
+        function acceptInvite(btnElement) {
+            const item = btnElement.closest('.feed-item');
+            if(item) {
+                item.classList.add('accepted-state');
+                const buttons = item.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    if(btn !== btnElement) btn.style.display = 'none';
+                });
+                btnElement.innerText = "Accepted";
+                btnElement.classList.remove('bg-brand-teal', 'text-white');
+                btnElement.classList.add('bg-transparent', 'text-green-700', 'font-bold', 'border-none');
+            }
+        }
+
+        function rejectInvite(btnElement) {
+             const item = btnElement.closest('.feed-item');
+            if(item) {
+                item.classList.add('rejected-state');
+                const buttons = item.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    if(btn !== btnElement) btn.style.display = 'none';
+                });
+                btnElement.innerText = "Rejected";
+                btnElement.classList.remove('text-red-500', 'border-red-200');
+                btnElement.classList.add('text-red-800', 'font-bold', 'border-none', 'bg-transparent');
+            }
+        }
+
 
         function confirmRemoveMember(memberId) {
             const form = document.getElementById('removeMemberForm');

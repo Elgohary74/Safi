@@ -547,3 +547,45 @@ body {
 .hidden { 
     display: none !important; 
 }
+
+
+.feed-item.read-state {
+    opacity: 0.9;
+    filter: grayscale(0.5);
+    background-color: #F9FAFB;
+}
+
+.feed-item.accepted-state {
+    background-color: #D1FAE5;
+    border-color: #10B981;
+    border-width: 2px;
+}
+
+.feed-item.rejected-state {
+    background-color: #FEE2E2;
+    border-color: #EF4444;
+    border-width: 1px;
+}
+
+.feed-item.accepted-state button {
+    background-color: #10B981 !important; 
+    color: white !important;
+    border: none !important;
+    opacity: 1 !important;
+    cursor: default;
+}
+
+.feed-item.rejected-state button {
+    background-color: #EF4444 !important; 
+    color: white !important;
+    border: none !important;
+    opacity: 1 !important;
+    cursor: default;
+}
+
+.feed-item.read-state button {
+    background-color: #E5E7EB !important; 
+    color: #6B7280 !important;
+    border: none !important;
+    cursor: default;
+}

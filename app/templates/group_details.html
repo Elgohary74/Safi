@@ -13,8 +13,15 @@
         <div class="flex items-center gap-3">
             <h2 class="page-title">{{ group.group_name }}</h2>
             
-            <!-- INVITATION CODE (Static Placeholder) -->
-            <!-- Backend Note: Populate this with {{ group.invite_code }} from your database -->
+            <div class="flex gap-2 ml-2">
+                <button onclick="openModal('editGroupModal')" class="text-gray-400 hover:text-brand-teal transition-colors" title="Edit Group Name">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="openModal('deleteGroupModal')" class="text-gray-400 hover:text-red-500 transition-colors" title="Delete Group">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+
             <div class="group relative flex items-center">
                 <span class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200" title="Click to Copy">
                     INV-8X29
@@ -25,6 +32,7 @@
     
     <div class="flex gap-2">
         <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
+        <button class="btn btn-white border-dashed text-gray-500" onclick="openModal('editExpenseModal')">Edit Expense</button>
         <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
     </div>
 </header>
