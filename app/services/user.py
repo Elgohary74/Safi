@@ -1,4 +1,4 @@
-from flask_login import current_user
+from flask_jwt_extended import current_user
 
 from app.models.user import UpdateUserRequest
 from app.services.base import BaseService
