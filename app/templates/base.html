@@ -491,7 +491,7 @@
     </div>
 </div>
 
-<!-- 15. E-WALLET MODAL (NEW) -->
+<!-- 15. E-WALLET MODAL -->
 <div id="addEWalletModal" class="modal-overlay hidden">
     <div class="modal-content">
         <div class="flex justify-between items-center mb-6">
@@ -510,7 +510,7 @@
     </div>
 </div>
 
-<!-- 16. CREDIT CARD MODAL (NEW) -->
+<!-- 16. CREDIT CARD MODAL -->
 <div id="addCardModal" class="modal-overlay hidden">
     <div class="modal-content">
         <div class="flex justify-between items-center mb-6">
@@ -570,6 +570,53 @@
     </div>
 </div>
 
+<!-- 19. USER PROFILE MODAL -->
+<div id="userProfileModal" class="modal-overlay hidden">
+    <div class="modal-content relative">
+        <button onclick="closeModal('userProfileModal')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 cursor-pointer">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="flex flex-col items-center mb-6">
+            <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-4xl mb-3 text-gray-500">
+                <i class="fas fa-user"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900" id="profileName">User Name</h3>
+            <p class="text-gray-500 text-sm" id="profilePhone">+20 1xxxxxxxxx</p>
+        </div>
+
+        <div class="space-y-4 mb-6">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b pb-1">Payment Methods</h4>
+            <div id="profileMethods" class="space-y-2">
+                <!-- Static Demo Item -->
+                <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                    <i class="fab fa-cc-visa text-blue-800 text-lg"></i>
+                    <div class="text-sm">
+                        <p class="font-bold text-gray-800">Visa</p>
+                        <p class="text-xs text-gray-500">**** 4242</p>
+                    </div>
+                </div>
+                <!-- Demo Item 2 -->
+                <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                    <i class="fas fa-wallet text-brand-teal text-lg"></i>
+                    <div class="text-sm">
+                        <p class="font-bold text-gray-800">Vodafone Cash</p>
+                        <p class="text-xs text-gray-500">010xxxxxxxxx</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <a href="#" id="waLink" target="_blank" class="flex items-center justify-center gap-2 btn btn-white border-green-500 text-green-600 hover:bg-green-50">
+                <i class="fab fa-whatsapp text-lg"></i> WhatsApp
+            </a>
+            <a href="#" id="callLink" class="flex items-center justify-center gap-2 btn btn-white border-blue-500 text-blue-600 hover:bg-blue-50">
+                <i class="fas fa-phone-alt"></i> Call
+            </a>
+        </div>
+    </div>
+</div>
 
 <script>
     function openModal(modalId) {
