@@ -4,9 +4,10 @@ from typing import Optional
 from flask import Request, send_file
 from flask_jwt_extended import current_user
 
+from app.models.payment_method import PaymentMethod
 from app.models.user import UpdateUserRequest, UserPicture
 from app.services.base import BaseService
-from app.utils.exceptions import ResourceNotFound, UpdateError
+from app.utils.exceptions import ResourceAlreadyExists, ResourceNotFound, UpdateError
 
 
 class UserService(BaseService):
@@ -68,3 +69,20 @@ class UserService(BaseService):
             as_attachment=False,
             download_name="profile_picture",
         )
+
+    def _payment_methods_equal(
+        self,
+        first: PaymentMethod,
+        second: PaymentMethod,
+    ) -> bool:
+        return getattr(first, "__dict__", {}) == getattr(second, "__dict__", {})
+
+    def check_if_payment_method_exists(self, payment_method: PaymentMethod) -> None:
+        if current_user.payment_methods:
+            for existing_method in current_user.payment_methods:
+                if self._payment_methods_equal(existing_method, payment_method):
+                    raise ResourceAlreadyExists("Payment method already exists")
+
+    def add_new_payment_method(self, payment_method: PaymentMethod) -> bool:
+        self.check_if_payment_method_exists(payment_method)
+        return self.user_repo.add_payment_method(current_user.user_id, payment_method)

@@ -1,5 +1,6 @@
 from typing import Optional
 
+from app.models.payment_method import PaymentMethod
 from app.models.user import User, UserPicture
 
 from .base import IRepository
@@ -14,6 +15,14 @@ class UserRepository(IRepository):
         self.logger.info(f"adding new user: {user.email}")
         self.collection.insert_one(user.model_dump(by_alias=True))
         return user.user_id
+
+    def add_payment_method(self, user_id: str, payment_method: PaymentMethod):
+        self.logger.info(f"adding payment method for user: {user_id}")
+        self.collection.update_one(
+            {"_id": user_id},
+            {"$push": {"payment_methods": payment_method.model_dump()}},
+        )
+        return True
 
     def get_by_id(self, user_id: str) -> Optional[User]:
         self.logger.debug(f"fetching user id: {user_id}")
