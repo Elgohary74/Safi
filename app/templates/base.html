@@ -47,7 +47,9 @@
             </nav>
 
             <div class="user-profile">
-                <div class="w-8 h-8 rounded-full bg-gray-600"></div>
+                {% set has_picture = current_user and current_user.user_picture %}
+                {% set profile_picture_url = url_for('UserController:get_picture', user_id=current_user.user_id) if has_picture else url_for('static', filename='assets/user.png') %}
+                <img src="{{ profile_picture_url }}" alt="Profile picture" class="w-8 h-8 rounded-full object-cover border border-gray-500" loading="lazy">
                 <div>
                     <p class="text-sm font-bold">{{ current_user.name }}</p>
                     <form action="{{ url_for('AuthController:handle_logout') }}" method="POST" class="inline">
