@@ -3,97 +3,123 @@
 {% block title %}Safi - Settings{% endblock %}
 
 {% block header %}
-    <header class="page-header">
-        <h2 class="page-title">Account Settings</h2>
-    </header>
+<header class="page-header">
+    <h2 class="page-title">Account Settings</h2>
+</header>
 {% endblock %}
 
 {% block content %}
-    <div class="grid grid-cols-2 gap-8">
-        <div class="card">
-            <h3 class="section-title mb-4 border-b pb-2">Profile Details</h3>
-            {% set has_picture = current_user and current_user.user_picture %}
-            {% set profile_picture_url = url_for('UserController:get_picture', user_id=current_user.user_id) if has_picture else url_for('static', filename='assets/user.png') %}
-            <div class="flex items-center gap-4 mb-6">
-                <img src="{{ profile_picture_url }}" alt="Profile picture" class="w-16 h-16 rounded-full object-cover border" loading="lazy">
-                <div class="flex-1">
-                    <label class="form-label">Profile Picture</label>
-                    <form id="profile-picture-form" action="{{ url_for('UserController:update_picture') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
-                        <input type="file" name="profile_picture" accept="image/jpeg,image/png" class="auth-input" required>
-                        <div id="profile-picture-selected" class="hidden text-green-600 text-sm flex items-center gap-2">
-                            <i class="fas fa-check-circle"></i>
-                            <span class="file-name"></span>
-                            <span class="status text-gray-600">Uploading…</span>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <form action="{{ url_for('UserController:update_profile') }}" method="POST" class="space-y-4">
-                <div>
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="new_name" class="auth-input" value="{{ current_user.name }}" required>
-                </div>
-                <div>
-                    <label class="form-label">Email Address</label>
-                    <input type="email" name="new_email" class="auth-input" value="{{ current_user.email }}"
-                           required>
-                </div>
-                <div>
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" name="new_phone_number" class="auth-input"
-                           value="{{ current_user.phone_number }}">
-                </div>
-                {#                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">#}
-                <button type="submit" class="btn btn-primary w-full mt-4">Save Changes</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h3 class="section-title mb-4 border-b pb-2">Payment Methods</h3>
-            <div id="paymentMethodsList" class="space-y-3 mb-6">
-                <div class="payment-item flex items-center justify-between p-3 border rounded-xl bg-gray-50">
-                    <div class="flex items-center gap-3">
-                        <i class="fab fa-cc-visa text-blue-800 text-xl"></i>
-                        <div>
-                            <p class="text-sm font-bold">Visa ending in 4242</p>
-                            <p class="text-muted-sm">Expires 12/25</p>
-                        </div>
+<div class="grid grid-cols-2 gap-8">
+    <div class="card">
+        <h3 class="section-title mb-4 border-b pb-2">Profile Details</h3>
+        {% set has_picture = current_user and current_user.user_picture %}
+        {% set profile_picture_url = url_for('UserController:get_picture', user_id=current_user.user_id) if has_picture
+        else url_for('static', filename='assets/user.png') %}
+        <div class="flex items-center gap-4 mb-6">
+            <img src="{{ profile_picture_url }}" alt="Profile picture"
+                class="w-16 h-16 rounded-full object-cover border" loading="lazy">
+            <div class="flex-1">
+                <label class="form-label">Profile Picture</label>
+                <form id="profile-picture-form" action="{{ url_for('UserController:update_picture') }}" method="POST"
+                    enctype="multipart/form-data" class="space-y-3">
+                    <input type="file" name="profile_picture" accept="image/jpeg,image/png" class="auth-input" required>
+                    <div id="profile-picture-selected" class="hidden text-green-600 text-sm flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="file-name"></span>
+                        <span class="status text-gray-600">Uploading…</span>
                     </div>
-                    <button onclick="requestRemovePayment(this)" class="text-red-500 text-xs font-bold hover:underline">
-                        Remove
-                    </button>
-                </div>
+                </form>
             </div>
-            <button onclick="startAddPayment()"
-                    class="w-full border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition">
-                + Add Method
-            </button>
         </div>
+        <form action="{{ url_for('UserController:update_profile') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="form-label">Full Name</label>
+                <input type="text" name="new_name" class="auth-input" value="{{ current_user.name }}" required>
+            </div>
+            <div>
+                <label class="form-label">Email Address</label>
+                <input type="email" name="new_email" class="auth-input" value="{{ current_user.email }}" required>
+            </div>
+            <div>
+                <label class="form-label">Phone Number</label>
+                <input type="tel" name="new_phone_number" class="auth-input" value="{{ current_user.phone_number }}">
+            </div>
+            {# <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">#}
+            <button type="submit" class="btn btn-primary w-full mt-4">Save Changes</button>
+        </form>
     </div>
+
+    <div class="card">
+        <h3 class="section-title mb-4 border-b pb-2">Payment Methods</h3>
+        <div id="paymentMethodsList" class="space-y-3 mb-6">
+            {% if current_user.payment_methods %}
+            {% for method in current_user.payment_methods %}
+            <div class="payment-item flex items-center justify-between p-3 border rounded-xl bg-gray-50">
+                <div class="flex items-center gap-3">
+                    {% set identifier = '' %}
+                    {% if method.type == 'instapay' %}
+                    <i class="fas fa-university text-purple-600 text-xl"></i>
+                    <div>
+                        <p class="text-sm font-bold">InstaPay</p>
+                        <p class="text-muted-sm">{{ method.ipn_address }}</p>
+                    </div>
+                    {% set identifier = method.ipn_address %}
+                    {% elif method.type == 'e-wallet' %}
+                    <i class="fas fa-wallet text-brand-teal text-xl"></i>
+                    <div>
+                        <p class="text-sm font-bold">E-Wallet</p>
+                        <p class="text-muted-sm">{{ method.phone_number }}</p>
+                    </div>
+                    {% set identifier = method.phone_number %}
+                    {% elif method.type == 'telda' %}
+                    <i class="fas fa-credit-card text-blue-600 text-xl"></i>
+                    <div>
+                        <p class="text-sm font-bold">Telda</p>
+                        <p class="text-muted-sm">{{ method.handler }}</p>
+                    </div>
+                    {% set identifier = method.handler %}
+                    {% endif %}
+                </div>
+                <button onclick="confirmRemovePayment('{{ method.type }}', '{{ identifier }}')"
+                    class="text-red-500 text-xs font-bold hover:underline">
+                    Remove
+                </button>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="text-gray-500 italic text-sm text-center py-4">No payment methods added yet.</p>
+            {% endif %}
+        </div>
+        <button onclick="openModal('paymentSelectionModal')"
+            class="w-full border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition">
+            + Add Method
+        </button>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const fileInput = document.querySelector('input[name="profile_picture"]');
-            const indicator = document.getElementById('profile-picture-selected');
-            const form = document.getElementById('profile-picture-form');
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.querySelector('input[name="profile_picture"]');
+        const indicator = document.getElementById('profile-picture-selected');
+        const form = document.getElementById('profile-picture-form');
 
-            if (!fileInput || !indicator || !form) return;
+        if (!fileInput || !indicator || !form) return;
 
-            fileInput.addEventListener('change', function () {
-                if (fileInput.files && fileInput.files.length > 0) {
-                    const name = fileInput.files[0].name;
-                    indicator.querySelector('.file-name').textContent = name;
-                    indicator.classList.remove('hidden');
-                    // Submit immediately to replace the old button workflow
-                    form.submit();
-                } else {
-                    indicator.querySelector('.file-name').textContent = '';
-                    indicator.classList.add('hidden');
-                }
-            });
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files && fileInput.files.length > 0) {
+                const name = fileInput.files[0].name;
+                indicator.querySelector('.file-name').textContent = name;
+                indicator.classList.remove('hidden');
+                // Submit immediately to replace the old button workflow
+                form.submit();
+            } else {
+                indicator.querySelector('.file-name').textContent = '';
+                indicator.classList.add('hidden');
+            }
         });
-    </script>
+    });
+</script>
 {% endblock %}

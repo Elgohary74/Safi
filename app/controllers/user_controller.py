@@ -46,4 +46,18 @@ class UserController(BaseController):
         payment_method: PaymentMethod = PaymentFactory.create_payment_method(data)
         self.user_service.add_new_payment_method(payment_method)
         flash("Payment method added successfully!", "success")
+
+        return redirect(request.referrer)
+
+    @route("/remove_payment_method", methods=["POST"])
+    def remove_payment_method(self):
+        data = request.get_json(silent=True) or request.form.to_dict()
+        try:
+            payment_method: PaymentMethod = PaymentFactory.create_payment_method(data)
+            if self.user_service.remove_payment_method(payment_method):
+                flash("Payment method removed successfully!", "success")
+            else:
+                flash("Payment method not found.", "error")
+        except Exception as e:
+            flash(f"Error removing payment method: {str(e)}", "error")
         return redirect(request.referrer)

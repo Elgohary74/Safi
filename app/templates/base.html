@@ -45,8 +45,10 @@
 
             <div class="user-profile">
                 {% set has_picture = current_user and current_user.user_picture %}
-                {% set profile_picture_url = url_for('UserController:get_picture', user_id=current_user.user_id) if has_picture else url_for('static', filename='assets/user.png') %}
-                <img src="{{ profile_picture_url }}" alt="Profile picture" class="w-8 h-8 rounded-full object-cover border border-gray-500" loading="lazy">
+                {% set profile_picture_url = url_for('UserController:get_picture', user_id=current_user.user_id) if
+                has_picture else url_for('static', filename='assets/user.png') %}
+                <img src="{{ profile_picture_url }}" alt="Profile picture"
+                    class="w-8 h-8 rounded-full object-cover border border-gray-500" loading="lazy">
                 <div>
                     <p class="text-sm font-bold">{{ current_user.name }}</p>
                     <form action="{{ url_for('AuthController:handle_logout') }}" method="POST" class="inline">
@@ -490,26 +492,7 @@
         </div>
     </div>
 
-    <!-- 13. REMOVE PAYMENT METHOD MODAL -->
-    <div id="removePaymentModal" class="modal-overlay hidden">
-        <div class="modal-content text-center">
-            <div
-                class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
-                <i class="fas fa-trash-alt"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Payment Method?</h3>
-            <p class="text-gray-500 mb-6">Are you sure you want to remove this payment method? This cannot be undone.
-            </p>
-            <div class="flex gap-3">
-                <button onclick="closeModal('removePaymentModal')" class="flex-1 btn btn-white justify-center">Cancel
-                </button>
-                <button onclick="confirmRemovePayment()"
-                    class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
-                    Remove
-                </button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- 14. SELECTION MODAL-->
     <div id="paymentSelectionModal" class="modal-overlay hidden">
@@ -527,10 +510,10 @@
                     <i class="fas fa-wallet text-2xl text-brand-teal mb-2"></i>
                     <span class="text-xs font-bold text-center">E-Wallet</span>
                 </div>
-                <div onclick="switchToModal('addCardModal')"
+                <div onclick="switchToModal('addTeldaModal')"
                     class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
                     <i class="fas fa-credit-card text-2xl text-blue-600 mb-2"></i>
-                    <span class="text-xs font-bold text-center">Credit Card</span>
+                    <span class="text-xs font-bold text-center">Telda</span>
                 </div>
                 <div onclick="switchToModal('addInstaPayModal')"
                     class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
@@ -551,8 +534,8 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form action="#" method="POST" class="space-y-4"
-                onsubmit="event.preventDefault(); showAlert('Success', 'E-Wallet Added'); closeModal('addEWalletModal');">
+            <form action="{{ url_for('UserController:add_payment_method') }}" method="POST" class="space-y-4">
+                <input type="hidden" name="type" value="e-wallet">
                 <div>
                     <label class="form-label">Phone Number</label>
                     <input type="tel" name="phone_number" class="auth-input" placeholder="01xxxxxxxxx" required>
@@ -563,32 +546,23 @@
     </div>
 
     <!-- 16. CREDIT CARD MODAL -->
-    <div id="addCardModal" class="modal-overlay hidden">
+    <!-- 16. TELDA MODAL -->
+    <div id="addTeldaModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="section-title">Add Credit Card</h3>
-                <button type="button" onclick="closeModal('addCardModal')"
+                <h3 class="section-title">Add Telda Account</h3>
+                <button type="button" onclick="closeModal('addTeldaModal')"
                     class="text-gray-400 hover:text-red-500 cursor-pointer">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form action="#" method="POST" class="space-y-4"
-                onsubmit="event.preventDefault(); showAlert('Success', 'Credit Card Added'); closeModal('addCardModal');">
+            <form action="{{ url_for('UserController:add_payment_method') }}" method="POST" class="space-y-4">
+                <input type="hidden" name="type" value="telda">
                 <div>
-                    <label class="form-label">Card Number</label>
-                    <input type="text" name="card_number" class="auth-input" placeholder="0000 0000 0000 0000" required>
+                    <label class="form-label">Telda Username / Handler</label>
+                    <input type="text" name="handler" class="auth-input" placeholder="@username" required>
                 </div>
-                <div class="flex gap-3">
-                    <div class="flex-1">
-                        <label class="form-label">Expiry</label>
-                        <input type="text" name="expiry" class="auth-input" placeholder="MM/YY" required>
-                    </div>
-                    <div class="flex-1">
-                        <label class="form-label">CVC</label>
-                        <input type="text" name="cvc" class="auth-input" placeholder="123" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn-signin">Add Card</button>
+                <button type="submit" class="btn-signin">Add Account</button>
             </form>
         </div>
     </div>
@@ -603,12 +577,11 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form action="#" method="POST" class="space-y-4"
-                onsubmit="event.preventDefault(); showAlert('Success', 'InstaPay Account Added'); closeModal('addInstaPayModal');">
+            <form action="{{ url_for('UserController:add_payment_method') }}" method="POST" class="space-y-4">
+                <input type="hidden" name="type" value="instapay">
                 <div>
                     <label class="form-label">InstaPay Address / Phone</label>
-                    <input type="text" name="instapay_address" class="auth-input" placeholder="username@instapay"
-                        required>
+                    <input type="text" name="ipn_address" class="auth-input" placeholder="username@instapay" required>
                 </div>
                 <button type="submit" class="btn-signin">Verify Address</button>
             </form>
@@ -648,22 +621,40 @@
             <div class="space-y-4 mb-6">
                 <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b pb-1">Payment Methods</h4>
                 <div id="profileMethods" class="space-y-2">
-                    <!-- Static Demo Item -->
-                    <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                        <i class="fab fa-cc-visa text-blue-800 text-lg"></i>
+                    {% if current_user.payment_methods %}
+                    {% for method in current_user.payment_methods %}
+                    <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg group relative">
+                        {% if method.type == 'instapay' %}
+                        <i class="fas fa-university text-purple-600 text-lg"></i>
                         <div class="text-sm">
-                            <p class="font-bold text-gray-800">Visa</p>
-                            <p class="text-xs text-gray-500">**** 4242</p>
+                            <p class="font-bold text-gray-800">InstaPay</p>
+                            <p class="text-xs text-gray-500">{{ method.ipn_address }}</p>
                         </div>
-                    </div>
-                    <!-- Demo Item 2 -->
-                    <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                        {% set identifier = method.ipn_address %}
+                        {% elif method.type == 'e-wallet' %}
                         <i class="fas fa-wallet text-brand-teal text-lg"></i>
                         <div class="text-sm">
-                            <p class="font-bold text-gray-800">Vodafone Cash</p>
-                            <p class="text-xs text-gray-500">010xxxxxxxxx</p>
+                            <p class="font-bold text-gray-800">E-Wallet</p>
+                            <p class="text-xs text-gray-500">{{ method.phone_number }}</p>
                         </div>
+                        {% set identifier = method.phone_number %}
+                        {% elif method.type == 'telda' %}
+                        <i class="fas fa-credit-card text-blue-600 text-lg"></i>
+                        <div class="text-sm">
+                            <p class="font-bold text-gray-800">Telda</p>
+                            <p class="text-xs text-gray-500">{{ method.handler }}</p>
+                        </div>
+                        {% set identifier = method.handler %}
+                        {% endif %}
+                        <button onclick="confirmRemovePayment('{{ method.type }}', '{{ identifier }}')"
+                            class="absolute right-2 text-gray-300 hover:text-red-500 hidden group-hover:block transition-colors">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-sm text-gray-400 italic">No payment methods added.</p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -680,6 +671,33 @@
         </div>
     </div>
 
+    <!-- 20. REMOVE PAYMENT MODAL -->
+    <div id="removePaymentModal" class="modal-overlay hidden">
+        <div class="modal-content w-96 text-center">
+            <div
+                class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 text-red-600 text-xl">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="font-bold text-gray-900 mb-1">Remove Payment Method?</h3>
+            <p class="text-sm text-gray-500 mb-6">Are you sure you want to remove this payment method? This action
+                cannot be undone.</p>
+
+            <form id="removePaymentForm" action="{{ url_for('UserController:remove_payment_method') }}" method="POST">
+                <input type="hidden" name="type" id="remove_type">
+                <!-- Using specific fields for reconstruction in backend -->
+                <input type="hidden" name="ipn_address" id="remove_ipn">
+                <input type="hidden" name="phone_number" id="remove_phone">
+                <input type="hidden" name="handler" id="remove_handler">
+
+                <div class="flex gap-3 justify-center">
+                    <button type="button" onclick="closeModal('removePaymentModal')"
+                        class="px-4 py-2 text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-bold transition">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 shadow-md hover:shadow-lg transition">Remove</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script>
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
@@ -825,10 +843,10 @@
                     const label = document.createElement('label');
                     label.className = 'flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer';
                     label.innerHTML = `
-                <input type="checkbox" name="split_with" value="${member.user_id}" checked
-                       class="form-checkbox text-brand-teal rounded h-4 w-4">
-                <span class="text-sm text-gray-700">${member.name}</span>
-            `;
+    <input type="checkbox" name="split_with" value="${member.user_id}" checked
+        class="form-checkbox text-brand-teal rounded h-4 w-4">
+    <span class="text-sm text-gray-700">${member.name}</span>
+    `;
                     splitContainer.appendChild(label);
                 });
             }
@@ -841,6 +859,26 @@
             }, 350);
         }
 
+        function confirmRemovePayment(type, identifier) {
+            document.getElementById('remove_type').value = type;
+
+            // Reset fields
+            document.getElementById('remove_ipn').value = '';
+            document.getElementById('remove_phone').value = '';
+            document.getElementById('remove_handler').value = '';
+
+            if (type === 'instapay') {
+                document.getElementById('remove_ipn').value = identifier;
+            } else if (type === 'e-wallet') {
+                document.getElementById('remove_phone').value = identifier;
+            } else if (type === 'telda') {
+                document.getElementById('remove_handler').value = identifier;
+            }
+
+            openModal('removePaymentModal');
+        }
+
+
         function showAlert(title, message) {
             document.getElementById('alertTitle').innerText = title;
             document.getElementById('alertMessage').innerText = message;
@@ -852,9 +890,7 @@
             openModal('removePaymentModal');
         }
 
-        function confirmRemovePayment() {
-            closeModal('removePaymentModal');
-        }
+
 
         function startAddPayment() {
             openModal('paymentSelectionModal');

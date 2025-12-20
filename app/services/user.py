@@ -86,3 +86,8 @@ class UserService(BaseService):
     def add_new_payment_method(self, payment_method: PaymentMethod) -> bool:
         self.check_if_payment_method_exists(payment_method)
         return self.user_repo.add_payment_method(current_user.user_id, payment_method)
+
+    def remove_payment_method(self, payment_method: PaymentMethod) -> bool:
+        return self.user_repo.remove_payment_method(
+            current_user.user_id, payment_method.model_dump()
+        )

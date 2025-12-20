@@ -24,6 +24,14 @@ class UserRepository(IRepository):
         )
         return True
 
+    def remove_payment_method(self, user_id: str, payment_method_data: dict) -> bool:
+        self.logger.info(f"removing payment method for user: {user_id}")
+        result = self.collection.update_one(
+            {"_id": user_id},
+            {"$pull": {"payment_methods": payment_method_data}},
+        )
+        return result.modified_count > 0
+
     def get_by_id(self, user_id: str) -> Optional[User]:
         self.logger.debug(f"fetching user id: {user_id}")
         data = self.collection.find_one({"_id": user_id})
