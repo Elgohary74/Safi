@@ -8,7 +8,7 @@ def _register_and_login(client, name="notifyuser", email="notify@example.com"):
         UserRegister(name=name, email=email, password="ValidPass9!")
     )
     resp = client.post(
-        "/auth/auth-controller/login",
+        "/auth/login",
         data={"email": email, "password": "ValidPass9!"},
         follow_redirects=False,
     )
