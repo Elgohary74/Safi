@@ -26,6 +26,12 @@ class TransactionRepository(IRepository):
         data_list = list(self.collection.find({"group_id": group_id}))
         return [TransactionSchema.model_validate(data) for data in data_list]
 
+    def get_by_user(self, user_id: str) -> List[TransactionSchema]:
+        self.logger.debug(f"fetching all transactions for user {user_id}")
+        query = {"$or": [{"payer_id": user_id}, {"receiver_id": user_id}]}
+        data_list = list(self.collection.find(query).sort("date", -1))
+        return [TransactionSchema.model_validate(data) for data in data_list]
+
     def update(self, trans_id: str, data: TransactionSchema):
         self.logger.info(f"updating transaction {trans_id} status")
         self.collection.update_one({"_id": trans_id}, {"$set": data.model_dump()})
