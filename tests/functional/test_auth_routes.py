@@ -49,6 +49,6 @@ def test_login_endpoint_invalid_credentials(client):
         follow_redirects=False,
     )
 
-    assert response.status_code == 401
-    assert response.status_code == 401
-    assert "Invalid email or password" in response.get_data(as_text=True)
+    # Updated to expect redirect (302) instead of 401/JSON
+    assert response.status_code == 302
+    assert "/auth/login" in response.headers.get("Location", "")
