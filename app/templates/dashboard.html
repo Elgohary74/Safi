@@ -5,7 +5,6 @@
 {% block header %}
     <header class="page-header">
         <h2 class="page-title">Dashboard Overview</h2>
-        <!-- Opens global expense modal from base.html -->
         <button onclick="openModal('expenseModal')" class="btn btn-primary">+ New Expense</button>
     </header>
 {% endblock %}
@@ -106,7 +105,7 @@
                         </div>
                     </div>
                     <button onclick="event.stopPropagation(); markAsRead(this)"
-                            class="text-xs text-gray-500 hover:text-brand-teal border border-gray-200 px-3 py-1 rounded transition-colors bg-white">
+                            class="text-xs text-gray-500 hover:text-brand-teal border border-gray-500 px-3 py-1 rounded transition-colors bg-white">
                         Mark Read
                     </button>
                 </div>
@@ -125,15 +124,25 @@
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="event.stopPropagation(); rejectInvite(this)"
-                                class="text-xs text-red-500 hover:bg-red-50 border border-red-200 px-3 py-1 rounded transition-colors bg-white">
-                            Reject
-                        </button>
-                        <button onclick="event.stopPropagation(); acceptInvite(this)"
-                                class="text-xs text-green-500 hover:bg-green-50 bg-brand-teal px-3 py-1 rounded hover:opacity-90 border border-brand-teal">
-                            Accept
-                        </button>
+                        <button onclick="event.stopPropagation(); rejectInvite(this)" class="text-xs text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded transition-colors bg-white">Reject</button>
+                        <button onclick="event.stopPropagation(); acceptInvite(this)" class="text-xs text-green-600 hover:bg-green-50 bg-brand-teal border border-green-600 px-3 py-1 rounded hover:opacity-90 border border-brand-teal">Accept</button>
                     </div>
+                </div>
+            </div>
+            <div class="feed-item cursor-pointer hover:bg-gray-50 transition" onclick="showTransaction('Ahmed recorded a payment of 150 EGP to you. Please confirm.')">
+            <div class="flex justify-between items-center w-full">
+                <div class="flex gap-4 items-center">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-900">Ahmed recorded payment (150 EGP)</p>
+                        <p class="text-muted-sm">15 mins ago</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                        <button onclick="event.stopPropagation(); rejectInvite(this)" class="text-xs text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded transition-colors bg-white">Reject</button>
+                        <button onclick="event.stopPropagation(); acceptInvite(this)" class="text-xs text-green-600 hover:bg-green-50 bg-brand-teal border border-green-600 px-3 py-1 rounded hover:opacity-90 border border-brand-teal">Accept</button>
                 </div>
             </div>
         </div>

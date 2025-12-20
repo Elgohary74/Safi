@@ -41,9 +41,8 @@
         </div>
 
         <div class="flex gap-2">
-
             <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
-        <button class="btn btn-white border-dashed text-gray-500" onclick="openModal('editExpenseModal')">Edit Expense</button>
+            <button class="btn btn-white border-dashed text-gray-500" onclick="openModal('inviteByEmailModal')">Invite via Email</button>
             <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
         </div>
     </header>
@@ -56,7 +55,7 @@
 
             {% if expenses %}
         {% for expense, user_share in expenses[::-1] %}
-        <div class="feed-item card">
+        <div class="feed-item card relative">
             <div class="flex gap-4">
                 <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
                 </div>
@@ -66,18 +65,31 @@
                         EGP <br>{{ expense.date.strftime("%d/%m/%Y at %I:%M %p") }}</p>
                 </div>
             </div>
-            <div class="text-right">
-                <p class="text-base
-                                {% if user_share < 0 %}text-status-danger
-                                {% else %}{% if user_share > 0 %}text-status-success
-                                {% else %} text-status
-                                {% endif %}{% endif %}">
-                    {{ '+' if user_share > 0 else '' }}{{ user_share }} EGP
-                </p>
-                <p class="text-xs text-gray-400">
-                    {% if user_share == 0 %} Not Involved
-                    {% else %} You {{ 'lent' if user_share > 0 else 'borrowed' }}
-                    {% endif %}
+            <div class="text-right flex items-center gap-4">
+                <div>
+                    <p class="text-base
+                                    {% if user_share < 0 %}text-status-danger
+                                    {% else %}{% if user_share > 0 %}text-status-success
+                                    {% else %} text-status
+                                    {% endif %}{% endif %}">
+                        {{ '+' if user_share > 0 else '' }}{{ user_share }} EGP
+                    </p>
+                    <p class="text-xs text-gray-400">
+                        {% if user_share == 0 %} Not Involved
+                        {% else %} You {{ 'lent' if user_share > 0 else 'borrowed' }}
+                        {% endif %}
+                </div>
+                
+                <div class="relative">
+                    <button onclick="toggleMenu('menu-{{ loop.index }}')" class="text-gray-400 hover:text-gray-600 focus:outline-none p-1">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>                    <div id="menu-{{ loop.index }}" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-100 overflow-hidden">
+                        <button onclick="openEditExpenseModal()" 
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                            <i class="fas fa-edit text-xs"></i> Edit
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         {% endfor %}
@@ -109,7 +121,7 @@
                 <ul class="space-y-3 text-sm text-gray-600">
                 {% if group.members %}
                 {% for member in group.members %}
-                <li class="flex justify-between items-center group">
+                <li class="flex justify-between items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition" onclick="showUserProfile('{{ member.name }}', '{{ member.phone|default('01000000000') }}')">
                     <div class="flex items-center gap-2">
                         <div
                             class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
@@ -132,7 +144,7 @@
                                 Settled#} {# {% endif %}#} {# </span>#}
                                 {% if group.first_member.user_id == current_user.user_id and group.first_member.user_id
                                 != member.user_id %}
-                                <button onclick="confirmRemoveMember('{{ member.user_id }}')"
+                                <button onclick="event.stopPropagation(); confirmRemoveMember('{{ member.user_id }}')"
                                     class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
                                     title="Remove Member">
                                     <i class="fas fa-times text-xs"></i>
@@ -153,13 +165,10 @@
         const inviteCode = "{{ group.invite_code }}";
         navigator.clipboard.writeText(inviteCode)
             .then(() => {
-                // Show a temporary "Copied!" tooltip
                 const span = document.getElementById('inviteCodeSpan');
                 const originalTitle = span.getAttribute('title');
                 span.setAttribute('title', 'Copied!');
                 span.classList.add('bg-green-100', 'border-green-300', 'text-green-700');
-
-                // Reset after 2 seconds
                 setTimeout(() => {
                     span.setAttribute('title', originalTitle);
                     span.classList.remove('bg-green-100', 'border-green-300', 'text-green-700');
@@ -169,5 +178,30 @@
                 console.error('Failed to copy: ', err);
             });
     }
+
+    function toggleMenu(menuId) {
+        const allMenus = document.querySelectorAll('[id^="menu-"]');
+        allMenus.forEach(menu => {
+            if (menu.id !== menuId) {
+                menu.classList.add('hidden');
+            }
+        });
+        
+        const menu = document.getElementById(menuId);
+        if (menu) {
+            menu.classList.toggle('hidden');
+        }
+    }
+    function openEditExpenseModal() {
+        const allMenus = document.querySelectorAll('[id^="menu-"]');
+        allMenus.forEach(menu => menu.classList.add('hidden'));
+        openModal('editExpenseModal');
+    }
+    window.addEventListener('click', function(e) {
+        if (!e.target.matches('.fa-ellipsis-v') && !e.target.closest('button')) {
+            const allMenus = document.querySelectorAll('[id^="menu-"]');
+            allMenus.forEach(menu => menu.classList.add('hidden'));
+        }
+    });
 </script>
 {% endblock %}
