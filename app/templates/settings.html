@@ -12,19 +12,20 @@
     <div class="grid grid-cols-2 gap-8">
         <div class="card">
             <h3 class="section-title mb-4 border-b pb-2">Profile Details</h3>
+            {% set has_picture = current_user and current_user.user_picture %}
+            {% set profile_picture_url = url_for('UserController:get_picture', user_id=current_user.user_id) if has_picture else url_for('static', filename='assets/user.png') %}
             <div class="flex items-center gap-4 mb-6">
-                <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl">👤</div>
+                <img src="{{ profile_picture_url }}" alt="Profile picture" class="w-16 h-16 rounded-full object-cover border" loading="lazy">
                 <div class="flex-1">
                     <label class="form-label">Profile Picture</label>
-                    <div class="relative">
-                        <select class="auth-input appearance-none cursor-pointer">
-                            <option value="avatar1">Default Avatar</option>
-                            <option value="avatar2">Uploaded Photo</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                            <i class="fas fa-chevron-down text-xs"></i>
+                    <form id="profile-picture-form" action="{{ url_for('UserController:update_picture') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                        <input type="file" name="profile_picture" accept="image/jpeg,image/png" class="auth-input" required>
+                        <div id="profile-picture-selected" class="hidden text-green-600 text-sm flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="file-name"></span>
+                            <span class="status text-gray-600">Uploading…</span>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             <form action="{{ url_for('UserController:update_profile') }}" method="POST" class="space-y-4">
@@ -69,4 +70,30 @@
             </button>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.querySelector('input[name="profile_picture"]');
+            const indicator = document.getElementById('profile-picture-selected');
+            const form = document.getElementById('profile-picture-form');
+
+            if (!fileInput || !indicator || !form) return;
+
+            fileInput.addEventListener('change', function () {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    const name = fileInput.files[0].name;
+                    indicator.querySelector('.file-name').textContent = name;
+                    indicator.classList.remove('hidden');
+                    // Submit immediately to replace the old button workflow
+                    form.submit();
+                } else {
+                    indicator.querySelector('.file-name').textContent = '';
+                    indicator.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -2,8 +2,10 @@ from flask import flash, redirect, request
 from flask_classful import route
 
 from app.controllers.base_controller import BaseController
+from app.models.payment_method import PaymentMethod
 from app.models.user import UpdateUserRequest
 from app.services import UserService
+from app.utils.payment_factory import PaymentFactory
 
 
 class UserController(BaseController):
@@ -24,4 +26,24 @@ class UserController(BaseController):
         else:
             flash("Please Enter a Valid Email or Name", "error")
 
+        return redirect(request.referrer)
+
+    @route("/update_picture", methods=["POST"])
+    def update_picture(self):
+        picture = self.user_service.get_picture_from_request(request)
+        self.user_service.update_user_picture(picture)
+        flash("Profile picture updated successfully!", "success")
+
+        return redirect(request.referrer)
+
+    @route("/picture/<user_id>", methods=["GET"])
+    def get_picture(self, user_id: str):
+        return self.user_service.get_user_picture(user_id)
+
+    @route("/add_payment_method", methods=["POST"])
+    def add_payment_method(self):
+        data = request.get_json(silent=True) or request.form.to_dict()
+        payment_method: PaymentMethod = PaymentFactory.create_payment_method(data)
+        self.user_service.add_new_payment_method(payment_method)
+        flash("Payment method added successfully!", "success")
         return redirect(request.referrer)

@@ -1,6 +1,7 @@
 from typing import Optional
 
-from app.models.user import User
+from app.models.payment_method import PaymentMethod
+from app.models.user import User, UserPicture
 
 from .base import IRepository
 
@@ -14,6 +15,14 @@ class UserRepository(IRepository):
         self.logger.info(f"adding new user: {user.email}")
         self.collection.insert_one(user.model_dump(by_alias=True))
         return user.user_id
+
+    def add_payment_method(self, user_id: str, payment_method: PaymentMethod):
+        self.logger.info(f"adding payment method for user: {user_id}")
+        self.collection.update_one(
+            {"_id": user_id},
+            {"$push": {"payment_methods": payment_method.model_dump()}},
+        )
+        return True
 
     def get_by_id(self, user_id: str) -> Optional[User]:
         self.logger.debug(f"fetching user id: {user_id}")
@@ -30,6 +39,22 @@ class UserRepository(IRepository):
         self.collection.update_one(
             {"_id": user_id}, {"$set": data.model_dump(by_alias=True)}
         )
+
+    def update_picture(self, user_id: str, user_picture: UserPicture):
+        self.logger.info(f"updating user picture for user {user_id}")
+        self.collection.update_one(
+            {"_id": user_id},
+            {
+                "$set": {
+                    "user_picture": {
+                        "profile_pic": user_picture.profile_pic,
+                        "content_type": user_picture.content_type,
+                    }
+                }
+            },
+        )
+
+        return True
 
     def delete(self, user_id: str):
         self.logger.warning(f"deleting user {user_id}")

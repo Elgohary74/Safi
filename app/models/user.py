@@ -4,24 +4,37 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
+from app.models.payment_method import PaymentMethod
 from app.utils.exceptions import InvalidPasswordFormat
 
 
-class User(BaseModel):
+class UserPicture(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    profile_pic: Optional[bytes] = None
+    content_type: Optional[str] = None
+
+
+class IUser(BaseModel):
+    name: str
+    email: EmailStr
+
+
+class UserBase(IUser):
+    phone_number: Optional[str] = None
+
+
+class User(UserBase):
     model_config = ConfigDict(populate_by_name=True)
 
     user_id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
-    name: str
-    email: str
     password_hash: str
-    phone_number: Optional[str] = None
+    user_picture: Optional[UserPicture] = None
+    payment_methods: list[PaymentMethod] = Field(default_factory=list)
 
 
-class UserRegister(BaseModel):
-    name: str
-    email: EmailStr
+class UserRegister(UserBase):
     password: str
-    phone_number: Optional[str] = None
 
     @field_validator("password")
     @classmethod

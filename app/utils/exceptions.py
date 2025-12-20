@@ -51,3 +51,20 @@ class InvalidPasswordFormat(AppError):
         payload=None,
     ):
         super().__init__(message, status_code, payload)
+
+
+class UpdateError(AppError):
+    def __init__(
+        self, message="Failed to update resource", status_code=400, payload=None
+    ):
+        super().__init__(message, status_code, payload)
+
+
+class UnkownTypeError(AppError):
+    def __init__(
+        self,
+        message="The provided type is not recognized",
+        status_code=422,
+        payload=None,
+    ):
+        super().__init__(message, status_code, payload)
