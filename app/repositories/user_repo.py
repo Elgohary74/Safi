@@ -1,6 +1,6 @@
 from typing import Optional
 
-from app.models.user import User
+from app.models.user import User, UserPicture
 
 from .base import IRepository
 
@@ -30,6 +30,20 @@ class UserRepository(IRepository):
         self.collection.update_one(
             {"_id": user_id}, {"$set": data.model_dump(by_alias=True)}
         )
+
+    def update_picture(self, user_id: str, user_picture: UserPicture):
+        self.logger.info(f"updating user picture for user {user_id}")
+        self.collection.update_one(
+            {"_id": user_id},
+            {
+                "$set": {
+                    "user_picture.profile_pic": user_picture.profile_pic,
+                    "user_picture.content_type": user_picture.content_type,
+                }
+            },
+        )
+
+        return True
 
     def delete(self, user_id: str):
         self.logger.warning(f"deleting user {user_id}")
