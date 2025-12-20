@@ -11,8 +11,8 @@
 
 <body class="{% block body_class %}{% endblock %}">
 
-<div class="app-container">
-    {% block sidebar %}
+    <div class="app-container">
+        {% block sidebar %}
         <aside class="sidebar">
             <div class="sidebar-header">
                 <i class="fa-solid fa-bolt fa-2xl" style="color: #00E6C3;"></i>
@@ -21,19 +21,19 @@
 
             <nav class="sidebar-nav">
                 <a href="{{ url_for('dashboard.dashboard_index') }}"
-                   class="nav-link {% if request.endpoint == 'dashboard.dashboard_index' %}active{% endif %}">
+                    class="nav-link {% if request.endpoint == 'dashboard.dashboard_index' %}active{% endif %}">
                     <i class="fas fa-th-large"></i> Dashboard
                 </a>
                 <a href="{{ url_for('GroupController:list_groups') }}"
-                   class="nav-link {% if 'groups' in request.path %}active{% endif %}">
+                    class="nav-link {% if 'groups' in request.path %}active{% endif %}">
                     <i class="fas fa-users"></i> My Groups
                 </a>
                 <a href="{{ url_for('dashboard.activity') }}"
-                   class="nav-link {% if request.endpoint == 'dashboard.activity' %}active{% endif %}">
+                    class="nav-link {% if request.endpoint == 'dashboard.activity' %}active{% endif %}">
                     <i class="fas fa-chart-line"></i> Notifications
                 </a>
                 <a href="{{ url_for('dashboard.settings') }}"
-                   class="nav-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
+                    class="nav-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
                     <i class="fas fa-cog"></i> Settings
                 </a>
                 <div class="mt-4 pt-4 border-t border-gray-700">
@@ -49,17 +49,17 @@
                     <p class="text-sm font-bold">{{ current_user.name }}</p>
                     <form action="{{ url_for('AuthController:handle_logout') }}" method="POST" class="inline">
                         <button type="submit"
-                                class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
+                            class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
                             Logout
                         </button>
                     </form>
                 </div>
             </div>
         </aside>
-    {% endblock %}
+        {% endblock %}
 
 
-    {% block main_layout %}
+        {% block main_layout %}
         <main class="main-content">
             <div class="moving-blob blob-teal"></div>
             <div class="moving-blob blob-blue"></div>
@@ -67,74 +67,74 @@
 
             <div class="content-padding">
                 {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div
-                                    class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div
+                    class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
                 {% endwith %}
                 {% block content %}{% endblock %}
             </div>
         </main>
-    {% endblock %}
-</div>
-
-
-<!-- 1. CREATE GROUP MODAL -->
-<div id="createGroupModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Create Group</h3>
-            <button type="button" onclick="closeModal('createGroupModal')"
-                    class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form action="/groups/create" method="POST" class="space-y-4">
-            <div>
-                <label class="form-label">Name</label>
-                <input type="text" name="group_name" class="auth-input" placeholder="Trip Name" required>
-            </div>
-            <div>
-                <label class="form-label">Description</label>
-                <input type="text" name="description" class="auth-input" placeholder="Short description">
-            </div>
-            <button type="submit" class="btn-signin">Create</button>
-        </form>
+        {% endblock %}
     </div>
-</div>
 
-<!-- 2. ADD EXPENSE MODAL -->
-<div id="expenseModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Add New Expense</h3>
-            <button type="button" onclick="closeModal('expenseModal')"
+
+    <!-- 1. CREATE GROUP MODAL -->
+    <div id="createGroupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Create Group</h3>
+                <button type="button" onclick="closeModal('createGroupModal')"
                     class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="/groups/create" method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label">Name</label>
+                    <input type="text" name="group_name" class="auth-input" placeholder="Trip Name" required>
+                </div>
+                <div>
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" class="auth-input" placeholder="Short description">
+                </div>
+                <button type="submit" class="btn-signin">Create</button>
+            </form>
         </div>
-        <form action="{{ url_for('ExpenseController:create_expense') }}" method="POST" class="space-y-4">
-            <div>
-                <label class="form-label">Description</label>
-                <input type="text" name="description" class="auth-input" placeholder="e.g. Dinner, Taxi" required>
-            </div>
-            <div>
-                <label class="form-label">Amount</label>
-                <input type="number" name="total_amount" step="0.01" class="auth-input" placeholder="0.00 EGP"
-                       required>
-            </div>
+    </div>
 
-            {% if group is defined and group and group.members %}
+    <!-- 2. ADD EXPENSE MODAL -->
+    <div id="expenseModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Add New Expense</h3>
+                <button type="button" onclick="closeModal('expenseModal')"
+                    class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="{{ url_for('ExpenseController:create_expense') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" class="auth-input" placeholder="e.g. Dinner, Taxi" required>
+                </div>
+                <div>
+                    <label class="form-label">Amount</label>
+                    <input type="number" name="total_amount" step="0.01" class="auth-input" placeholder="0.00 EGP"
+                        required>
+                </div>
+
+                {% if group is defined and group and group.members %}
                 <input type="hidden" name="group_id" value="{{ group.group_id }}">
                 <div>
                     <label class="form-label">Paid By</label>
                     <select name="payer_id" class="auth-input" required>
                         {% for member in group.members %}
-                            <option value="{{ member.user_id }}">{{ member.name }}</option>
+                        <option value="{{ member.user_id }}">{{ member.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -142,24 +142,24 @@
                     <label class="form-label">Split With</label>
                     <div class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50">
                         {% for member in group.members %}
-                            <label class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
-                                <input type="checkbox" name="split_with" value="{{ member.user_id }}" checked
-                                       class="form-checkbox text-brand-teal rounded h-4 w-4">
-                                <span class="text-sm text-gray-700">{{ member.name }}</span>
-                            </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
+                            <input type="checkbox" name="split_with" value="{{ member.user_id }}" checked
+                                class="form-checkbox text-brand-teal rounded h-4 w-4">
+                            <span class="text-sm text-gray-700">{{ member.name }}</span>
+                        </label>
                         {% endfor %}
                     </div>
                     <p class="text-xs text-gray-400 mt-1">Uncheck to exclude from split.</p>
                 </div>
-            {% else %}
+                {% else %}
                 <div>
                     <label class="form-label">Group</label>
                     <select name="group_id" class="auth-input" required>
                         <option value="" disabled selected>Select a group</option>
                         {% if groups is defined and groups %}
-                            {% for g in groups %}
-                                <option value="{{ g.group_id }}">{{ g.name }}</option>
-                            {% endfor %}
+                        {% for g in groups %}
+                        <option value="{{ g.group_id }}">{{ g.name }}</option>
+                        {% endfor %}
                         {% endif %}
                     </select>
                 </div>
@@ -172,178 +172,180 @@
                 <div>
                     <label class="form-label">Split With</label>
                     <div
-                            class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50 split-container">
+                        class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50 split-container">
                         <p class="text-xs text-gray-400 p-2">Select a group to see members</p>
                     </div>
                 </div>
-            {% endif %}
+                {% endif %}
 
-            <button type="submit" class="btn-signin">Save Expense</button>
-        </form>
-    </div>
-</div>
-
-<!-- 3. SETTLE UP MODAL -->
-<div id="settleModal" class="modal-overlay hidden">
-    <div class="modal-content" style="max-width: 500px;">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Settle Up</h3>
-            <button type="button" onclick="closeModal('settleModal')"
-                    class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
+                <button type="submit" class="btn-signin">Save Expense</button>
+            </form>
         </div>
-        <form action="#" method="POST" class="space-y-4">
-            {% if group is defined and group and group.members %}
+    </div>
+
+    <!-- 3. SETTLE UP MODAL -->
+    <div id="settleModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Settle Up</h3>
+                <button type="button" onclick="closeModal('settleModal')"
+                    class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="#" method="POST" class="space-y-4">
+                {% if group is defined and group and group.members %}
                 <div>
                     <label class="form-label">Pay To</label>
                     <select name="pay_to" class="auth-input" required>
                         {% for member in group.members %}
-                            <option value="{{ member.user_id }}">{{ member.name }}</option>
+                        <option value="{{ member.user_id }}">{{ member.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-            {% else %}
+                {% else %}
                 <p class="text-sm text-gray-500">Please go to a specific Group page to settle debts.</p>
-            {% endif %}
+                {% endif %}
 
-            <div>
-                <label class="form-label">Amount</label>
-                <input type="number" name="amount" step="0.01" class="auth-input" placeholder="0.00 EGP" required>
-            </div>
-
-            <div>
-                <label class="form-label">Payment Method</label>
-                <div class="grid grid-cols-2 gap-3 mt-2">
-                    <label class="cursor-pointer relative">
-                        <input type="radio" name="payment_method" value="cash" class="payment-radio hidden" checked>
-                        <div
-                                class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                            <div
-                                    class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <p class="text-sm font-bold text-gray-800">Cash</p>
-                            <i
-                                    class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon"></i>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer relative">
-                        <input type="radio" name="payment_method" value="instapay" class="payment-radio hidden">
-                        <div
-                                class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                            <div
-                                    class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                                <i class="fas fa-university"></i>
-                            </div>
-                            <p class="text-sm font-bold text-gray-800">InstaPay</p>
-                            <i
-                                    class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
-                        </div>
-                    </label>
+                <div>
+                    <label class="form-label">Amount</label>
+                    <input type="number" name="amount" step="0.01" class="auth-input" placeholder="0.00 EGP" required>
                 </div>
-            </div>
-            <button type="submit" class="btn-signin bg-green-600 border-green-600 hover:text-green-600">Confirm
-                Payment
-            </button>
-        </form>
-    </div>
-</div>
 
-<!-- 4. REMOVE MEMBER MODAL -->
-{% if group %}
+                <div>
+                    <label class="form-label">Payment Method</label>
+                    <div class="grid grid-cols-2 gap-3 mt-2">
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="payment_method" value="cash" class="payment-radio hidden" checked>
+                            <div
+                                class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <p class="text-sm font-bold text-gray-800">Cash</p>
+                                <i
+                                    class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon"></i>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="payment_method" value="instapay" class="payment-radio hidden">
+                            <div
+                                class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <p class="text-sm font-bold text-gray-800">InstaPay</p>
+                                <i
+                                    class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-signin bg-green-600 border-green-600 hover:text-green-600">Confirm
+                    Payment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. REMOVE MEMBER MODAL -->
+    {% if group %}
     <div id="removeMemberModal" class="modal-overlay hidden">
         <div class="modal-content text-center">
             <div
-                    class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
                 <i class="fas fa-user-times"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Member?</h3>
             <p class="text-gray-500 mb-6">Are you sure you want to remove this member? This action cannot be undone.</p>
 
             <form id="removeMemberForm" action="{{ url_for('GroupController:remove_member', group_id=group.group_id) }}"
-                  method="POST" class="flex gap-3">
+                method="POST" class="flex gap-3">
                 <input type="hidden" name="member_id" id="member_id">
                 <button type="button" onclick="closeModal('removeMemberModal')"
-                        class="flex-1 btn btn-white justify-center">
+                    class="flex-1 btn btn-white justify-center">
                     Cancel
                 </button>
                 <button type="submit"
-                        class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
+                    class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
                     Remove
                 </button>
             </form>
         </div>
     </div>
-{% endif %}
+    {% endif %}
 
-<!-- 5. GENERIC NOTIFICATION MODAL -->
-<div id="notificationModal" class="modal-overlay hidden">
-    <div class="modal-content text-center">
-        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-teal text-2xl">
-            <i class="fas fa-bell"></i>
+    <!-- 5. GENERIC NOTIFICATION MODAL -->
+    <div id="notificationModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div
+                class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-teal text-2xl">
+                <i class="fas fa-bell"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Notification</h3>
+            <p class="text-gray-500 mb-6" id="notifMessage">Details about this action.</p>
+            <button onclick="closeModal('notificationModal')" class="btn-signin w-full">Mark as Read</button>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Notification</h3>
-        <p class="text-gray-500 mb-6" id="notifMessage">Details about this action.</p>
-        <button onclick="closeModal('notificationModal')" class="btn-signin w-full">Mark as Read</button>
     </div>
-</div>
 
-<!-- 6. INVITATION MODAL -->
-<div id="invitationModal" class="modal-overlay hidden">
-    <div class="modal-content text-center">
-        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600 text-2xl">
-            <i class="fas fa-envelope"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Group Invitation</h3>
-        <p class="text-gray-500 mb-6">You have been invited to join <span id="inviteGroupName"
-                                                                          class="font-bold text-gray-800">Summer Trip</span>.
-        </p>
-        <div class="flex gap-3">
-            <button onclick="closeModal('invitationModal')"
+    <!-- 6. INVITATION MODAL -->
+    <div id="invitationModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div
+                class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600 text-2xl">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Group Invitation</h3>
+            <p class="text-gray-500 mb-6">You have been invited to join <span id="inviteGroupName"
+                    class="font-bold text-gray-800">Summer Trip</span>.
+            </p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('invitationModal')"
                     class="flex-1 btn btn-white justify-center border-red-200 text-red-500 hover:bg-red-50">Reject
-            </button>
-            <button onclick="closeModal('invitationModal')" class="flex-1 btn btn-signin justify-center">Accept</button>
+                </button>
+                <button onclick="closeModal('invitationModal')" class="flex-1 btn btn-signin justify-center">Accept
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- 7. EDIT GROUP MODAL-->
-<div id="editGroupModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Edit Group</h3>
-            <button onclick="closeModal('editGroupModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        {% if group is defined %}
+    <!-- 7. EDIT GROUP MODAL-->
+    <div id="editGroupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Edit Group</h3>
+                <button onclick="closeModal('editGroupModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            {% if group is defined %}
             <form id="editGroupForm" action="{{ url_for('GroupController:update_group', group_id=group.group_id) }}"
-                  method="POST" class="space-y-4">
+                method="POST" class="space-y-4">
                 <input type="hidden" id="edit_group_id" name="group_id">
                 <div>
                     <label class="form-label">Group Name</label>
                     <input type="text" value="{{ group.group_name }}" id="edit_group_name" name="new_group_name"
-                           class="auth-input"
-                           required>
+                        class="auth-input" required>
                 </div>
                 <div>
                     <label class="form-label">Group Description</label>
                     <input type="text" value="{{ group.description }}" id="edit_group_description"
-                           name="new_group_description"
-                           class="auth-input">
+                        name="new_group_description" class="auth-input">
                 </div>
                 <button type="submit" class="btn-signin">Save Changes</button>
             </form>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
-</div>
 
-<!-- 8. DELETE GROUP MODAL-->
-<div id="deleteGroupModal" class="modal-overlay hidden">
-    {% if group is defined %}
+    <!-- 8. DELETE GROUP MODAL-->
+    <div id="deleteGroupModal" class="modal-overlay hidden">
+        {% if group is defined %}
         <div class="modal-content text-center">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+            <div
+                class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Group?</h3>
@@ -352,494 +354,518 @@
                 All expenses and history will be permanently lost.
             </p>
             <form id="deleteGroupForm" action="{{ url_for('GroupController:delete_group', group_id=group.group_id) }}"
-                  method="POST" class="flex gap-3">
+                method="POST" class="flex gap-3">
                 <input type="hidden" id="delete_group_id" name="group_id">
                 <button type="button" onclick="closeModal('deleteGroupModal')"
-                        class="flex-1 btn btn-white justify-center">
+                    class="flex-1 btn btn-white justify-center">
                     Cancel
                 </button>
                 <button type="submit"
-                        class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
+                    class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
                     Delete
                 </button>
             </form>
         </div>
-    {% endif %}
-</div>
+        {% endif %}
+    </div>
 
-<!-- 9. EDIT EXPENSE MODAL-->
-<div id="editExpenseModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Edit Expense</h3>
-            <button onclick="closeModal('editExpenseModal')" class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form id="editExpenseForm" action="#" method="POST" class="space-y-4">
-            <input type="hidden" id="edit_expense_id" name="expense_id">
-            <div>
-                <label class="form-label">Description</label>
-                <input type="text" id="edit_expense_description" name="description" class="auth-input" required>
-            </div>
-            <div>
-                <label class="form-label">Amount</label>
-                <input type="number" id="edit_expense_amount" name="amount" step="0.01" class="auth-input" required>
+    <!-- 9. EDIT EXPENSE MODAL-->
+    <div id="editExpenseModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Edit Expense</h3>
+                <button onclick="closeModal('editExpenseModal')"
+                    class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
-            {% if group is defined and group and group.members %}
+            <form id="editExpenseForm" action="#" method="POST" class="space-y-4">
+                <input type="hidden" id="edit_expense_id" name="expense_id">
+                <div>
+                    <label class="form-label">Description</label>
+                    <input type="text" id="edit_expense_description" name="description" class="auth-input" required>
+                </div>
+                <div>
+                    <label class="form-label">Amount</label>
+                    <input type="number" id="edit_expense_amount" name="total_amount" step="0.01" class="auth-input"
+                        required>
+                </div>
+
+                {% if group is defined and group and group.members %}
                 <div>
                     <label class="form-label">Paid By</label>
-                    <select id="edit_expense_paid_by" name="paid_by" class="auth-input" required>
+                    <select id="edit_expense_paid_by" name="payer_id" class="auth-input" required>
                         {% for member in group.members %}
-                            <option value="{{ member.user_id }}">{{ member.name }}</option>
+                        <option value="{{ member.user_id }}">{{ member.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-            {% endif %}
-            <button type="submit" class="btn-signin">Save Changes</button>
-        </form>
-    </div>
-</div>
+                <div>
+                    <label class="form-label">Split With</label>
+                    <div class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50">
+                        {% for member in group.members %}
+                        <label class="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer">
+                            <input type="checkbox" name="split_with" value="{{ member.user_id }}" checked
+                                class="form-checkbox text-brand-teal rounded h-4 w-4">
+                            <span class="text-sm text-gray-700">{{ member.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Uncheck to exclude from split.</p>
+                </div>
+                {% endif %}
+                <button type="submit" class="btn-signin">Save Changes</button>
+            </form>
 
-<!-- 10. JOIN GROUP MODAL  -->
-<div id="joinGroupModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Join Group</h3>
-            <button type="button" onclick="closeModal('joinGroupModal')"
+        </div>
+    </div>
+
+    <!-- 10. JOIN GROUP MODAL  -->
+    <div id="joinGroupModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Join Group</h3>
+                <button type="button" onclick="closeModal('joinGroupModal')"
                     class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="/groups/join" method="POST" class="space-y-4">
+                <div>
+                    <label class="form-label">Group Code</label>
+                    <input type="text" name="invite_code"
+                        class="auth-input text-center text-lg tracking-widest uppercase" placeholder="ENTER CODE"
+                        maxlength="8" required>
+                </div>
+                <div class="text-xs text-gray-400 text-center">
+                    Ask the group admin for the invitation code.
+                </div>
+                <button type="submit" class="btn-signin">Join Group</button>
+            </form>
         </div>
-        <form action="/groups/join" method="POST" class="space-y-4">
-            <div>
-                <label class="form-label">Group Code</label>
-                <input type="text" name="invite_code" class="auth-input text-center text-lg tracking-widest uppercase"
-                       placeholder="ENTER CODE" maxlength="8" required>
-            </div>
-            <div class="text-xs text-gray-400 text-center">
-                Ask the group admin for the invitation code.
-            </div>
-            <button type="submit" class="btn-signin">Join Group</button>
-        </form>
     </div>
-</div>
 
-<!-- 11. INVITE BY EMAIL MODAL -->
-<div id="inviteByEmailModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Invite via Email</h3>
-            <button type="button" onclick="closeModal('inviteByEmailModal')"
+    <!-- 11. INVITE BY EMAIL MODAL -->
+    <div id="inviteByEmailModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Invite via Email</h3>
+                <button type="button" onclick="closeModal('inviteByEmailModal')"
                     class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form action="#" method="POST" class="space-y-4"> <!-- Update action to actual endpoint -->
-            <div>
-                <label class="form-label">Email Address</label>
-                <input type="email" name="email" class="auth-input" placeholder="friend@example.com" required>
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="text-xs text-gray-400">
-                We'll send them an invitation link to join this group.
-            </div>
-            <button type="submit" class="btn-signin">Send Invitation</button>
-        </form>
-    </div>
-</div>
-
-<!-- 12. TRANSACTION CONFIRMATION MODAL-->
-<div id="transactionModal" class="modal-overlay hidden">
-    <div class="modal-content text-center">
-        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600 text-2xl">
-            <i class="fas fa-money-bill-wave"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Confirm Transaction</h3>
-        <p class="text-gray-500 mb-6" id="transactionMessage">Please confirm this transaction.</p>
-        <div class="flex gap-3">
-            <button onclick="closeModal('transactionModal')"
-                    class="flex-1 btn btn-white justify-center border-red-200 text-red-500 hover:bg-red-50">Reject
-            </button>
-            <button onclick="closeModal('transactionModal')" class="flex-1 btn btn-signin justify-center">Accept
-            </button>
+            <form action="#" method="POST" class="space-y-4"> <!-- Update action to actual endpoint -->
+                <div>
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="auth-input" placeholder="friend@example.com" required>
+                </div>
+                <div class="text-xs text-gray-400">
+                    We'll send them an invitation link to join this group.
+                </div>
+                <button type="submit" class="btn-signin">Send Invitation</button>
+            </form>
         </div>
     </div>
-</div>
 
-<!-- 13. REMOVE PAYMENT METHOD MODAL -->
-<div id="removePaymentModal" class="modal-overlay hidden">
-    <div class="modal-content text-center">
-        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
-            <i class="fas fa-trash-alt"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Payment Method?</h3>
-        <p class="text-gray-500 mb-6">Are you sure you want to remove this payment method? This cannot be undone.</p>
-        <div class="flex gap-3">
-            <button onclick="closeModal('removePaymentModal')" class="flex-1 btn btn-white justify-center">Cancel
-            </button>
-            <button onclick="confirmRemovePayment()"
-                    class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
-                Remove
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- 14. SELECTION MODAL-->
-<div id="paymentSelectionModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="section-title">Add Payment Method</h3>
-            <button onclick="closeModal('paymentSelectionModal')"
-                    class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="grid grid-cols-3 gap-3 mb-4">
-            <div onclick="switchToModal('addEWalletModal')"
-                 class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
-                <i class="fas fa-wallet text-2xl text-brand-teal mb-2"></i>
-                <span class="text-xs font-bold text-center">E-Wallet</span>
+    <!-- 12. TRANSACTION CONFIRMATION MODAL-->
+    <div id="transactionModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div
+                class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600 text-2xl">
+                <i class="fas fa-money-bill-wave"></i>
             </div>
-            <div onclick="switchToModal('addCardModal')"
-                 class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
-                <i class="fas fa-credit-card text-2xl text-blue-600 mb-2"></i>
-                <span class="text-xs font-bold text-center">Credit Card</span>
-            </div>
-            <div onclick="switchToModal('addInstaPayModal')"
-                 class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
-                <i class="fas fa-university text-2xl text-purple-600 mb-2"></i>
-                <span class="text-xs font-bold text-center">InstaPay</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 15. E-WALLET MODAL -->
-<div id="addEWalletModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Add E-Wallet</h3>
-            <button type="button" onclick="closeModal('addEWalletModal')"
-                    class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form action="#" method="POST" class="space-y-4"
-              onsubmit="event.preventDefault(); showAlert('Success', 'E-Wallet Added'); closeModal('addEWalletModal');">
-            <div>
-                <label class="form-label">Phone Number</label>
-                <input type="tel" name="phone_number" class="auth-input" placeholder="01xxxxxxxxx" required>
-            </div>
-            <button type="submit" class="btn-signin">Connect Wallet</button>
-        </form>
-    </div>
-</div>
-
-<!-- 16. CREDIT CARD MODAL -->
-<div id="addCardModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Add Credit Card</h3>
-            <button type="button" onclick="closeModal('addCardModal')"
-                    class="text-gray-400 hover:text-red-500 cursor-pointer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form action="#" method="POST" class="space-y-4"
-              onsubmit="event.preventDefault(); showAlert('Success', 'Credit Card Added'); closeModal('addCardModal');">
-            <div>
-                <label class="form-label">Card Number</label>
-                <input type="text" name="card_number" class="auth-input" placeholder="0000 0000 0000 0000" required>
-            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Confirm Transaction</h3>
+            <p class="text-gray-500 mb-6" id="transactionMessage">Please confirm this transaction.</p>
             <div class="flex gap-3">
-                <div class="flex-1">
-                    <label class="form-label">Expiry</label>
-                    <input type="text" name="expiry" class="auth-input" placeholder="MM/YY" required>
+                <button onclick="closeModal('transactionModal')"
+                    class="flex-1 btn btn-white justify-center border-red-200 text-red-500 hover:bg-red-50">Reject
+                </button>
+                <button onclick="closeModal('transactionModal')" class="flex-1 btn btn-signin justify-center">Accept
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 13. REMOVE PAYMENT METHOD MODAL -->
+    <div id="removePaymentModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div
+                class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Payment Method?</h3>
+            <p class="text-gray-500 mb-6">Are you sure you want to remove this payment method? This cannot be undone.
+            </p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('removePaymentModal')" class="flex-1 btn btn-white justify-center">Cancel
+                </button>
+                <button onclick="confirmRemovePayment()"
+                    class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 14. SELECTION MODAL-->
+    <div id="paymentSelectionModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="section-title">Add Payment Method</h3>
+                <button onclick="closeModal('paymentSelectionModal')"
+                    class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div onclick="switchToModal('addEWalletModal')"
+                    class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
+                    <i class="fas fa-wallet text-2xl text-brand-teal mb-2"></i>
+                    <span class="text-xs font-bold text-center">E-Wallet</span>
                 </div>
-                <div class="flex-1">
-                    <label class="form-label">CVC</label>
-                    <input type="text" name="cvc" class="auth-input" placeholder="123" required>
+                <div onclick="switchToModal('addCardModal')"
+                    class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
+                    <i class="fas fa-credit-card text-2xl text-blue-600 mb-2"></i>
+                    <span class="text-xs font-bold text-center">Credit Card</span>
+                </div>
+                <div onclick="switchToModal('addInstaPayModal')"
+                    class="cursor-pointer border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center hover:border-brand-teal hover:bg-teal-50 transition">
+                    <i class="fas fa-university text-2xl text-purple-600 mb-2"></i>
+                    <span class="text-xs font-bold text-center">InstaPay</span>
                 </div>
             </div>
-            <button type="submit" class="btn-signin">Add Card</button>
-        </form>
+        </div>
     </div>
-</div>
 
-<!-- 17. INSTAPAY MODAL -->
-<div id="addInstaPayModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="section-title">Add InstaPay</h3>
-            <button type="button" onclick="closeModal('addInstaPayModal')"
+    <!-- 15. E-WALLET MODAL -->
+    <div id="addEWalletModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Add E-Wallet</h3>
+                <button type="button" onclick="closeModal('addEWalletModal')"
                     class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="#" method="POST" class="space-y-4"
+                onsubmit="event.preventDefault(); showAlert('Success', 'E-Wallet Added'); closeModal('addEWalletModal');">
+                <div>
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" name="phone_number" class="auth-input" placeholder="01xxxxxxxxx" required>
+                </div>
+                <button type="submit" class="btn-signin">Connect Wallet</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 16. CREDIT CARD MODAL -->
+    <div id="addCardModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Add Credit Card</h3>
+                <button type="button" onclick="closeModal('addCardModal')"
+                    class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="#" method="POST" class="space-y-4"
+                onsubmit="event.preventDefault(); showAlert('Success', 'Credit Card Added'); closeModal('addCardModal');">
+                <div>
+                    <label class="form-label">Card Number</label>
+                    <input type="text" name="card_number" class="auth-input" placeholder="0000 0000 0000 0000" required>
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <label class="form-label">Expiry</label>
+                        <input type="text" name="expiry" class="auth-input" placeholder="MM/YY" required>
+                    </div>
+                    <div class="flex-1">
+                        <label class="form-label">CVC</label>
+                        <input type="text" name="cvc" class="auth-input" placeholder="123" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-signin">Add Card</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 17. INSTAPAY MODAL -->
+    <div id="addInstaPayModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="section-title">Add InstaPay</h3>
+                <button type="button" onclick="closeModal('addInstaPayModal')"
+                    class="text-gray-400 hover:text-red-500 cursor-pointer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form action="#" method="POST" class="space-y-4"
+                onsubmit="event.preventDefault(); showAlert('Success', 'InstaPay Account Added'); closeModal('addInstaPayModal');">
+                <div>
+                    <label class="form-label">InstaPay Address / Phone</label>
+                    <input type="text" name="instapay_address" class="auth-input" placeholder="username@instapay"
+                        required>
+                </div>
+                <button type="submit" class="btn-signin">Verify Address</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 18. GENERIC ALERT MODAL-->
+    <div id="alertModal" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <div
+                class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 text-green-600 text-xl">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="font-bold text-gray-900 mb-1" id="alertTitle">Success</h3>
+            <p class="text-sm text-gray-500 mb-4" id="alertMessage">Action completed successfully.</p>
+            <button onclick="closeModal('alertModal')" class="btn-signin py-2 text-sm">OK</button>
+        </div>
+    </div>
+
+    <!-- 19. USER PROFILE MODAL -->
+    <div id="userProfileModal" class="modal-overlay hidden">
+        <div class="modal-content relative">
+            <button onclick="closeModal('userProfileModal')"
+                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 cursor-pointer">
                 <i class="fas fa-times"></i>
             </button>
-        </div>
-        <form action="#" method="POST" class="space-y-4"
-              onsubmit="event.preventDefault(); showAlert('Success', 'InstaPay Account Added'); closeModal('addInstaPayModal');">
-            <div>
-                <label class="form-label">InstaPay Address / Phone</label>
-                <input type="text" name="instapay_address" class="auth-input" placeholder="username@instapay" required>
-            </div>
-            <button type="submit" class="btn-signin">Verify Address</button>
-        </form>
-    </div>
-</div>
 
-<!-- 18. GENERIC ALERT MODAL-->
-<div id="alertModal" class="modal-overlay hidden">
-    <div class="modal-content text-center">
-        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 text-green-600 text-xl">
-            <i class="fas fa-check"></i>
-        </div>
-        <h3 class="font-bold text-gray-900 mb-1" id="alertTitle">Success</h3>
-        <p class="text-sm text-gray-500 mb-4" id="alertMessage">Action completed successfully.</p>
-        <button onclick="closeModal('alertModal')" class="btn-signin py-2 text-sm">OK</button>
-    </div>
-</div>
-
-<!-- 19. USER PROFILE MODAL -->
-<div id="userProfileModal" class="modal-overlay hidden">
-    <div class="modal-content relative">
-        <button onclick="closeModal('userProfileModal')"
-                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 cursor-pointer">
-            <i class="fas fa-times"></i>
-        </button>
-
-        <div class="flex flex-col items-center mb-6">
-            <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-4xl mb-3 text-gray-500">
-                <i class="fas fa-user"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900" id="profileName">User Name</h3>
-            <p class="text-gray-500 text-sm" id="profilePhone">+20 1xxxxxxxxx</p>
-        </div>
-
-        <div class="space-y-4 mb-6">
-            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b pb-1">Payment Methods</h4>
-            <div id="profileMethods" class="space-y-2">
-                <!-- Static Demo Item -->
-                <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                    <i class="fab fa-cc-visa text-blue-800 text-lg"></i>
-                    <div class="text-sm">
-                        <p class="font-bold text-gray-800">Visa</p>
-                        <p class="text-xs text-gray-500">**** 4242</p>
-                    </div>
+            <div class="flex flex-col items-center mb-6">
+                <div
+                    class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-4xl mb-3 text-gray-500">
+                    <i class="fas fa-user"></i>
                 </div>
-                <!-- Demo Item 2 -->
-                <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                    <i class="fas fa-wallet text-brand-teal text-lg"></i>
-                    <div class="text-sm">
-                        <p class="font-bold text-gray-800">Vodafone Cash</p>
-                        <p class="text-xs text-gray-500">010xxxxxxxxx</p>
+                <h3 class="text-xl font-bold text-gray-900" id="profileName">User Name</h3>
+                <p class="text-gray-500 text-sm" id="profilePhone">+20 1xxxxxxxxx</p>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b pb-1">Payment Methods</h4>
+                <div id="profileMethods" class="space-y-2">
+                    <!-- Static Demo Item -->
+                    <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                        <i class="fab fa-cc-visa text-blue-800 text-lg"></i>
+                        <div class="text-sm">
+                            <p class="font-bold text-gray-800">Visa</p>
+                            <p class="text-xs text-gray-500">**** 4242</p>
+                        </div>
+                    </div>
+                    <!-- Demo Item 2 -->
+                    <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                        <i class="fas fa-wallet text-brand-teal text-lg"></i>
+                        <div class="text-sm">
+                            <p class="font-bold text-gray-800">Vodafone Cash</p>
+                            <p class="text-xs text-gray-500">010xxxxxxxxx</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <a href="#" id="waLink" target="_blank"
-               class="flex items-center justify-center gap-2 btn btn-white border-green-500 text-green-600 hover:bg-green-50">
-                <i class="fab fa-whatsapp text-lg"></i> WhatsApp
-            </a>
-            <a href="#" id="callLink"
-               class="flex items-center justify-center gap-2 btn btn-white border-blue-500 text-blue-600 hover:bg-blue-50">
-                <i class="fas fa-phone-alt"></i> Call
-            </a>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="#" id="waLink" target="_blank"
+                    class="flex items-center justify-center gap-2 btn btn-white border-green-500 text-green-600 hover:bg-green-50">
+                    <i class="fab fa-whatsapp text-lg"></i> WhatsApp
+                </a>
+                <a href="#" id="callLink"
+                    class="flex items-center justify-center gap-2 btn btn-white border-blue-500 text-blue-600 hover:bg-blue-50">
+                    <i class="fas fa-phone-alt"></i> Call
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    function openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.remove('hidden');
-            void modal.offsetWidth;
-            modal.classList.add('open');
-            modal.style.display = 'flex';
+    <script>
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+                void modal.offsetWidth;
+                modal.classList.add('open');
+                modal.style.display = 'flex';
+            }
         }
-    }
 
-    function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.remove('open');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-            }, 300);
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('open');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }, 300);
+            }
         }
-    }
 
 
-    function confirmRemoveMember(memberId) {
-        const form = document.getElementById('removeMemberForm');
-        form.querySelector('#member_id').value = memberId;
-        openModal('removeMemberModal');
-    }
-
-    function showNotificationDetails(message) {
-        document.getElementById('notifMessage').innerText = message;
-        openModal('notificationModal');
-    }
-
-    function showInvitation(groupName) {
-        document.getElementById('inviteGroupName').innerText = groupName;
-        openModal('invitationModal');
-    }
-
-    function showTransaction(message) {
-        document.getElementById('transactionMessage').innerText = message;
-        openModal('transactionModal');
-    }
-
-    function markAsRead(btnElement) {
-        const item = btnElement.closest('.feed-item');
-        if (item) {
-            item.classList.add('read-state');
-            btnElement.innerText = "Read";
-            btnElement.disabled = true;
-            btnElement.classList.add('opacity-50', 'cursor-default');
+        function confirmRemoveMember(memberId) {
+            const form = document.getElementById('removeMemberForm');
+            form.querySelector('#member_id').value = memberId;
+            openModal('removeMemberModal');
         }
-    }
 
-    function acceptInvite(btnElement) {
-        const item = btnElement.closest('.feed-item');
-        if (item) {
-            item.classList.add('accepted-state');
-            const buttons = item.querySelectorAll('button');
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                if (btn !== btnElement) btn.style.display = 'none';
+        function showNotificationDetails(message) {
+            document.getElementById('notifMessage').innerText = message;
+            openModal('notificationModal');
+        }
+
+        function showInvitation(groupName) {
+            document.getElementById('inviteGroupName').innerText = groupName;
+            openModal('invitationModal');
+        }
+
+        function showTransaction(message) {
+            document.getElementById('transactionMessage').innerText = message;
+            openModal('transactionModal');
+        }
+
+        function markAsRead(btnElement) {
+            const item = btnElement.closest('.feed-item');
+            if (item) {
+                item.classList.add('read-state');
+                btnElement.innerText = "Read";
+                btnElement.disabled = true;
+                btnElement.classList.add('opacity-50', 'cursor-default');
+            }
+        }
+
+        function acceptInvite(btnElement) {
+            const item = btnElement.closest('.feed-item');
+            if (item) {
+                item.classList.add('accepted-state');
+                const buttons = item.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    if (btn !== btnElement) btn.style.display = 'none';
+                });
+                btnElement.innerText = "Accepted";
+                btnElement.classList.remove('bg-brand-teal', 'text-white');
+                btnElement.classList.add('bg-transparent', 'text-green-700', 'font-bold', 'border-none');
+            }
+        }
+
+        function rejectInvite(btnElement) {
+            const item = btnElement.closest('.feed-item');
+            if (item) {
+                item.classList.add('rejected-state');
+                const buttons = item.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    if (btn !== btnElement) btn.style.display = 'none';
+                });
+                btnElement.innerText = "Rejected";
+                btnElement.classList.remove('text-red-500', 'border-red-200');
+                btnElement.classList.add('text-red-800', 'font-bold', 'border-none', 'bg-transparent');
+            }
+        }
+
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(event.target.id);
+            }
+        }
+
+        document.querySelectorAll('.payment-radio').forEach(radio => {
+            radio.addEventListener('change', function () {
+                document.querySelectorAll('.check-icon').forEach(icon => icon.classList.add('hidden'));
+                if (this.checked) {
+                    this.parentElement.querySelector('.check-icon').classList.remove('hidden');
+                }
             });
-            btnElement.innerText = "Accepted";
-            btnElement.classList.remove('bg-brand-teal', 'text-white');
-            btnElement.classList.add('bg-transparent', 'text-green-700', 'font-bold', 'border-none');
-        }
-    }
-
-    function rejectInvite(btnElement) {
-        const item = btnElement.closest('.feed-item');
-        if (item) {
-            item.classList.add('rejected-state');
-            const buttons = item.querySelectorAll('button');
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                if (btn !== btnElement) btn.style.display = 'none';
-            });
-            btnElement.innerText = "Rejected";
-            btnElement.classList.remove('text-red-500', 'border-red-200');
-            btnElement.classList.add('text-red-800', 'font-bold', 'border-none', 'bg-transparent');
-        }
-    }
-
-    window.onclick = function (event) {
-        if (event.target.classList.contains('modal-overlay')) {
-            closeModal(event.target.id);
-        }
-    }
-
-    document.querySelectorAll('.payment-radio').forEach(radio => {
-        radio.addEventListener('change', function () {
-            document.querySelectorAll('.check-icon').forEach(icon => icon.classList.add('hidden'));
-            if (this.checked) {
-                this.parentElement.querySelector('.check-icon').classList.remove('hidden');
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const groupSelect = document.querySelector('select[name="group_id"]');
+            if (groupSelect) {
+                groupSelect.addEventListener('change', function () {
+                    const groupId = this.value;
+                    if (groupId) {
+                        fetchMembers(groupId);
+                    }
+                });
             }
         });
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        const groupSelect = document.querySelector('select[name="group_id"]');
-        if (groupSelect) {
-            groupSelect.addEventListener('change', function () {
-                const groupId = this.value;
-                if (groupId) {
-                    fetchMembers(groupId);
-                }
-            });
+
+        function fetchMembers(groupId) {
+            fetch(`/groups/${groupId}/members`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.members) {
+                        updateMemberInputs(data.members);
+                    }
+                })
+                .catch(error => console.error('Error fetching members:', error));
         }
-    });
 
-    function fetchMembers(groupId) {
-        fetch(`/groups/${groupId}/members`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.members) {
-                    updateMemberInputs(data.members);
-                }
-            })
-            .catch(error => console.error('Error fetching members:', error));
-    }
-
-    function updateMemberInputs(members) {
-        // Update Paid By
-        const payerSelect = document.querySelector('select[name="payer_id"]');
-        const currentPayer = payerSelect.value;
-        payerSelect.innerHTML = '';
-        members.forEach(member => {
-            const option = document.createElement('option');
-            option.value = member.user_id;
-            option.textContent = member.name;
-            payerSelect.appendChild(option);
-        });
-        // Restore selection if possible, otherwise default to first (usually current user if in list)
-        // But here we might just want to keep it simple or default to current user if available
-        // logic to select current user if present is better UX, but simple for now.
-
-
-        // Update Split With
-        const splitContainer = document.querySelector('.max-h-32');
-        if (splitContainer) {
-            splitContainer.innerHTML = '';
+        function updateMemberInputs(members) {
+            // Update Paid By
+            const payerSelect = document.querySelector('select[name="payer_id"]');
+            const currentPayer = payerSelect.value;
+            payerSelect.innerHTML = '';
             members.forEach(member => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer';
-                label.innerHTML = `
+                const option = document.createElement('option');
+                option.value = member.user_id;
+                option.textContent = member.name;
+                payerSelect.appendChild(option);
+            });
+            // Restore selection if possible, otherwise default to first (usually current user if in list)
+            // But here we might just want to keep it simple or default to current user if available
+            // logic to select current user if present is better UX, but simple for now.
+
+
+            // Update Split With
+            const splitContainer = document.querySelector('.max-h-32');
+            if (splitContainer) {
+                splitContainer.innerHTML = '';
+                members.forEach(member => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer';
+                    label.innerHTML = `
                 <input type="checkbox" name="split_with" value="${member.user_id}" checked
                        class="form-checkbox text-brand-teal rounded h-4 w-4">
                 <span class="text-sm text-gray-700">${member.name}</span>
             `;
-                splitContainer.appendChild(label);
-            });
+                    splitContainer.appendChild(label);
+                });
+            }
         }
-    }
 
-    function switchToModal(newModalId) {
-        closeModal('paymentSelectionModal');
-        setTimeout(() => {
-            openModal(newModalId);
-        }, 350);
-    }
+        function switchToModal(newModalId) {
+            closeModal('paymentSelectionModal');
+            setTimeout(() => {
+                openModal(newModalId);
+            }, 350);
+        }
 
-    function showAlert(title, message) {
-        document.getElementById('alertTitle').innerText = title;
-        document.getElementById('alertMessage').innerText = message;
-        openModal('alertModal');
-    }
+        function showAlert(title, message) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = message;
+            openModal('alertModal');
+        }
 
-    function requestRemovePayment(paymentId) {
-        document.getElementById('removePaymentId').value = paymentId;
-        openModal('removePaymentModal');
-    }
+        function requestRemovePayment(paymentId) {
+            document.getElementById('removePaymentId').value = paymentId;
+            openModal('removePaymentModal');
+        }
 
-    function confirmRemovePayment() {
-        closeModal('removePaymentModal');
-    }
+        function confirmRemovePayment() {
+            closeModal('removePaymentModal');
+        }
 
-    function startAddPayment() {
-        openModal('paymentSelectionModal');
-    }
+        function startAddPayment() {
+            openModal('paymentSelectionModal');
+        }
 
-    function confirmRemoveMember(memberId) {
-        const form = document.getElementById('removeMemberForm');
-        form.querySelector('#member_id').value = memberId;
-        openModal('removeMemberModal');
-    }
-</script>
+        function confirmRemoveMember(memberId) {
+            const form = document.getElementById('removeMemberForm');
+            form.querySelector('#member_id').value = memberId;
+            openModal('removeMemberModal');
+        }
+    </script>
 
-{% block scripts %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 
 </html>

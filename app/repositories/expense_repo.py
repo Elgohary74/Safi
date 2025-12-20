@@ -19,7 +19,7 @@ class ExpenseRepository(IRepository):
 
     def get_by_id(self, expense_id: str) -> Optional[ExpenseSchema]:
         self.logger.debug(f"fetching expense id: {expense_id}")
-        data = self.collection.find_one({"_id": expense_id})
+        data = self.collection.find_one({"expense_id": expense_id})
         return ExpenseSchema.model_validate(data) if data else None
 
     def get_all_by_group(self, group_id: str) -> List[ExpenseSchema]:
@@ -29,8 +29,8 @@ class ExpenseRepository(IRepository):
 
     def update(self, expense_id: str, data: ExpenseSchema):
         self.logger.info(f"updating expense id: {expense_id}")
-        self.collection.update_one({"_id": expense_id}, {"$set": data.model_dump()})
+        self.collection.update_one({"expense_id": expense_id}, {"$set": data.model_dump()})
 
     def delete(self, expense_id: str):
         self.logger.info(f"deleting expense id: {expense_id}")
-        self.collection.delete_one({"_id": expense_id})
+        self.collection.delete_one({"expense_id": expense_id})

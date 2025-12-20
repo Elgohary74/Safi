@@ -15,6 +15,11 @@ class ExpenseCreationRequest(BaseModel):
     description: str = Field(default="")
     payer_id: str
 
+class ExpenseUpdateRequest(BaseModel):
+    total_amount: float
+    description: str = Field(default="")
+    payer_id: str
+
 
 class ExpenseBase(BaseModel):
     expense_id: str = Field(default_factory=lambda: str(uuid.uuid4()))

@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 
 from app.events.signals import expense_created
 from app.models import Expense
-from app.models.expense import ExpenseCreationRequest
+from app.models.expense import ExpenseCreationRequest, ExpenseUpdateRequest
 from app.services.base import BaseService
-from app.utils.exceptions import CreationError
+from app.utils.exceptions import CreationError, ResourceNotFound
 
 
 class ExpenseService(BaseService):
@@ -34,6 +34,18 @@ class ExpenseService(BaseService):
             raise CreationError(message="Failed to create expense")
         expense_created.send(self, expense=expense)
         return expense_id
+
+    def update_expense(self, expense_id: str, update_expense_request: ExpenseUpdateRequest) -> None:
+        expense_schema = self.expense_repo.get_by_id(expense_id)
+        if not expense_schema:
+             raise ResourceNotFound(message="Expense not found")
+            
+        expense_schema.total_amount = update_expense_request.total_amount
+        expense_schema.description = update_expense_request.description
+        expense_schema.payer_id = update_expense_request.payer_id
+        
+        self.expense_repo.update(expense_id, expense_schema)
+        
 
     def get_group_expenses(self, group_id: str) -> list[Expense]:
         expenses_schemas = self.expense_repo.get_all_by_group(group_id)
