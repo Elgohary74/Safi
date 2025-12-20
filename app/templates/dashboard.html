@@ -3,196 +3,221 @@
 {% block title %}Safi - Dashboard{% endblock %}
 
 {% block header %}
-<header class="page-header">
-    <h2 class="page-title">Dashboard Overview</h2>
-    <!-- Opens global expense modal from base.html -->
-    <button onclick="openModal('expenseModal')" class="btn btn-primary">+ New Expense</button>
-</header>
+    <header class="page-header">
+        <h2 class="page-title">Dashboard Overview</h2>
+        <button onclick="openModal('expenseModal')" class="btn btn-primary">+ New Expense</button>
+    </header>
 {% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-3 gap-6 mb-8">
-    <div class="card stat-card">
-        <span class="stat-label">Net Balance</span>
-        <span class="stat-value">{{ net_balance|default(0) }} <span class="text-muted-sm font-normal">EGP</span></span>
-    </div>
-    <div class="card stat-card">
-        <span class="stat-label">You are owed</span>
-        <span class="stat-value positive">+{{ amount_owed|default(0) }} <span
-                class="text-muted-sm font-normal">EGP</span></span>
-    </div>
-    <div class="card stat-card">
-        <span class="stat-label">You owe</span>
-        <span class="stat-value negative">-{{ amount_owing|default(0) }} <span
-                class="text-muted-sm font-normal">EGP</span></span>
-    </div>
-</div>
-
-<div class="data-table-container mb-8">
-    <div
-        class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center bg-white gap-4">
-        <div class="flex items-center gap-6">
-            <h3 class="font-bold text-gray-800">Groups</h3>
-            <div class="flex space-x-4 bg-gray-100 p-1 rounded-lg">
-                <button onclick="setFilter('active')" id="tab-active"
-                    class="px-3 py-1 rounded-md text-xs font-semibold transition-all bg-white text-brand-teal shadow-sm">
-                    Active
-                </button>
-                <button onclick="setFilter('inactive')" id="tab-inactive"
-                    class="px-3 py-1 rounded-md text-xs font-semibold transition-all text-gray-500 hover:text-gray-700">
-                    Inactive
-                </button>
-                <button onclick="setFilter('all')" id="tab-all"
-                    class="px-3 py-1 rounded-md text-xs font-semibold transition-all text-gray-500 hover:text-gray-700">
-                    All
-                </button>
-            </div>
+    <div class="grid grid-cols-3 gap-6 mb-8">
+        <div class="card stat-card">
+            <span class="stat-label">Net Balance</span>
+            <span class="stat-value">{{ net_balance|default(0) }} <span
+                    class="text-muted-sm font-normal">EGP</span></span>
         </div>
-        <a href="{{ url_for('GroupController:list_groups') }}"
-            class="text-xs font-bold text-brand-blue hover:underline">View All</a>
+        <div class="card stat-card">
+            <span class="stat-label">You are owed</span>
+            <span class="stat-value positive">+{{ amount_owed|default(0) }} <span
+                    class="text-muted-sm font-normal">EGP</span></span>
+        </div>
+        <div class="card stat-card">
+            <span class="stat-label">You owe</span>
+            <span class="stat-value negative">-{{ amount_owing|default(0) }} <span
+                    class="text-muted-sm font-normal">EGP</span></span>
+        </div>
     </div>
-    <table class="data-table" id="groupsTable">
-        <thead>
+
+    <div class="data-table-container mb-8">
+        <div
+                class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center bg-white gap-4">
+            <div class="flex items-center gap-6">
+                <h3 class="font-bold text-gray-800">Groups</h3>
+                <div class="flex space-x-4 bg-gray-100 p-1 rounded-lg">
+                    <button onclick="setFilter('active')" id="tab-active"
+                            class="px-3 py-1 rounded-md text-xs font-semibold transition-all bg-white text-brand-teal shadow-sm">
+                        Active
+                    </button>
+                    <button onclick="setFilter('inactive')" id="tab-inactive"
+                            class="px-3 py-1 rounded-md text-xs font-semibold transition-all text-gray-500 hover:text-gray-700">
+                        Inactive
+                    </button>
+                    <button onclick="setFilter('all')" id="tab-all"
+                            class="px-3 py-1 rounded-md text-xs font-semibold transition-all text-gray-500 hover:text-gray-700">
+                        All
+                    </button>
+                </div>
+            </div>
+            <a href="{{ url_for('GroupController:list_groups') }}"
+               class="text-xs font-bold text-brand-blue hover:underline">View All</a>
+        </div>
+        <table class="data-table" id="groupsTable">
+            <thead>
             <tr>
                 <th>Group Name</th>
                 <th>Members</th>
                 <th>Status</th>
                 <th>Your Balance</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% if groups %}
-            {% for group in groups %}
-            <tr class="group-row" data-status="{{ 'active' if group.is_active else 'inactive' }}"
-                onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.group_id) }}'"
-                style="cursor: pointer;">
-                <td><i class="fas fa-group-arrows-rotate text-orange-500 mr-2"></i> {{ group.name }}</td>
-                <td>{{ group.member_count }} Members</td>
-                <td>
-                    {% if group.is_active %}
-                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Active</span>
-                    {% else %}
-                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Inactive</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if group.user_balance > 0 %}
-                    <span class="text-green-600 font-bold">+{{ group.user_balance }} EGP</span>
-                    {% elif group.user_balance < 0 %} <span class="text-red-500 font-bold">{{ group.user_balance }}
+                {% for group in groups %}
+                    <tr class="group-row" data-status="{{ 'active' if group.is_active else 'inactive' }}"
+                        onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.group_id) }}'"
+                        style="cursor: pointer;">
+                        <td><i class="fas fa-group-arrows-rotate text-orange-500 mr-2"></i> {{ group.name }}</td>
+                        <td>{{ group.member_count }} Members</td>
+                        <td>
+                            {% if group.is_active %}
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Active</span>
+                            {% else %}
+                                <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if group.user_balance > 0 %}
+                                <span class="text-green-600 font-bold">+{{ group.user_balance }} EGP</span>
+                            {% elif group.user_balance < 0 %}
+                                <span class="text-red-500 font-bold">{{ group.user_balance }}
                         EGP</span>
-                        {% else %}
-                        <span class="text-gray-400">0 EGP</span>
-                        {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
+                            {% else %}
+                                <span class="text-gray-400">0 EGP</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
             {% else %}
-            <tr id="noGroupsRow">
-                <td colspan="5" class="text-center text-gray-500 py-8">
-                    No groups yet.
-                    <button onclick="openModal('createGroupModal')"
-                        class="text-brand-blue hover:underline bg-transparent border-none cursor-pointer">Create
-                        your first group
-                    </button>
-                </td>
-            </tr>
+                <tr id="noGroupsRow">
+                    <td colspan="5" class="text-center text-gray-500 py-8">
+                        No groups yet.
+                        <button onclick="openModal('createGroupModal')"
+                                class="text-brand-blue hover:underline bg-transparent border-none cursor-pointer">Create
+                            your first group
+                        </button>
+                    </td>
+                </tr>
             {% endif %}
-        </tbody>
-    </table>
-</div>
-
-<div class="card">
-    <div class="flex justify-between items-center mb-6">
-        <h3 class="section-title">Recent Notifications</h3>
-        <a href="{{ url_for('dashboard.activity') }}" class="text-xs font-bold text-brand-blue hover:underline">View
-            All</a>
+            </tbody>
+        </table>
     </div>
 
-    <div class="feed-list">
-        <div class="feed-item cursor-pointer hover:bg-gray-50 transition"
-            onclick="showNotificationDetails('Omar added expense Gas Station (200 EGP)')">
-            <div class="flex justify-between items-center w-full">
-                <div class="flex gap-4 items-center">
-                    <div
-                        class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-brand-teal shrink-0">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold text-gray-900">Omar added expense "Gas Station"</p>
-                        <p class="text-muted-sm">2 hours ago</p>
-                    </div>
-                </div>
-                <button onclick="event.stopPropagation(); markAsRead(this)"
-                    class="text-xs text-gray-500 hover:text-brand-teal border border-gray-200 px-3 py-1 rounded transition-colors bg-white">
-                    Mark Read
-                </button>
-            </div>
+    <div class="card">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="section-title">Recent Notifications</h3>
+            <a href="{{ url_for('dashboard.activity') }}" class="text-xs font-bold text-brand-blue hover:underline">View
+                All</a>
         </div>
 
-        <div class="feed-item cursor-pointer hover:bg-gray-50 transition" onclick="showInvitation('Dahab Trip 2025')">
-            <div class="flex justify-between items-center w-full">
-                <div class="flex gap-4 items-center">
-                    <div
-                        class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
-                        <i class="fas fa-envelope"></i>
+        <div class="feed-list">
+            <div class="feed-item cursor-pointer hover:bg-gray-50 transition"
+                 onclick="showNotificationDetails('Omar added expense Gas Station (200 EGP)')">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex gap-4 items-center">
+                        <div
+                                class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-brand-teal shrink-0">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900">Omar added expense "Gas Station"</p>
+                            <p class="text-muted-sm">2 hours ago</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-bold text-gray-900">Invited to "Dahab Trip 2025"</p>
-                        <p class="text-muted-sm">Just now</p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="event.stopPropagation(); rejectInvite(this)"
-                        class="text-xs text-red-500 hover:bg-red-50 border border-red-200 px-3 py-1 rounded transition-colors bg-white">
-                        Reject
-                    </button>
-                    <button onclick="event.stopPropagation(); acceptInvite(this)"
-                        class="text-xs text-green-500 hover:bg-green-50 bg-brand-teal px-3 py-1 rounded hover:opacity-90 border border-brand-teal">
-                        Accept
+                    <button onclick="event.stopPropagation(); markAsRead(this)"
+                            class="text-xs text-gray-500 hover:text-brand-teal border border-gray-200 px-3 py-1 rounded transition-colors bg-white">
+                        Mark Read
                     </button>
                 </div>
             </div>
+
+            <div class="feed-item cursor-pointer hover:bg-gray-50 transition"
+                 onclick="showInvitation('Dahab Trip 2025')">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex gap-4 items-center">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900">Invited to "Dahab Trip 2025"</p>
+                            <p class="text-muted-sm">Just now</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="event.stopPropagation(); rejectInvite(this)"
+                                class="text-xs text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded transition-colors bg-white">
+                            Reject
+                        </button>
+                        <button onclick="event.stopPropagation(); acceptInvite(this)"
+                                class="text-xs text-green-600 hover:bg-green-50 bg-brand-teal border border-green-600 px-3 py-1 rounded hover:opacity-90 border border-brand-teal">
+                            Accept
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="feed-item cursor-pointer hover:bg-gray-50 transition"
+                 onclick="showTransaction('Ahmed recorded a payment of 150 EGP to you. Please confirm.')">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex gap-4 items-center">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900">Ahmed recorded payment (150 EGP)</p>
+                            <p class="text-muted-sm">15 mins ago</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="event.stopPropagation(); rejectInvite(this)"
+                                class="text-xs text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded transition-colors bg-white">
+                            Reject
+                        </button>
+                        <button onclick="event.stopPropagation(); acceptInvite(this)"
+                                class="text-xs text-green-600 hover:bg-green-50 bg-brand-teal border border-green-600 px-3 py-1 rounded hover:opacity-90 border border-brand-teal">
+                            Accept
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Add script for client-side filtering -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        setFilter('active');
-    });
-
-    function setFilter(filter) {
-        // Update tabs styling
-        const tabs = ['active', 'inactive', 'all'];
-        tabs.forEach(tab => {
-            const el = document.getElementById('tab-' + tab);
-            if (tab === filter) {
-                el.className = 'px-3 py-1 rounded-md text-xs font-semibold transition-all bg-white text-brand-teal shadow-sm';
-            } else {
-                el.className = 'px-3 py-1 rounded-md text-xs font-semibold transition-all text-gray-500 hover:text-gray-700';
-            }
+    <!-- Add script for client-side filtering -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setFilter('active');
         });
 
-        // Filter table rows
-        const rows = document.querySelectorAll('.group-row');
-        let visibleCount = 0;
+        function setFilter(filter) {
+            // Update tabs styling
+            const tabs = ['active', 'inactive', 'all'];
+            tabs.forEach(tab => {
+                const el = document.getElementById('tab-' + tab);
+                if (tab === filter) {
+                    el.className = 'px-3 py-1 rounded-md text-xs font-semibold transition-all bg-white text-brand-teal shadow-sm';
+                } else {
+                    el.className = 'px-3 py-1 rounded-md text-xs font-semibold transition-all text-gray-500 hover:text-gray-700';
+                }
+            });
 
-        rows.forEach(row => {
-            const status = row.getAttribute('data-status');
-            if (filter === 'all' || status === filter) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
+            // Filter table rows
+            const rows = document.querySelectorAll('.group-row');
+            let visibleCount = 0;
 
-        // Handle empty state
-        // If table body has no visible rows, we might want to show a message, 
-        // but the original template uses "noGroupsRow" only if 'groups' is empty from backend.
-        // Client-side filtering might result in 0 visible rows even if groups exist (e.g. no inactive groups).
-        // We can add a simple check here if desired, but standard behavior usually just shows empty table.
-    }
-</script>
+            rows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                if (filter === 'all' || status === filter) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Handle empty state
+            // If table body has no visible rows, we might want to show a message,
+            // but the original template uses "noGroupsRow" only if 'groups' is empty from backend.
+            // Client-side filtering might result in 0 visible rows even if groups exist (e.g. no inactive groups).
+            // We can add a simple check here if desired, but standard behavior usually just shows empty table.
+        }
+    </script>
 {% endblock %}
