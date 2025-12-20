@@ -240,12 +240,7 @@ class GroupService(BaseService):
         else:
             self.group_repo.remove_pending_member(group_id, user_id)
 
-    def update_group_info(
-        self, admin_id: str, group_id: str, new_name: str, new_description: str
-    ):
-        if not self._is_user_first_member_of_group(admin_id, group_id):
-            raise CreationError(message="Only the admin can update group info")
-
+    def update_group_info(self, group_id: str, new_name: str, new_description: str):
         group_schema = self.group_repo.get_by_id(group_id)
         if not group_schema:
             raise ResourceNotFound(message="Group not found")

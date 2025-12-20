@@ -97,7 +97,7 @@
                 </button>
             </div>
 
-            <form action="/groups/join" method="POST" class="space-y-4">
+            <form action="{{ url_for('GroupController:join_group') }}" method="POST" class="space-y-4">
                 <div>
                     <label class="form-label">Group Code</label>
                     <input type="text" name="invite_code"

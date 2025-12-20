@@ -14,36 +14,40 @@
 
                 <h2 class="page-title">{{ group.group_name }}</h2>
 
-            {% if group.first_member.user_id == current_user.user_id %}
+                {% if group.first_member.user_id == current_user.user_id %}
 
-            <div class="flex gap-2 ml-2">
-                <button onclick="openModal('editGroupModal')" class="text-gray-400 hover:text-brand-teal transition-colors" title="Edit Group Name">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="openModal('deleteGroupModal')" class="text-gray-400 hover:text-red-500 transition-colors" title="Delete Group">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
+                    <div class="flex gap-2 ml-2">
+                        <button onclick="openModal('editGroupModal')"
+                                class="text-gray-400 hover:text-brand-teal transition-colors" title="Edit Group">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="openModal('deleteGroupModal')"
+                                class="text-gray-400 hover:text-red-500 transition-colors" title="Delete Group">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
 
-                <div class="group relative flex items-center">
+                    <div class="group relative flex items-center">
                 <span id="inviteCodeSpan"
-                    class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
-                    title="Click to Copy" onclick="copyInviteCode()">
+                      class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
+                      title="Click to Copy" onclick="copyInviteCode()">
                     {{ group.invite_code }}
                 </span>
-                <div id="copyNotification"
-                    class="hidden absolute left-0 -bottom-8 text-xs text-white bg-gray-800 px-2 py-1 rounded opacity-0 transition-opacity duration-300">
-                    Copied to clipboard!
-                </div>
-                </div>
-            {% endif %}
+                        <div id="copyNotification"
+                             class="hidden absolute left-0 -bottom-8 text-xs text-white bg-gray-800 px-2 py-1 rounded opacity-0 transition-opacity duration-300">
+                            Copied to clipboard!
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
         <div class="flex gap-2">
 
             <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
-        <button class="btn btn-white border-dashed text-gray-500" onclick="openModal('editExpenseModal')">Edit Expense</button>
+            <button class="btn btn-white border-dashed text-gray-500" onclick="openModal('editExpenseModal')">Edit
+                Expense
+            </button>
             <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
         </div>
     </header>
@@ -55,49 +59,49 @@
             <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
             {% if expenses %}
-        {% for expense, user_share in expenses[::-1] %}
-        <div class="feed-item card">
-            <div class="flex gap-4">
-                <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
-                    <p class="text-muted-sm">{{ expense.payer.name }} paid {{ expense.total_amount }}
-                        EGP <br>{{ expense.date.strftime("%d/%m/%Y at %I:%M %p") }}</p>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-base
+                {% for expense, user_share in expenses[::-1] %}
+                    <div class="feed-item card">
+                        <div class="flex gap-4">
+                            <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
+                                <p class="text-muted-sm">{{ expense.payer.name }} paid {{ expense.total_amount }}
+                                    EGP <br>{{ expense.date.strftime("%d/%m/%Y at %I:%M %p") }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-base
                                 {% if user_share < 0 %}text-status-danger
                                 {% else %}{% if user_share > 0 %}text-status-success
                                 {% else %} text-status
                                 {% endif %}{% endif %}">
-                    {{ '+' if user_share > 0 else '' }}{{ user_share }} EGP
-                </p>
-                <p class="text-xs text-gray-400">
-                    {% if user_share == 0 %} Not Involved
-                    {% else %} You {{ 'lent' if user_share > 0 else 'borrowed' }}
-                    {% endif %}
-            </div>
-        </div>
-        {% endfor %}
+                                {{ '+' if user_share > 0 else '' }}{{ user_share }} EGP
+                            </p>
+                            <p class="text-xs text-gray-400">
+                                {% if user_share == 0 %} Not Involved
+                                {% else %} You {{ 'lent' if user_share > 0 else 'borrowed' }}
+                                {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
             {% else %}
-        <div class="text-center py-8 text-gray-400">
-            <p>No expenses recorded yet.</p>
-        </div>
+                <div class="text-center py-8 text-gray-400">
+                    <p>No expenses recorded yet.</p>
+                </div>
             {% endif %}
         </div>
 
         <div class="col-span-1 flex flex-col gap-6">
             <div class="card">
                 <p class="stat-label">Your Position</p>
-            <h2 class="text-base
+                <h2 class="text-base
                                 {% if your_balance < 0 %}text-status-danger
                                 {% else %}{% if your_balance > 0 %}text-status-success
                                 {% else %} text-status
                                 {% endif %}{% endif %} text-3xl mb-4">
-                {{ '+' if your_balance > 0 else '' }}{{ your_balance }} <span
-                    class="text-sm text-gray-400 font-normal">EGP</span>
+                    {{ '+' if your_balance > 0 else '' }}{{ your_balance }} <span
+                        class="text-sm text-gray-400 font-normal">EGP</span>
                 </h2>
                 <hr class="border-gray-100 my-4">
 
@@ -107,67 +111,68 @@
                 </div>
 
                 <ul class="space-y-3 text-sm text-gray-600">
-                {% if group.members %}
-                {% for member in group.members %}
-                <li class="flex justify-between items-center group">
-                    <div class="flex items-center gap-2">
-                        <div
-                            class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="font-medium">{{ member.name }}</span>
-                            {% if group.first_member.user_id == member.user_id %}
-                            <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {% if group.members %}
+                        {% for member in group.members %}
+                            <li class="flex justify-between items-center group">
+                                <div class="flex items-center gap-2">
+                                    <div
+                                            class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="font-medium">{{ member.name }}</span>
+                                        {% if group.first_member.user_id == member.user_id %}
+                                            <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
-                    <div class="flex items-center gap-3">
-                        {# <span
+                                <div class="flex items-center gap-3">
+                                    {# <span
                             class="{% if member.balance > 0 %}text-green-500{% elif member.balance < 0 %}text-red-500{% else %}text-gray-400{% endif %} font-bold text-xs">#}
-                            {# {% if member.balance > 0 %}#}
-                            {# Gets {{ member.balance }}#}
-                            {# {% elif member.balance < 0 %}#} {# Owes {{ member.balance|abs }}#} {# {% else %}#} {#
+                                    {# {% if member.balance > 0 %}#}
+                                    {# Gets {{ member.balance }}#}
+                                    {# {% elif member.balance < 0 %}#} {# Owes {{ member.balance|abs }}#}
+                                    {# {% else %}#} {#
                                 Settled#} {# {% endif %}#} {# </span>#}
-                                {% if group.first_member.user_id == current_user.user_id and group.first_member.user_id
+                                    {% if group.first_member.user_id == current_user.user_id and group.first_member.user_id
                                 != member.user_id %}
-                                <button onclick="confirmRemoveMember('{{ member.user_id }}')"
-                                    class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
-                                    title="Remove Member">
-                                    <i class="fas fa-times text-xs"></i>
-                                </button>
+                                        <button onclick="confirmRemoveMember('{{ member.user_id }}')"
+                                                class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
+                                                title="Remove Member">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
                                     {% endif %}
-                    </div>
-                </li>
-                {% endfor %}
-                {% else %}
-                <li class="text-gray-400 italic">No members found</li>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="text-gray-400 italic">No members found</li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </div>
-<script>
-    function copyInviteCode() {
-        const inviteCode = "{{ group.invite_code }}";
-        navigator.clipboard.writeText(inviteCode)
-            .then(() => {
-                // Show a temporary "Copied!" tooltip
-                const span = document.getElementById('inviteCodeSpan');
-                const originalTitle = span.getAttribute('title');
-                span.setAttribute('title', 'Copied!');
-                span.classList.add('bg-green-100', 'border-green-300', 'text-green-700');
+    <script>
+        function copyInviteCode() {
+            const inviteCode = "{{ group.invite_code }}";
+            navigator.clipboard.writeText(inviteCode)
+                .then(() => {
+                    // Show a temporary "Copied!" tooltip
+                    const span = document.getElementById('inviteCodeSpan');
+                    const originalTitle = span.getAttribute('title');
+                    span.setAttribute('title', 'Copied!');
+                    span.classList.add('bg-green-100', 'border-green-300', 'text-green-700');
 
-                // Reset after 2 seconds
-                setTimeout(() => {
-                    span.setAttribute('title', originalTitle);
-                    span.classList.remove('bg-green-100', 'border-green-300', 'text-green-700');
-                }, 2000);
-            })
-            .catch(err => {
-                console.error('Failed to copy: ', err);
-            });
-    }
-</script>
+                    // Reset after 2 seconds
+                    setTimeout(() => {
+                        span.setAttribute('title', originalTitle);
+                        span.classList.remove('bg-green-100', 'border-green-300', 'text-green-700');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+        }
+    </script>
 {% endblock %}

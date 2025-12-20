@@ -320,43 +320,55 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form id="editGroupForm" action="#" method="POST" class="space-y-4">
-            <input type="hidden" id="edit_group_id" name="group_id">
-            <div>
-                <label class="form-label">Group Name</label>
-                {% if group is defined %}
+        {% if group is defined %}
+            <form id="editGroupForm" action="{{ url_for('GroupController:update_group', group_id=group.group_id) }}"
+                  method="POST" class="space-y-4">
+                <input type="hidden" id="edit_group_id" name="group_id">
+                <div>
+                    <label class="form-label">Group Name</label>
                     <input type="text" value="{{ group.group_name }}" id="edit_group_name" name="new_group_name"
                            class="auth-input"
                            required>
-                {% endif %}
-            </div>
-            <button type="submit" class="btn-signin">Save Changes</button>
-        </form>
+                </div>
+                <div>
+                    <label class="form-label">Group Description</label>
+                    <input type="text" value="{{ group.description }}" id="edit_group_description"
+                           name="new_group_description"
+                           class="auth-input"
+                           required>
+                </div>
+                <button type="submit" class="btn-signin">Save Changes</button>
+            </form>
+        {% endif %}
     </div>
 </div>
 
 <!-- 8. DELETE GROUP MODAL-->
 <div id="deleteGroupModal" class="modal-overlay hidden">
-    <div class="modal-content text-center">
-        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
-            <i class="fas fa-exclamation-triangle"></i>
+    {% if group is defined %}
+        <div class="modal-content text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Group?</h3>
+            <p class="text-gray-500 mb-6">
+                Are you sure you want to delete <strong id="delete_group_name_display">this group</strong>? <br>
+                All expenses and history will be permanently lost.
+            </p>
+            <form id="deleteGroupForm" action="{{ url_for('GroupController:delete_group', group_id=group.group_id) }}:"
+                  method="POST" class="flex gap-3">
+                <input type="hidden" id="delete_group_id" name="group_id">
+                <button type="button" onclick="closeModal('deleteGroupModal')"
+                        class="flex-1 btn btn-white justify-center">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
+                    Delete
+                </button>
+            </form>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Group?</h3>
-        <p class="text-gray-500 mb-6">
-            Are you sure you want to delete <strong id="delete_group_name_display">this group</strong>? <br>
-            All expenses and history will be permanently lost.
-        </p>
-        <form id="deleteGroupForm" action="#" method="POST" class="flex gap-3">
-            <input type="hidden" id="delete_group_id" name="group_id">
-            <button type="button" onclick="closeModal('deleteGroupModal')" class="flex-1 btn btn-white justify-center">
-                Cancel
-            </button>
-            <button type="submit"
-                    class="flex-1 btn btn-signin bg-red-500 border-red-500 hover:bg-red-600 text-white justify-center">
-                Delete
-            </button>
-        </form>
-    </div>
+    {% endif %}
 </div>
 
 <!-- 9. EDIT EXPENSE MODAL-->

@@ -94,12 +94,10 @@ class GroupController(BaseController):
     @route("/<group_id>/update", methods=["POST"])
     @require_group_admin
     def update_group(self, group_id):
-        name = request.form.get("group_name")
-        description = request.form.get("description")
+        new_name = request.form.get("new_group_name")
+        new_description = request.form.get("new_group_description")
         try:
-            self.group_service.update_group_info(
-                self.current_user.user_id, group_id, name, description
-            )
+            self.group_service.update_group_info(group_id, new_name, new_description)
             flash("Group updated successfully!", "success")
         except (ResourceNotFound, CreationError) as e:
             flash(e.message, "danger")
@@ -194,3 +192,7 @@ class GroupController(BaseController):
             {"user_id": member.user_id, "name": member.name} for member in group.members
         ]
         return {"members": members}
+
+    @require_group_admin
+    @route("/<group_id>/delete")
+    def delete_group(self, group_id:str):
