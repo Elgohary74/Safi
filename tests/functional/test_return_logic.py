@@ -1,6 +1,3 @@
-import pytest
-from flask import session, url_for
-
 from app.models.group import GroupCreationRequest
 from app.models.user import UserRegister
 from app.services import AuthService, GroupService

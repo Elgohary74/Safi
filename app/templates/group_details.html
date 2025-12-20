@@ -3,18 +3,29 @@
 {% block title %}Safi - Group Details{% endblock %}
 
 {% block header %}
-<header class="page-header">
-    <div class="flex items-center gap-4">
-        <a href="{{ url_for(back_endpoint) }}"
-            class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100 transition-colors">
-            <i class="fas fa-arrow-left"></i>
-        </a>
+    <header class="page-header">
+        <div class="flex items-center gap-4">
+            <a href="{{ url_for(back_endpoint) }}"
+               class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+            </a>
 
-        <div class="flex items-center gap-3">
-            <h2 class="page-title">{{ group.group_name }}</h2>
+            <div class="flex items-center gap-3">
+
+                <h2 class="page-title">{{ group.group_name }}</h2>
 
             {% if group.first_member.user_id == current_user.user_id %}
-            <div class="group relative flex items-center">
+
+            <div class="flex gap-2 ml-2">
+                <button onclick="openModal('editGroupModal')" class="text-gray-400 hover:text-brand-teal transition-colors" title="Edit Group Name">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="openModal('deleteGroupModal')" class="text-gray-400 hover:text-red-500 transition-colors" title="Delete Group">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+
+                <div class="group relative flex items-center">
                 <span id="inviteCodeSpan"
                     class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
                     title="Click to Copy" onclick="copyInviteCode()">
@@ -24,24 +35,26 @@
                     class="hidden absolute left-0 -bottom-8 text-xs text-white bg-gray-800 px-2 py-1 rounded opacity-0 transition-opacity duration-300">
                     Copied to clipboard!
                 </div>
-            </div>
+                </div>
             {% endif %}
+            </div>
         </div>
-    </div>
 
-    <div class="flex gap-2">
-        <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
-        <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
-    </div>
-</header>
+        <div class="flex gap-2">
+
+            <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
+        <button class="btn btn-white border-dashed text-gray-500" onclick="openModal('editExpenseModal')">Edit Expense</button>
+            <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
+        </div>
+    </header>
 {% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-3 gap-8">
-    <div class="col-span-2 feed-list">
-        <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
+    <div class="grid grid-cols-3 gap-8">
+        <div class="col-span-2 feed-list">
+            <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
-        {% if expenses %}
+            {% if expenses %}
         {% for expense, user_share in expenses[::-1] %}
         <div class="feed-item card">
             <div class="flex gap-4">
@@ -68,16 +81,16 @@
             </div>
         </div>
         {% endfor %}
-        {% else %}
+            {% else %}
         <div class="text-center py-8 text-gray-400">
             <p>No expenses recorded yet.</p>
         </div>
-        {% endif %}
-    </div>
+            {% endif %}
+        </div>
 
-    <div class="col-span-1 flex flex-col gap-6">
-        <div class="card">
-            <p class="stat-label">Your Position</p>
+        <div class="col-span-1 flex flex-col gap-6">
+            <div class="card">
+                <p class="stat-label">Your Position</p>
             <h2 class="text-base
                                 {% if your_balance < 0 %}text-status-danger
                                 {% else %}{% if your_balance > 0 %}text-status-success
@@ -85,14 +98,15 @@
                                 {% endif %}{% endif %} text-3xl mb-4">
                 {{ '+' if your_balance > 0 else '' }}{{ your_balance }} <span
                     class="text-sm text-gray-400 font-normal">EGP</span>
-            </h2>
-            <hr class="border-gray-100 my-4">
+                </h2>
+                <hr class="border-gray-100 my-4">
 
-            <div class="flex justify-between items-center mb-3">
-                <h4 class="font-bold text-sm">Members ({{ group.members|length if group.members else 0 }})</h4>
-            </div>
+                <div class="flex justify-between items-center mb-3">
 
-            <ul class="space-y-3 text-sm text-gray-600">
+                    <h4 class="font-bold text-sm">Members ({{ group.members|length if group.members else 0 }})</h4>
+                </div>
+
+                <ul class="space-y-3 text-sm text-gray-600">
                 {% if group.members %}
                 {% for member in group.members %}
                 <li class="flex justify-between items-center group">
@@ -123,17 +137,17 @@
                                     title="Remove Member">
                                     <i class="fas fa-times text-xs"></i>
                                 </button>
-                                {% endif %}
+                                    {% endif %}
                     </div>
                 </li>
                 {% endfor %}
                 {% else %}
                 <li class="text-gray-400 italic">No members found</li>
-                {% endif %}
-            </ul>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 <script>
     function copyInviteCode() {
         const inviteCode = "{{ group.invite_code }}";

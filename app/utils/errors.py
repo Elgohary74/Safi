@@ -1,4 +1,4 @@
-from flask import jsonify, render_template
+from flask import render_template
 from flask_jwt_extended import current_user
 
 from app.utils.exceptions import AppError
