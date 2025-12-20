@@ -37,8 +37,10 @@ class UserRepository(IRepository):
             {"_id": user_id},
             {
                 "$set": {
-                    "user_picture.profile_pic": user_picture.profile_pic,
-                    "user_picture.content_type": user_picture.content_type,
+                    "user_picture": {
+                        "profile_pic": user_picture.profile_pic,
+                        "content_type": user_picture.content_type,
+                    }
                 }
             },
         )
