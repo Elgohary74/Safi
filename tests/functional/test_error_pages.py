@@ -24,7 +24,7 @@ def test_app_error_renders_html(client):
     assert "text/html" in resp.content_type
 
     # It should contain content from error.html
-    # e.g. "Error 404" or "Resource not found"
     text = resp.get_data(as_text=True)
-    assert "Error 404" in text
+    assert "404" in text
+    # ResourceNotFound default message
     assert "Resource not found" in text

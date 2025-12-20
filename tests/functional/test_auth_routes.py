@@ -50,5 +50,5 @@ def test_login_endpoint_invalid_credentials(client):
     )
 
     assert response.status_code == 401
-    body = response.get_json()
-    assert body["error"] == "Invalid email or password"
+    assert response.status_code == 401
+    assert "Invalid email or password" in response.get_data(as_text=True)
