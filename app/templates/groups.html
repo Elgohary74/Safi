@@ -3,167 +3,231 @@
 {% block title %}Safi - My Groups{% endblock %}
 
 {% block header %}
-    <header class="page-header">
-        <h2 class="page-title">My Groups</h2>
+<header class="page-header">
+    <h2 class="page-title">My Groups</h2>
 
-        <div class="relative w-64">
-            <input type="text" id="groupSearch" onkeyup="filterGroups()" placeholder="Search groups..."
-                   class="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all shadow-sm">
-            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-        </div>
-    </header>
+    <div class="relative w-64">
+        <input type="text" id="groupSearch" onkeyup="filterGroups()" placeholder="Search groups..."
+            class="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all shadow-sm">
+        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+    </div>
+</header>
 {% endblock %}
 
 {% block content %}
-    <div class="grid grid-cols-3 gap-6" id="groupsGrid">
-        {% if groups %}
-            {% for group in groups %}
-                <div class="group-card searchable-card"
-                     onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.group_id) }}'">
-                    <div>
-                        <div
-                                class="group-icon {{ ['text-orange-500', 'text-blue-500', 'text-green-500', 'text-purple-500']|random }}">
-                            <i class="fas fa-group-arrows-rotate"></i>
-                        </div>
-                        <h3 class="section-title">{{ group.group_name }}</h3>
-                        <p class="text-muted-sm">{{ group.description or 'No description' }}</p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-                        <span class="text-xs font-bold text-gray-400 uppercase">Admin</span>
-                        <span class="text-xs text-gray-600">{{ 'You' if group.first_member.user_id == current_user.user_id else
-                group.first_member.name }}</span>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <div class="col-span-3 text-center py-12">
-                <div class="text-gray-400 mb-4">
-                    <i class="fas fa-users fa-3x"></i>
-                </div>
-                <p class="text-gray-500 text-lg">No groups yet. Create your first group!</p>
-            </div>
+<div class="flex space-x-6 mb-6 border-b border-gray-200">
+    <button onclick="setFilter('active')" id="tab-active"
+        class="pb-3 px-1 text-sm font-medium transition-colors border-b-2 border-brand-teal text-brand-teal">
+        Active Groups
+    </button>
+    <button onclick="setFilter('inactive')" id="tab-inactive"
+        class="pb-3 px-1 text-sm font-medium transition-colors text-gray-500 hover:text-gray-700 border-transparent border-b-2 hover:border-gray-300">
+        Inactive Groups
+    </button>
+    <button onclick="setFilter('all')" id="tab-all"
+        class="pb-3 px-1 text-sm font-medium transition-colors text-gray-500 hover:text-gray-700 border-transparent border-b-2 hover:border-gray-300">
+        All Groups
+    </button>
+</div>
+
+<div class="grid grid-cols-3 gap-6" id="groupsGrid">
+    {% if groups %}
+    {% for group in groups %}
+    <div class="group-card searchable-card relative {{ 'opacity-75 grayscale' if not group.is_active else '' }}"
+        data-status="{{ 'active' if group.is_active else 'inactive' }}"
+        onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.group_id) }}'">
+        {% if not group.is_active %}
+        <div
+            class="absolute top-2 right-2 bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded font-bold uppercase z-10">
+            Inactive</div>
         {% endif %}
-
-
-        <div class="group-card border-dashed border-2 border-gray-300 bg-gray-50 flex items-center justify-center min-h-[200px]"
-             onclick="toggleModal()">
-            <div class="text-center">
-                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3 text-gray-500">
-                    <i class="fas fa-plus"></i>
-                </div>
-                <p class="font-bold text-gray-500">Create New Group</p>
+        <div>
+            <div
+                class="group-icon {{ ['text-orange-500', 'text-blue-500', 'text-green-500', 'text-purple-500']|random }}">
+                <i class="fas fa-group-arrows-rotate"></i>
             </div>
+            <h3 class="section-title">{{ group.group_name }}</h3>
+            <p class="text-muted-sm">{{ group.description or 'No description' }}</p>
         </div>
+        <div class="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
+            <span class="text-xs font-bold text-gray-400 uppercase">Admin</span>
+            <span class="text-xs text-gray-600">{{ 'You' if group.first_member.user_id == current_user.user_id else
+                group.first_member.name }}</span>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="col-span-3 text-center py-12">
+        <div class="text-gray-400 mb-4">
+            <i class="fas fa-users fa-3x"></i>
+        </div>
+        <p class="text-gray-500 text-lg">No groups found.</p>
+    </div>
+    {% endif %}
 
-        <div class="group-card border-dashed border-2 border-gray-300 bg-gray-50 flex items-center justify-center min-h-[200px] hover:bg-teal-100 transition"
-             onclick="openModal('joinGroupModal')">
-            <div class="text-center">
-                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3 text-brand-teal">
-                    <i class="fas fa-sign-in-alt " style="color: gray;"></i>
-                </div>
-                <p class="font-bold text-gray-500">Join via Code</p>
+    <div id="createActionCard"
+        class="group-card border-dashed border-2 border-gray-300 bg-gray-50 flex items-center justify-center min-h-[200px]"
+        onclick="toggleModal()">
+        <div class="text-center">
+            <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3 text-gray-500">
+                <i class="fas fa-plus"></i>
             </div>
+            <p class="font-bold text-gray-500">Create New Group</p>
         </div>
     </div>
 
-    <div id="groupModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="section-title">Create Group</h3>
-                <button onclick="toggleModal()" class="text-gray-400 hover:text-red-500">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div id="joinActionCard"
+        class="group-card border-dashed border-2 border-gray-300 bg-gray-50 flex items-center justify-center min-h-[200px] hover:bg-teal-100 transition"
+        onclick="openModal('joinGroupModal')">
+        <div class="text-center">
+            <div
+                class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3 text-brand-teal">
+                <i class="fas fa-sign-in-alt " style="color: gray;"></i>
             </div>
-
-            <form action="{{ url_for('GroupController:create_group') }}" method="POST" class="space-y-4">
-                <div>
-                    <label class="form-label">Name</label>
-                    <input type="text" name="group_name" class="auth-input" placeholder="Trip Name" required>
-                </div>
-                <div>
-                    <label class="form-label">Description</label>
-                    <input type="text" name="description" class="auth-input" placeholder="Short description">
-                </div>
-                <button type="submit" class="btn-signin">Create</button>
-            </form>
+            <p class="font-bold text-gray-500">Join via Code</p>
         </div>
     </div>
-    <div id="joinGroupModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="section-title">Join Group</h3>
-                <button onclick="closeModal('joinGroupModal')" class="text-gray-400 hover:text-red-500">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+</div>
 
-            <form action="{{ url_for('GroupController:join_group') }}" method="POST" class="space-y-4">
-                <div>
-                    <label class="form-label">Group Code</label>
-                    <input type="text" name="invite_code"
-                           class="auth-input text-center text-lg tracking-widest uppercase" placeholder="ENTER CODE"
-                           maxlength="8" required>
-                </div>
-                <div class="text-xs text-gray-400 text-center">
-                    Ask the group admin for the invitation code.
-                </div>
-                <button type="submit" class="btn-signin">Join Group</button>
-            </form>
+<div id="groupModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="section-title">Create Group</h3>
+            <button onclick="toggleModal()" class="text-gray-400 hover:text-red-500">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
+
+        <form action="{{ url_for('GroupController:create_group') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="form-label">Name</label>
+                <input type="text" name="group_name" class="auth-input" placeholder="Trip Name" required>
+            </div>
+            <div>
+                <label class="form-label">Description</label>
+                <input type="text" name="description" class="auth-input" placeholder="Short description">
+            </div>
+            <button type="submit" class="btn-signin">Create</button>
+        </form>
     </div>
+</div>
+<div id="joinGroupModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="section-title">Join Group</h3>
+            <button onclick="closeModal('joinGroupModal')" class="text-gray-400 hover:text-red-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('GroupController:join_group') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="form-label">Group Code</label>
+                <input type="text" name="invite_code" class="auth-input text-center text-lg tracking-widest uppercase"
+                    placeholder="ENTER CODE" maxlength="8" required>
+            </div>
+            <div class="text-xs text-gray-400 text-center">
+                Ask the group admin for the invitation code.
+            </div>
+            <button type="submit" class="btn-signin">Join Group</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-                setTimeout(() => modal.classList.add('open'), 10);
-            }
-        }
+<script>
+    let currentFilter = 'active';
 
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('open');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.style.display = 'none';
-                }, 300);
-            }
-        }
+    function setFilter(filter) {
+        currentFilter = filter;
 
-        function toggleModal() {
-            const modal = document.getElementById('groupModal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-                setTimeout(() => modal.classList.add('open'), 10);
+        // Update tabs styling
+        const tabs = ['active', 'inactive', 'all'];
+        tabs.forEach(tab => {
+            const el = document.getElementById('tab-' + tab);
+            if (tab === filter) {
+                el.className = 'pb-3 px-1 text-sm font-medium transition-colors border-b-2 border-brand-teal text-brand-teal';
             } else {
-                modal.classList.remove('open');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.style.display = 'none';
-                }, 300);
+                el.className = 'pb-3 px-1 text-sm font-medium transition-colors text-gray-500 hover:text-gray-700 border-transparent border-b-2 hover:border-gray-300';
             }
+        });
+
+        // Hide/Show action cards
+        const createCard = document.getElementById('createActionCard');
+        const joinCard = document.getElementById('joinActionCard');
+
+        if (filter === 'inactive') {
+            createCard.classList.add('hidden');
+            joinCard.classList.add('hidden');
+        } else {
+            createCard.classList.remove('hidden');
+            joinCard.classList.remove('hidden');
         }
 
-        function filterGroups() {
-            var input = document.getElementById('groupSearch');
-            var filter = input.value.toUpperCase();
-            var cards = document.getElementsByClassName('searchable-card');
+        filterGroups();
+    }
 
-            for (var i = 0; i < cards.length; i++) {
-                var h3 = cards[i].getElementsByTagName("h3")[0];
-                var txtValue = h3.textContent || h3.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    cards[i].style.display = "";
-                } else {
-                    cards[i].style.display = "none";
-                }
+    function filterGroups() {
+        var input = document.getElementById('groupSearch');
+        var searchFilter = input.value.toUpperCase();
+        var cards = document.getElementsByClassName('searchable-card');
+
+        for (var i = 0; i < cards.length; i++) {
+            var card = cards[i];
+            var h3 = card.getElementsByTagName("h3")[0];
+            var txtValue = h3.textContent || h3.innerText;
+            var status = card.getAttribute('data-status');
+
+            var matchesSearch = txtValue.toUpperCase().indexOf(searchFilter) > -1;
+            var matchesTab = (currentFilter === 'all') || (currentFilter === status);
+
+            if (matchesSearch && matchesTab) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
             }
         }
-    </script>
+    }
+
+    // Initialize with active filter by default
+    document.addEventListener('DOMContentLoaded', function () {
+        setFilter('active');
+    });
+
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }, 300);
+        }
+    }
+
+    function toggleModal() {
+        const modal = document.getElementById('groupModal');
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        } else {
+            modal.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }, 300);
+        }
+    }
+</script>
 {% endblock %}

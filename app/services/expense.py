@@ -13,6 +13,9 @@ class ExpenseService(BaseService):
 
     def create_new_expense(self, request: ExpenseCreationRequest) -> Expense:
         group = self.get_group(request.group_id)
+        if not group.is_active:
+            raise CreationError(message="Cannot add expense to an inactive group")
+
         payer = self.get_user(request.payer_id)
 
         new_expense = Expense(

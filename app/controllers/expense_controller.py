@@ -23,6 +23,10 @@ class ExpenseController(BaseController):
 
         participant_ids = request.form.getlist("split_with")
         group = self.expense_service.get_group(expense_request.group_id)
+        if not group.is_active:
+            flash("Cannot add expense to an inactive group", "error")
+            return redirect(request.referrer)
+
         payer = self.expense_service.get_user(expense_request.payer_id)
 
         num_participants = len(participant_ids)

@@ -77,9 +77,7 @@ def test_update_group_info(app):
         group = group_service.create_new_group(req, admin.user_id)
         group_service.save_new_group(group)
 
-        group_service.update_group_info(
-            admin.user_id, group.group_id, "New Name", "New Desc"
-        )
+        group_service.update_group_info(group.group_id, "New Name", "New Desc")
 
         updated_group = group_service.get_group(group.group_id)
         assert updated_group.group_name == "New Name"

@@ -24,6 +24,14 @@ def configure_test_env():
     original_env = {key: os.environ.get(key) for key in overrides}
     os.environ.update(overrides)
 
+    # Reset MongoDatabase singleton to force re-initialization with new env vars
+    from app.services.database import MongoDatabase
+
+    MongoDatabase._instance = None
+    MongoDatabase._client = None
+    MongoDatabase._db = None
+    MongoDatabase._initialized = False
+
     yield
 
     for key, value in original_env.items():
@@ -63,3 +71,45 @@ def client(app):
     with app.test_client() as client:
         with app.app_context():
             yield client
+
+
+class AuthActions:
+    def __init__(self, client):
+        self._client = client
+        self._current_email = None
+
+    def login(self, email="test@example.com", password="ValidPass1!"):
+        self._current_email = email
+        return self._client.post(
+            "/auth/login",
+            data={"email": email, "password": password},
+            follow_redirects=True,
+        )
+
+    def register(
+        self,
+        email="test@example.com",
+        name="Test User",
+        password="ValidPass1!",
+        phone="1234567890",
+    ):
+        self._current_email = email
+        return self._client.post(
+            "/auth/register",
+            data={"email": email, "name": name, "password": password, "phone": phone},
+            follow_redirects=True,
+        )
+
+    def logout(self):
+        self._current_email = None
+        return self._client.get("/auth/logout", follow_redirects=True)
+
+    def get_current_user(self):
+        if not self._current_email:
+            return None
+        return UserRepository().get_by_email(self._current_email)
+
+
+@pytest.fixture
+def auth_client(client):
+    return AuthActions(client)

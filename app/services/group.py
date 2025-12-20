@@ -46,10 +46,10 @@ class GroupService(BaseService):
             description=request.description,
             first_member=first_member,
             members=[first_member],
-            working_invites=[],
             debts=[],
             invite_code="",  # Will be set after group_id is generated
             invite_code_expiry=datetime.now() + timedelta(hours=2),
+            is_active=True,
         )
 
         new_group.invite_code = self.generate_invite_code(
@@ -109,6 +109,9 @@ class GroupService(BaseService):
         if not group_schema:
             raise ResourceNotFound(message="Invalid invite code")
 
+        if not group_schema.is_active:
+            raise CreationError(message="Cannot join an inactive group")
+
         group = self._convert_schema_to_group(group_schema)
 
         # check expiry
@@ -127,17 +130,18 @@ class GroupService(BaseService):
         # refresh group data
         return self.get_group(group.group_id)
 
-    def get_user_groups(self, user_id: str) -> list[Group]:
+    def get_user_groups(self, user_id: str, status: str = "all") -> list[Group]:
         """
         Retrieve all groups associated with a specific user.
 
         Args:
             user_id: The unique identifier of the user.
+            status: Filter status ('active', 'inactive', 'all').
 
         Returns:
             A list of Group objects that the user is a member of.
         """
-        group_schemas = self.group_repo.get_groups_by_user(user_id)
+        group_schemas = self.group_repo.get_groups_by_user(user_id, status=status)
         return [
             self._convert_schema_to_group(group_schema)
             for group_schema in group_schemas
@@ -211,6 +215,9 @@ class GroupService(BaseService):
         if not group_schema:
             raise ResourceNotFound(message="Group not found")
 
+        if not group_schema.is_active:
+            raise CreationError(message="Cannot invite members to an inactive group")
+
         # check if already member
         if user.user_id in group_schema.members_ids:
             raise ResourceAlreadyExists(message="User is already a member")
@@ -245,6 +252,9 @@ class GroupService(BaseService):
         if not group_schema:
             raise ResourceNotFound(message="Group not found")
 
+        if not group_schema.is_active:
+            raise CreationError(message="Cannot update an inactive group")
+
         group_schema.group_name = new_name
         group_schema.description = new_description
         self.group_repo.update(group_id, group_schema)
@@ -253,6 +263,9 @@ class GroupService(BaseService):
         group_schema = self.group_repo.get_by_id(group_id)
         if not group_schema:
             raise ResourceNotFound(message="Group not found")
+
+        if not group_schema.is_active:
+            raise CreationError(message="Cannot remove members from an inactive group")
 
         if member_id not in group_schema.members_ids:
             raise ResourceNotFound(message="User is not a member of this group")
@@ -280,6 +293,9 @@ class GroupService(BaseService):
         if not group_schema:
             raise ResourceNotFound(message="Group not found")
 
+        if not group_schema.is_active:
+            raise CreationError(message="Cannot leave an inactive group")
+
         if user_id not in group_schema.members_ids:
             raise ResourceNotFound(message="User is not a member of this group")
 
@@ -304,3 +320,23 @@ class GroupService(BaseService):
                 self.group_repo.update(group_id, group_schema)
 
         self.group_repo.move_member_to_past(group_id, user_id)
+
+    def restore_group(self, admin_id: str, group_id: str):
+        if not self._is_user_first_member_of_group(admin_id, group_id):
+            raise CreationError(message="Only the admin can restore the group")
+
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        self.group_repo.restore(group_id)
+
+    def delete_group(self, group_id: str):
+        group_schema = self.group_repo.get_by_id(group_id)
+        if not group_schema:
+            raise ResourceNotFound(message="Group not found")
+
+        if not group_schema.is_active:
+            raise CreationError(message="Group is already inactive")
+
+        self.group_repo.soft_delete(group_id)

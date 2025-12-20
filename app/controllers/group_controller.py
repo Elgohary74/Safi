@@ -36,7 +36,7 @@ class GroupController(BaseController):
             )
             flash("Joined group successfully!", "success")
         except (ResourceNotFound, CreationError, ResourceAlreadyExists) as e:
-            flash(e.message, "danger")
+            flash(e.message, "error")
 
         return redirect(url_for("GroupController:list_groups"))
 
@@ -48,7 +48,7 @@ class GroupController(BaseController):
             self.group_service.invite_member(self.current_user.user_id, group_id, email)
             flash("Invitation sent successfully!", "success")
         except (ResourceNotFound, CreationError, ResourceAlreadyExists) as e:
-            flash(e.message, "danger")
+            flash(e.message, "error")
         return redirect(url_for("GroupController:get_group_details", group_id=group_id))
 
     @route("/<group_id>/respond", methods=["POST"])
@@ -175,11 +175,17 @@ class GroupController(BaseController):
     @route("/list", methods=["GET"])
     def list_groups(self):
         user_id = self.current_user.user_id
-        groups = self.group_service.get_user_groups(user_id)
-        groups = [group.model_dump() for group in groups]
+        # Always fetch all groups for client-side filtering
+        groups = self.group_service.get_user_groups(user_id, status="all")
+        groups = [group for group in groups]
+
+        # sort groups by active first then alphabetically
+        groups.sort(key=lambda group: (not group.is_active, group.group_name))
 
         return render_template(
-            "groups.html", groups=groups, current_user=self.current_user
+            "groups.html",
+            groups=groups,
+            current_user=self.current_user,
         )
 
     @route("/<group_id>/members", methods=["GET"])
@@ -194,5 +200,24 @@ class GroupController(BaseController):
         return {"members": members}
 
     @require_group_admin
-    @route("/<group_id>/delete")
-    def delete_group(self, group_id:str):
+    @route("/<group_id>/delete", methods=["POST"])
+    def delete_group(self, group_id: str):
+        try:
+            self.group_service.delete_group(group_id)
+            flash("Group deleted successfully!", "success")
+        except (ResourceNotFound, CreationError) as e:
+            flash(e.message, "danger")
+            return redirect(
+                url_for("GroupController:get_group_details", group_id=group_id)
+            )
+        return redirect(url_for("GroupController:list_groups"))
+
+    @require_group_admin
+    @route("/<group_id>/restore", methods=["POST"])
+    def restore_group(self, group_id: str):
+        try:
+            self.group_service.restore_group(self.current_user.user_id, group_id)
+            flash("Group restored successfully!", "success")
+        except (ResourceNotFound, CreationError) as e:
+            flash(e.message, "danger")
+        return redirect(url_for("GroupController:get_group_details", group_id=group_id))

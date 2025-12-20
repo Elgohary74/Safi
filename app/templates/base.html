@@ -334,8 +334,7 @@
                     <label class="form-label">Group Description</label>
                     <input type="text" value="{{ group.description }}" id="edit_group_description"
                            name="new_group_description"
-                           class="auth-input"
-                           required>
+                           class="auth-input">
                 </div>
                 <button type="submit" class="btn-signin">Save Changes</button>
             </form>
@@ -355,7 +354,7 @@
                 Are you sure you want to delete <strong id="delete_group_name_display">this group</strong>? <br>
                 All expenses and history will be permanently lost.
             </p>
-            <form id="deleteGroupForm" action="{{ url_for('GroupController:delete_group', group_id=group.group_id) }}:"
+            <form id="deleteGroupForm" action="{{ url_for('GroupController:delete_group', group_id=group.group_id) }}"
                   method="POST" class="flex gap-3">
                 <input type="hidden" id="delete_group_id" name="group_id">
                 <button type="button" onclick="closeModal('deleteGroupModal')"
