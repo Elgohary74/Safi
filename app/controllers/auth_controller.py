@@ -9,6 +9,7 @@ from app.services import AuthService
 
 class AuthController(IController):
     route_prefix = "/auth"
+    route_base = ""
 
     def __init__(self):
         self.auth_service = AuthService()
@@ -36,9 +37,13 @@ class AuthController(IController):
             password=request.form.get("password"),
             phone_number=request.form.get("phone", None),
         )
-        self.auth_service.register_user(user_register)
-        flash("Registration successful! You can now log in.", "success")
-        return redirect(url_for("view.login_view"))
+        try:
+            self.auth_service.register_user(user_register)
+            flash("Registration successful! You can now log in.", "success")
+            return redirect(url_for("view.login_view"))
+        except Exception as e:
+            flash(str(e), "error")
+            return redirect(url_for("view.register_view"))
 
     @route("/login", methods=["POST"])
     def handle_login(self):
@@ -57,14 +62,18 @@ class AuthController(IController):
             password=request.form.get("password"),
         )
 
-        user, access_token = self.auth_service.authenticate_user(
-            user_login.email, user_login.password
-        )
-        response = redirect(url_for("dashboard.dashboard_index"))
-        set_access_cookies(response, access_token)
+        try:
+            user, access_token = self.auth_service.authenticate_user(
+                user_login.email, user_login.password
+            )
+            response = redirect(url_for("dashboard.dashboard_index"))
+            set_access_cookies(response, access_token)
 
-        flash("Login successful!", "success")
-        return response
+            flash("Login successful!", "success")
+            return response
+        except Exception:
+            flash("Invalid email or password", "error")
+            return redirect(url_for("view.login_view"))
 
     @route("/logout", methods=["POST"])
     def handle_logout(self):
