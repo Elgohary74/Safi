@@ -26,5 +26,5 @@ def test_app_error_renders_html(client):
     # It should contain content from error.html
     text = resp.get_data(as_text=True)
     assert "404" in text
-    # ResourceNotFound default message
-    assert "Resource not found" in text
+    # ResourceNotFound message
+    assert "Group not found." in text
