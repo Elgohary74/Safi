@@ -5,7 +5,7 @@ from app.services import AuthService
 
 def test_register_endpoint_creates_user_and_redirects(client):
     response = client.post(
-        "/auth/auth-controller/register",
+        "/auth/register",
         data={
             "name": "Route User",
             "email": "routeuser@example.com",
@@ -32,7 +32,7 @@ def test_login_endpoint_sets_access_cookie(client):
     )
 
     response = client.post(
-        "/auth/auth-controller/login",
+        "/auth/login",
         data={"email": "cookie@example.com", "password": "ValidPass4!"},
         follow_redirects=False,
     )
@@ -44,7 +44,7 @@ def test_login_endpoint_sets_access_cookie(client):
 
 def test_login_endpoint_invalid_credentials(client):
     response = client.post(
-        "/auth/auth-controller/login",
+        "/auth/login",
         data={"email": "missing@example.com", "password": "WrongPass1!"},
         follow_redirects=False,
     )

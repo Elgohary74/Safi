@@ -15,7 +15,8 @@ def test_return_logic_dashboard(client):
     )
 
     # Create Group
-    user_id = AuthService().authenticate_user(email, "Password123!").user_id
+    auth_result = AuthService().authenticate_user(email, "Password123!")
+    user_id = auth_result[0].user_id
     group = GroupService().create_new_group(
         GroupCreationRequest(group_name="Test Group", description="Desc"),
         first_member_id=user_id,

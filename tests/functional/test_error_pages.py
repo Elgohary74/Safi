@@ -10,7 +10,7 @@ def test_app_error_renders_html(client):
         UserRegister(name="Error User", email=email, password="Password123!")
     )
     client.post(
-        "/auth/auth-controller/login",
+        "/auth/login",
         data={"email": email, "password": "Password123!"},
     )
 
