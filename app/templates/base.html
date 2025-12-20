@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="{% block body_class %}{% endblock %}">
 
 <div class="app-container">
@@ -48,7 +50,7 @@
                 <div class="w-8 h-8 rounded-full bg-gray-600"></div>
                 <div>
                     <p class="text-sm font-bold">{{ current_user.name }}</p>
-                    <form action="{{ url_for("AuthController:handle_logout") }}" method="POST" class="inline">
+                    <form action="{{ url_for('AuthController:handle_logout') }}" method="POST" class="inline">
                         <button type="submit"
                                 class="text-xs text-gray-500 hover:text-white border-none bg-transparent p-0 cursor-pointer">
                             Logout
@@ -70,7 +72,8 @@
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            <div
+                                    class="alert alert-{{ category }} mb-4 p-3 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
                                 {{ message }}
                             </div>
                         {% endfor %}
@@ -117,14 +120,15 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form action="{{ url_for("ExpenseController:create_expense") }}" method="POST" class="space-y-4">
+        <form action="{{ url_for('ExpenseController:create_expense') }}" method="POST" class="space-y-4">
             <div>
                 <label class="form-label">Description</label>
                 <input type="text" name="description" class="auth-input" placeholder="e.g. Dinner, Taxi" required>
             </div>
             <div>
                 <label class="form-label">Amount</label>
-                <input type="number" name="total_amount" step="0.01" class="auth-input" placeholder="0.00 EGP" required>
+                <input type="number" name="total_amount" step="0.01" class="auth-input" placeholder="0.00 EGP"
+                       required>
             </div>
 
             {% if group is defined and group and group.members %}
@@ -168,6 +172,13 @@
                         <option value="{{ current_user.user_id }}">{{ current_user.name }}</option>
                     </select>
                 </div>
+                <div>
+                    <label class="form-label">Split With</label>
+                    <div
+                            class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50 split-container">
+                        <p class="text-xs text-gray-400 p-2">Select a group to see members</p>
+                    </div>
+                </div>
             {% endif %}
 
             <button type="submit" class="btn-signin">Save Expense</button>
@@ -209,22 +220,28 @@
                 <div class="grid grid-cols-2 gap-3 mt-2">
                     <label class="cursor-pointer relative">
                         <input type="radio" name="payment_method" value="cash" class="payment-radio hidden" checked>
-                        <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                        <div
+                                class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                            <div
+                                    class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                                 <i class="fas fa-money-bill-wave"></i>
                             </div>
                             <p class="text-sm font-bold text-gray-800">Cash</p>
-                            <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon"></i>
+                            <i
+                                    class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon"></i>
                         </div>
                     </label>
                     <label class="cursor-pointer relative">
                         <input type="radio" name="payment_method" value="instapay" class="payment-radio hidden">
-                        <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
-                            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                        <div
+                                class="border border-gray-200 rounded-xl p-3 flex items-center gap-3 transition hover:border-brand-teal">
+                            <div
+                                    class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                                 <i class="fas fa-university"></i>
                             </div>
                             <p class="text-sm font-bold text-gray-800">InstaPay</p>
-                            <i class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
+                            <i
+                                    class="fas fa-check-circle text-brand-teal absolute top-2 right-2 text-xs check-icon hidden"></i>
                         </div>
                     </label>
                 </div>
@@ -240,15 +257,15 @@
 {% if group %}
     <div id="removeMemberModal" class="modal-overlay hidden">
         <div class="modal-content text-center">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+            <div
+                    class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
                 <i class="fas fa-user-times"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">Remove Member?</h3>
             <p class="text-gray-500 mb-6">Are you sure you want to remove this member? This action cannot be undone.</p>
 
             <form id="removeMemberForm" action="{{ url_for('GroupController:remove_member', group_id=group.group_id) }}"
-                  method="POST"
-                  class="flex gap-3">
+                  method="POST" class="flex gap-3">
                 <input type="hidden" name="member_id" id="member_id">
                 <button type="button" onclick="closeModal('removeMemberModal')"
                         class="flex-1 btn btn-white justify-center">
@@ -306,7 +323,65 @@
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const groupSelect = document.querySelector('select[name="group_id"]');
+        if (groupSelect) {
+            groupSelect.addEventListener('change', function () {
+                const groupId = this.value;
+                if (groupId) {
+                    fetchMembers(groupId);
+                }
+            });
+        }
+    });
+
+    function fetchMembers(groupId) {
+        fetch(`/groups/${groupId}/members`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.members) {
+                    updateMemberInputs(data.members);
+                }
+            })
+            .catch(error => console.error('Error fetching members:', error));
+    }
+
+    function updateMemberInputs(members) {
+        // Update Paid By
+        const payerSelect = document.querySelector('select[name="payer_id"]');
+        const currentPayer = payerSelect.value;
+        payerSelect.innerHTML = '';
+        members.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member.user_id;
+            option.textContent = member.name;
+            payerSelect.appendChild(option);
+        });
+        // Restore selection if possible, otherwise default to first (usually current user if in list)
+        // But here we might just want to keep it simple or default to current user if available
+        // logic to select current user if present is better UX, but simple for now.
+
+
+        // Update Split With
+        const splitContainer = document.querySelector('.max-h-32');
+        if (splitContainer) {
+            splitContainer.innerHTML = '';
+            members.forEach(member => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2 p-1 hover:bg-gray-100 rounded cursor-pointer';
+                label.innerHTML = `
+                <input type="checkbox" name="split_with" value="${member.user_id}" checked
+                       class="form-checkbox text-brand-teal rounded h-4 w-4">
+                <span class="text-sm text-gray-700">${member.name}</span>
+            `;
+                splitContainer.appendChild(label);
+            });
+        }
+    }
+</script>
 
 {% block scripts %}{% endblock %}
 </body>
+
 </html>

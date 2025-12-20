@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template
 from flask_jwt_extended import current_user, jwt_required
 
-from app.services import GroupService
+from app.services import ExpenseService, GroupService
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 group_service = GroupService()
+expense_service = ExpenseService()
 
 
 @dashboard_bp.route("/", methods=["GET"], endpoint="dashboard_index")
@@ -16,25 +17,41 @@ def index():
     # Convert to list of dicts for processing
     groups_dicts = [group.model_dump() for group in raw_groups]
 
-    net_balance = 0.0
     amount_owed = 0.0
     amount_owing = 0.0
     group_list = []
 
     for group in groups_dicts:
+        group_id = group.get("group_id")
+
+        # Calculate balance from expenses (Source of Truth)
+        expenses = expense_service.get_group_expenses(group_id)
         user_balance = 0.0
-        debts = group.get("debts", [])
-        for debt in debts:
-            # debt: {from_user, to_user, amount, currency}
-            if debt["to_user"] == current_user.user_id:
-                user_balance += debt["amount"]
-                amount_owed += debt["amount"]
-            elif debt["from_user"] == current_user.user_id:
-                user_balance -= debt["amount"]
-                amount_owing += debt["amount"]
+
+        for expense in expenses:
+            involved_ids = [split.participant.user_id for split in expense.splits]
+            if current_user.user_id not in involved_ids:
+                continue
+
+            # Share is negative (you owe)
+            share = -expense.total_amount / len(expense.splits)
+
+            # If you paid, you get positive amount back
+            if expense.payer.user_id == current_user.user_id:
+                share += expense.total_amount
+
+            user_balance += share
+
+        user_balance = round(user_balance, 2)
+
+        if user_balance > 0:
+            amount_owed += user_balance
+        elif user_balance < 0:
+            amount_owing += abs(user_balance)
+
         group_list.append(
             {
-                "id": group.get("group_id"),
+                "group_id": group_id,
                 "name": group.get("group_name"),
                 "member_count": (
                     len(group.get("members", [])) if "members" in group else 1

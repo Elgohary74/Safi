@@ -8,6 +8,7 @@ from app.services import AuthService
 
 
 class AuthController(IController):
+    route_base = ""
     route_prefix = "/auth"
 
     def __init__(self):

@@ -7,13 +7,8 @@
     <h2 class="page-title">My Groups</h2>
 
     <div class="relative w-64">
-        <input
-                type="text"
-                id="groupSearch"
-                onkeyup="filterGroups()"
-                placeholder="Search groups..."
-                class="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all shadow-sm"
-        >
+        <input type="text" id="groupSearch" onkeyup="filterGroups()" placeholder="Search groups..."
+            class="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal transition-all shadow-sm">
         <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
     </div>
 </header>
@@ -22,34 +17,36 @@
 {% block content %}
 <div class="grid grid-cols-3 gap-6" id="groupsGrid">
     {% if groups %}
-        {% for group in groups %}
-            <div class="group-card searchable-card"
-                 onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.group_id) }}'">
-                <div>
-                    <div class="group-icon {{ ['text-orange-500', 'text-blue-500', 'text-green-500', 'text-purple-500']|random }}">
-                        <i class="fas fa-group-arrows-rotate"></i>
-                    </div>
-                    <h3 class="section-title">{{ group.group_name }}</h3>
-                    <p class="text-muted-sm">{{ group.description or 'No description' }}</p>
-                </div>
-                <div class="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <span class="text-xs font-bold text-gray-400 uppercase">Admin</span>
-                    <span class="text-xs text-gray-600">{{ 'You' if group.admin_id == current_user_id else 'Member' }}</span>
-                </div>
+    {% for group in groups %}
+    <div class="group-card searchable-card"
+        onclick="window.location.href='{{ url_for('GroupController:get_group_details', group_id=group.group_id) }}'">
+        <div>
+            <div
+                class="group-icon {{ ['text-orange-500', 'text-blue-500', 'text-green-500', 'text-purple-500']|random }}">
+                <i class="fas fa-group-arrows-rotate"></i>
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="col-span-3 text-center py-12">
-            <div class="text-gray-400 mb-4">
-                <i class="fas fa-users fa-3x"></i>
-            </div>
-            <p class="text-gray-500 text-lg">No groups yet. Create your first group!</p>
+            <h3 class="section-title">{{ group.group_name }}</h3>
+            <p class="text-muted-sm">{{ group.description or 'No description' }}</p>
         </div>
+        <div class="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
+            <span class="text-xs font-bold text-gray-400 uppercase">Admin</span>
+            <span class="text-xs text-gray-600">{{ 'You' if group.first_member.user_id == current_user.user_id else
+                group.first_member.name }}</span>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="col-span-3 text-center py-12">
+        <div class="text-gray-400 mb-4">
+            <i class="fas fa-users fa-3x"></i>
+        </div>
+        <p class="text-gray-500 text-lg">No groups yet. Create your first group!</p>
+    </div>
     {% endif %}
 
 
     <div class="group-card border-dashed border-2 border-gray-300 bg-gray-50 flex items-center justify-center min-h-[200px]"
-         onclick="toggleModal()">
+        onclick="toggleModal()">
         <div class="text-center">
             <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3 text-gray-500">
                 <i class="fas fa-plus"></i>

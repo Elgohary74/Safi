@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, session, url_for
 from flask_classful import route
 
 from app.controllers.base_controller import BaseController
@@ -151,6 +151,19 @@ class GroupController(BaseController):
             self.group_service.refresh_invite_code(self.current_user.user_id, group_id)
             is_admin = True
 
+        # determining back endpoint logic
+        # if the user came from dashboard or groups list, store that preference
+        if request.referrer:
+            if "dashboard" in request.referrer:
+                session[f"return_to_{group_id}"] = "dashboard.dashboard_index"
+            elif "groups/list" in request.referrer:
+                session[f"return_to_{group_id}"] = "GroupController:list_groups"
+
+        # default to groups list if nothing stored or known
+        back_endpoint = session.get(
+            f"return_to_{group_id}", "GroupController:list_groups"
+        )
+
         return render_template(
             "group_details.html",
             group=group,
@@ -158,6 +171,7 @@ class GroupController(BaseController):
             your_balance=round(sum(user_shares), 2),
             current_user=self.current_user,
             is_admin=is_admin,
+            back_endpoint=back_endpoint,
         )
 
     @route("/list", methods=["GET"])
@@ -169,3 +183,14 @@ class GroupController(BaseController):
         return render_template(
             "groups.html", groups=groups, current_user=self.current_user
         )
+
+    @route("/<group_id>/members", methods=["GET"])
+    def get_group_members(self, group_id):
+        group = self.group_service.get_group(group_id)
+        if not group:
+            raise ResourceNotFound("Group not found.")
+
+        members = [
+            {"user_id": member.user_id, "name": member.name} for member in group.members
+        ]
+        return {"members": members}
