@@ -29,7 +29,9 @@ class ExpenseRepository(IRepository):
 
     def update(self, expense_id: str, data: ExpenseSchema):
         self.logger.info(f"updating expense id: {expense_id}")
-        self.collection.update_one({"expense_id": expense_id}, {"$set": data.model_dump()})
+        self.collection.update_one(
+            {"expense_id": expense_id}, {"$set": data.model_dump()}
+        )
 
     def delete(self, expense_id: str):
         self.logger.info(f"deleting expense id: {expense_id}")

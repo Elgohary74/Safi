@@ -38,7 +38,7 @@ def test_activity_page_access(client):
 
     response = client.get("/transactions/activity", follow_redirects=True)
     assert response.status_code == 200
-    assert b"Activity Log" in response.data
+    assert b"All Notification" in response.data
 
 
 def test_create_settlement_flow(client):

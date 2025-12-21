@@ -5,7 +5,12 @@ from flask_classful import route
 
 from app.controllers.base_controller import BaseController
 from app.models.debt import Debt
-from app.models.expense import Expense, ExpenseCreationRequest, ExpenseUpdateRequest, SharedExpense
+from app.models.expense import (
+    Expense,
+    ExpenseCreationRequest,
+    ExpenseUpdateRequest,
+    SharedExpense,
+)
 from app.services import ExpenseService, GroupService
 
 
@@ -71,6 +76,8 @@ class ExpenseController(BaseController):
 
     @route("/<expense_id>/update", methods=["POST"])
     def update_expense(self, expense_id):
-        self.expense_service.update_expense(expense_id, ExpenseUpdateRequest(**request.form.to_dict()))
+        self.expense_service.update_expense(
+            expense_id, ExpenseUpdateRequest(**request.form.to_dict())
+        )
         flash("Expense updated successfully!", "success")
         return redirect(request.referrer)

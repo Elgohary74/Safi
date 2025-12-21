@@ -66,4 +66,3 @@ class UserController(BaseController):
     def get_payment_methods(self, user_id: str):
         methods = self.user_service.get_user_payment_methods(user_id)
         return {"payment_methods": methods}
-

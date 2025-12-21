@@ -40,7 +40,7 @@ def test_get_notifications_returns_unread_for_user(client):
     )
 
 
-def test_mark_as_read_marks_notification_and_redirects(client):
+def test_mark_as_read_marks_notification_and_returns_success(client):
     repo = NotificationRepository()
     repo.collection.delete_many({})
 
@@ -59,9 +59,9 @@ def test_mark_as_read_marks_notification_and_redirects(client):
         follow_redirects=False,
     )
 
-    # Should redirect to activity page
-    assert r.status_code == 302
-    assert "/dashboard/activity" in r.headers.get("Location", "")
+    # Should return success JSON
+    assert r.status_code == 200
+    assert r.get_json() == {"status": "success"}
 
     # Now unread list should be empty
     unread = repo.get_unread_by_user(user.user_id)

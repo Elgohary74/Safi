@@ -95,6 +95,9 @@ class UserService(BaseService):
         user = self.user_repo.get_by_id(user_id)
         if not user:
             raise ResourceNotFound("User not found")
-        
-        return [method.model_dump() for method in user.payment_methods] if user.payment_methods else []
 
+        return (
+            [method.model_dump() for method in user.payment_methods]
+            if user.payment_methods
+            else []
+        )

@@ -54,10 +54,10 @@ class GroupController(BaseController):
     @route("/<group_id>/respond", methods=["POST"])
     def respond_to_invite(self, group_id):
         is_json = request.is_json or request.content_type == "application/json"
-        
+
         action = request.form.get("action")
         notification_id = request.form.get("notification_id")
-        
+
         if is_json:
             data = request.get_json()
             action = data.get("action")
@@ -69,14 +69,14 @@ class GroupController(BaseController):
             )
             if is_json:
                 return {"status": "success", "message": f"Invitation {action}ed!"}, 200
-            
+
             flash(f"Invitation {action}ed!", "success")
         except (ResourceNotFound, ValueError) as e:
             message = getattr(e, "message", str(e))
             if is_json:
                 return {"status": "error", "message": message}, 400
             flash(message, "danger")
-            
+
         return redirect(url_for("GroupController:list_groups"))
 
     @route("/<group_id>/invite/refresh", methods=["POST"])

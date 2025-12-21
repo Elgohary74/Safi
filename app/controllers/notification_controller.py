@@ -1,4 +1,4 @@
-from flask import jsonify, redirect, url_for
+from flask import jsonify
 from flask_classful import route
 
 from app.controllers.base_controller import BaseController
