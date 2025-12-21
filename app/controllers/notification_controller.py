@@ -23,6 +23,7 @@ class NotificationController(BaseController):
                 "message": notif.message,
                 "timestamp": notif.timestamp,
                 "type": notif.type,
+                "is_read": notif.is_read,
             }
             for notif in notifications
         ]
@@ -31,4 +32,4 @@ class NotificationController(BaseController):
     @route("/<notif_id>/mark_as_read", methods=["POST"])
     def mark_as_read(self, notif_id):
         self.notification_service.mark_notification_as_read(notif_id)
-        return redirect(url_for("dashboard.activity"))
+        return jsonify({"status": "success"}), 200

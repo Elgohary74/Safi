@@ -121,6 +121,8 @@ class BaseService:
             message=notification.message,
             timestamp=notification.timestamp,
             type=notification.type,
+            is_read=notification.is_read,
+            payload=notification.payload,
         )
 
     def _convert_schema_to_notification(
@@ -133,4 +135,6 @@ class BaseService:
             message=schema.message,
             timestamp=schema.timestamp,
             type=schema.type,
+            is_read=schema.is_read,
+            payload=schema.payload,
         )

@@ -87,7 +87,14 @@ class UserService(BaseService):
         self.check_if_payment_method_exists(payment_method)
         return self.user_repo.add_payment_method(current_user.user_id, payment_method)
 
-    def remove_payment_method(self, payment_method: PaymentMethod) -> bool:
         return self.user_repo.remove_payment_method(
             current_user.user_id, payment_method.model_dump()
         )
+
+    def get_user_payment_methods(self, user_id: str) -> list[dict]:
+        user = self.user_repo.get_by_id(user_id)
+        if not user:
+            raise ResourceNotFound("User not found")
+        
+        return [method.model_dump() for method in user.payment_methods] if user.payment_methods else []
+

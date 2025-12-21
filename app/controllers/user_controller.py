@@ -61,3 +61,9 @@ class UserController(BaseController):
         except Exception as e:
             flash(f"Error removing payment method: {str(e)}", "error")
         return redirect(request.referrer)
+
+    @route("/<user_id>/payment_methods", methods=["GET"])
+    def get_payment_methods(self, user_id: str):
+        methods = self.user_service.get_user_payment_methods(user_id)
+        return {"payment_methods": methods}
+

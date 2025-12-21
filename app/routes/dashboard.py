@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template
 from flask_jwt_extended import current_user, jwt_required
 
-from app.services import ExpenseService, GroupService
+from app.services import ExpenseService, GroupService, NotificationService
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 group_service = GroupService()
 expense_service = ExpenseService()
+notification_service = NotificationService()
 
 
 @dashboard_bp.route("/", methods=["GET"], endpoint="dashboard_index")
@@ -55,8 +56,10 @@ def index():
         )
 
     net_balance = amount_owed - amount_owing
-
     group_list.sort(key=lambda x: (not x["is_active"], x["name"]))
+
+    unread_notifications = notification_service.get_unread_notifications(current_user)
+    recent_notifications = unread_notifications[:3] if unread_notifications else []
 
     return render_template(
         "dashboard.html",
@@ -65,13 +68,17 @@ def index():
         amount_owed=round(amount_owed, 2),
         amount_owing=round(amount_owing, 2),
         current_user=current_user,
+        recent_notifications=recent_notifications,
     )
 
 
 @dashboard_bp.route("/activity")
 @jwt_required()
 def activity():
-    return render_template("activity.html", current_user=current_user)
+    notifications = notification_service.get_user_notifications(current_user)
+    return render_template(
+        "activity.html", current_user=current_user, notifications=notifications
+    )
 
 
 @dashboard_bp.route("/settings")

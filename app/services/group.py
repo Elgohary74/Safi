@@ -231,7 +231,13 @@ class GroupService(BaseService):
 
         invite_sent.send(self, group_schema=group_schema, user=user)
 
-    def respond_to_invite(self, user_id: str, group_id: str, action: str):
+    def respond_to_invite(
+        self,
+        user_id: str,
+        group_id: str,
+        action: str,
+        notification_id: Optional[str] = None,
+    ):
         if action not in ["accept", "reject"]:
             raise ValueError("Invalid action")
 
@@ -246,6 +252,13 @@ class GroupService(BaseService):
             self.group_repo.move_pending_to_member(group_id, user_id)
         else:
             self.group_repo.remove_pending_member(group_id, user_id)
+
+        if notification_id:
+            notification = self.notification_repo.get_by_id(notification_id)
+            if notification:
+                notification.is_read = True
+                notification.payload["status"] = action
+                self.notification_repo.update(notification_id, notification)
 
     def update_group_info(self, group_id: str, new_name: str, new_description: str):
         group_schema = self.group_repo.get_by_id(group_id)

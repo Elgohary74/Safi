@@ -9,10 +9,24 @@ class NotificationService(BaseService):
         super().__init__()
 
     def get_user_notifications(self, user: User) -> Optional[list[Notification]]:
+        notifications_schemas = self.notification_repo.get_all_by_user(user.user_id)
+
+        if notifications_schemas is None:
+            return None
+
+        return [
+            self._convert_schema_to_notification(schema)
+            for schema in notifications_schemas
+        ]
+
+    def get_unread_notifications(self, user: User) -> Optional[list[Notification]]:
         notifications_schemas = self.notification_repo.get_unread_by_user(user.user_id)
 
         if notifications_schemas is None:
             return None
+
+        # Sort by timestamp descending (newest first)
+        notifications_schemas.sort(key=lambda x: x.timestamp, reverse=True)
 
         return [
             self._convert_schema_to_notification(schema)

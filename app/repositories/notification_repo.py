@@ -24,6 +24,13 @@ class NotificationRepository(IRepository):
         data_list = list(self.collection.find({"user_id": user_id, "is_read": False}))
         return [NotificationSchema.model_validate(data) for data in data_list]
 
+    def get_all_by_user(self, user_id: str) -> List[NotificationSchema]:
+        self.logger.debug(f"fetching all notifications for user {user_id}")
+        data_list = list(
+            self.collection.find({"user_id": user_id}).sort("timestamp", -1)
+        )
+        return [NotificationSchema.model_validate(data) for data in data_list]
+
     def mark_as_read(self, notif_id: str):
         self.logger.debug(f"marking notification {notif_id} as read")
         self.collection.update_one(

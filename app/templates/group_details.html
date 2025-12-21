@@ -3,256 +3,268 @@
 {% block title %}Safi - Group Details{% endblock %}
 
 {% block header %}
-<header class="page-header">
-    <div class="flex flex-col gap-4 w-full">
-        {% if not group.is_active %}
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 w-full mb-4">
-            <div class="flex justify-between items-center">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-archive text-yellow-400"></i>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-yellow-700">
-                            This group is inactive and view-only.
-                        </p>
+    <header class="page-header">
+        <div class="flex flex-col gap-4 w-full">
+            {% if not group.is_active %}
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 w-full mb-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-archive text-yellow-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    This group is inactive and view-only.
+                                </p>
+                            </div>
+                        </div>
+                        {% if is_admin %}
+                            <form action="{{ url_for('GroupController:restore_group', group_id=group.group_id) }}"
+                                  method="POST">
+                                <button type="submit"
+                                        class="text-sm font-medium text-yellow-700 hover:text-yellow-600 underline">
+                                    Restore Group
+                                </button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
-                {% if is_admin %}
-                <form action="{{ url_for('GroupController:restore_group', group_id=group.group_id) }}" method="POST">
-                    <button type="submit" class="text-sm font-medium text-yellow-700 hover:text-yellow-600 underline">
-                        Restore Group
-                    </button>
-                </form>
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
+            {% endif %}
 
-        <div class="flex items-center justify-between w-full">
-            <div class="flex items-center gap-4">
-                <a href="{{ url_for(back_endpoint) }}"
-                    class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100 transition-colors">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
+            <div class="flex items-center justify-between w-full">
+                <div class="flex items-center gap-4">
+                    <a href="{{ url_for(back_endpoint) }}"
+                       class="w-8 h-8 bg-white rounded-full border flex items-center justify-center text-black hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
 
-                <div class="flex items-center gap-3">
-                    <h2 class="page-title">{{ group.group_name }}</h2>
+                    <div class="flex items-center gap-3">
+                        <h2 class="page-title">{{ group.group_name }}</h2>
 
-                    {% if group.first_member.user_id == current_user.user_id and group.is_active %}
-                    <div class="flex gap-2 ml-2">
-                        <button onclick="openModal('editGroupModal')"
-                            class="text-gray-400 hover:text-brand-teal transition-colors" title="Edit Group">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="openModal('deleteGroupModal')"
-                            class="text-gray-400 hover:text-red-500 transition-colors" title="Delete Group">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
+                        {% if group.first_member.user_id == current_user.user_id and group.is_active %}
+                            <div class="flex gap-2 ml-2">
+                                <button onclick="openModal('editGroupModal')"
+                                        class="text-gray-400 hover:text-brand-teal transition-colors"
+                                        title="Edit Group">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="openModal('deleteGroupModal')"
+                                        class="text-gray-400 hover:text-red-500 transition-colors" title="Delete Group">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
 
-                    <div class="group relative flex items-center">
+                            <div class="group relative flex items-center">
                         <span id="inviteCodeSpan"
-                            class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
-                            title="Click to Copy" onclick="copyInviteCode()">
+                              class="text-xs font-mono font-bold text-gray-500 bg-gray-100 border border-dashed border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
+                              title="Click to Copy" onclick="copyInviteCode()">
                             {{ group.invite_code }}
                         </span>
-                        <div id="copyNotification"
-                            class="hidden absolute left-0 -bottom-8 text-xs text-white bg-gray-800 px-2 py-1 rounded opacity-0 transition-opacity duration-300">
-                            Copied to clipboard!
-                        </div>
+                                <div id="copyNotification"
+                                     class="hidden absolute left-0 -bottom-8 text-xs text-white bg-gray-800 px-2 py-1 rounded opacity-0 transition-opacity duration-300">
+                                    Copied to clipboard!
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
-            </div>
-            {% if group.is_active %}
-            <div class="flex gap-2">
-                <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
-                <button class="btn btn-white border-dashed text-gray-500" onclick="openModal('inviteByEmailModal')">
-                    Invite via Email
-                </button>
-                <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
-            </div>
-            {% endif %}
-</header>
+                {% if group.is_active %}
+                    <div class="flex gap-2">
+                        <button class="btn btn-white" onclick="openModal('expenseModal')">Add Expense</button>
+                        <button class="btn btn-white border-dashed text-gray-500"
+                                onclick="openInviteModal('{{ group.group_id }}', '{{ group.group_name }}')">
+                            Invite via Email
+                        </button>
+                        <button class="btn btn-accent" onclick="openModal('settleModal')">Settle Up</button>
+                    </div>
+                {% endif %}
+    </header>
 {% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-3 gap-8">
-    <div class="col-span-2 feed-list">
-        <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
+    <div class="grid grid-cols-3 gap-8">
+        <div class="col-span-2 feed-list">
+            <h3 class="section-title text-gray-500 uppercase text-xs mb-2">Expenses Feed</h3>
 
-        {% if expenses %}
-        {% for expense, user_share in expenses[::-1] %}
-        <div class="feed-item card relative">
-            <div class="flex gap-4">
-                <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
-                    <p class="text-muted-sm">{{ expense.payer.name }} paid {{ expense.total_amount }}
-                        EGP <br>{{ expense.date.strftime("%d/%m/%Y at %I:%M %p") }}</p>
-                </div>
-            </div>
-            <div class="text-right flex items-center gap-4">
-                <div>
-                    <p class="text-base
+            {% if expenses %}
+                {% for expense, user_share in expenses[::-1] %}
+                    <div class="feed-item card relative">
+                        <div class="flex gap-4">
+                            <div class="feed-icon"><i class="fas fa-{{ expense.icon|default('receipt') }}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">{{ expense.description }}</h4>
+                                <p class="text-muted-sm">{{ expense.payer.name }} paid {{ expense.total_amount }}
+                                    EGP <br>{{ expense.date.strftime("%d/%m/%Y at %I:%M %p") }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex items-center gap-4">
+                            <div>
+                                <p class="text-base
                                     {% if user_share < 0 %}text-status-danger
                                     {% else %}{% if user_share > 0 %}text-status-success
                                     {% else %} text-status
                                     {% endif %}{% endif %}">
-                        {{ '+' if user_share > 0 else '' }}{{ user_share }} EGP
-                    </p>
-                    <p class="text-xs text-gray-400">
-                        {% if user_share == 0 %} Not Involved
-                        {% else %} You {{ 'lent' if user_share > 0 else 'borrowed' }}
-                        {% endif %}
-                </div>
+                                    {{ '+' if user_share > 0 else '' }}{{ user_share }} EGP
+                                </p>
+                                <p class="text-xs text-gray-400">
+                                    {% if user_share == 0 %} Not Involved
+                                    {% else %} You {{ 'lent' if user_share > 0 else 'borrowed' }}
+                                    {% endif %}
+                            </div>
 
-                <div class="relative">
-                    <button onclick="toggleMenu('menu-{{ loop.index }}')"
-                        class="text-gray-400 hover:text-gray-600 focus:outline-none p-1">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <div id="menu-{{ loop.index }}"
-                        class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-100 overflow-hidden">
-                        <button
-                            onclick="openEditExpenseModal('{{ expense.expense_id }}', '{{ expense.description }}', '{{ expense.total_amount }}', '{{ expense.payer.user_id }}')"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                            <i class="fas fa-edit text-xs"></i> Edit
-                        </button>
+                            <div class="relative">
+                                <button onclick="toggleMenu('menu-{{ loop.index }}')"
+                                        class="text-gray-400 hover:text-gray-600 focus:outline-none p-1">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div id="menu-{{ loop.index }}"
+                                     class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-100 overflow-hidden">
+                                    <button
+                                            onclick="openEditExpenseModal('{{ expense.expense_id }}', '{{ expense.description }}', '{{ expense.total_amount }}', '{{ expense.payer.user_id }}')"
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                        <i class="fas fa-edit text-xs"></i> Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-8 text-gray-400">
+                    <p>No expenses recorded yet.</p>
                 </div>
-            </div>
+            {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="text-center py-8 text-gray-400">
-            <p>No expenses recorded yet.</p>
-        </div>
-        {% endif %}
-    </div>
 
-    <div class="col-span-1 flex flex-col gap-6">
-        <div class="card">
-            <p class="stat-label">Your Position</p>
-            <h2 class="text-base
+        <div class="col-span-1 flex flex-col gap-6">
+            <div class="card">
+                <p class="stat-label">Your Position</p>
+                <h2 class="text-base
                                 {% if your_balance < 0 %}text-status-danger
                                 {% else %}{% if your_balance > 0 %}text-status-success
                                 {% else %} text-status
                                 {% endif %}{% endif %} text-3xl mb-4">
-                {{ '+' if your_balance > 0 else '' }}{{ your_balance }} <span
-                    class="text-sm text-gray-400 font-normal">EGP</span>
-            </h2>
-            <hr class="border-gray-100 my-4">
+                    {{ '+' if your_balance > 0 else '' }}{{ your_balance }} <span
+                        class="text-sm text-gray-400 font-normal">EGP</span>
+                </h2>
+                <hr class="border-gray-100 my-4">
 
-            <div class="flex justify-between items-center mb-3">
+                <div class="flex justify-between items-center mb-3">
 
-                <h4 class="font-bold text-sm">Members ({{ group.members|length if group.members else 0 }})</h4>
-            </div>
+                    <h4 class="font-bold text-sm">Members ({{ group.members|length if group.members else 0 }})</h4>
+                </div>
 
-            <ul class="space-y-3 text-sm text-gray-600">
-                {% if group.members %}
-                {% for member in group.members %}
-                <li class="flex justify-between items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition"
-                    onclick="showUserProfile('{{ member.name }}', '{{ member.phone|default('01000000000') }}')">
-                    <div class="flex items-center gap-2">
-                        <div
-                            class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="font-medium">{{ member.name }}</span>
-                            {% if group.first_member.user_id == member.user_id %}
-                            <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
-                            {% endif %}
-                        </div>
-                    </div>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    {% if group.members %}
+                        {% for member in group.members %}
+                            <li class="flex justify-between items-center group cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition"
+                                onclick="showUserProfile('{{ member.name }}', '{{ member.phone_number }}', '{{ member.user_id }}')">
 
-                    <div class="flex items-center gap-3">
-                        {# <span
+                                <div class="flex items-center gap-2">
+                                    <div
+                                            class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500 overflow-hidden">
+                                        {% if member.user_picture %}
+                                            <img src="{{ url_for('UserController:get_picture', user_id=member.user_id) }}"
+                                                 alt="{{ member.name }}" class="w-full h-full object-cover"
+                                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-user\'></i>';">
+                                        {% else %}
+                                            <i class="fas fa-user"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="font-medium">{{ member.name }}</span>
+                                        {% if group.first_member.user_id == member.user_id %}
+                                            <span class="text-[10px] text-brand-teal font-bold uppercase">Admin</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    {# <span
                             class="{% if member.balance > 0 %}text-green-500{% elif member.balance < 0 %}text-red-500{% else %}text-gray-400{% endif %} font-bold text-xs">#}
-                            {# {% if member.balance > 0 %}#}
-                            {# Gets {{ member.balance }}#}
-                            {# {% elif member.balance < 0 %}#} {# Owes {{ member.balance|abs }}#} {# {% else %}#} {#
+                                    {# {% if member.balance > 0 %}#}
+                                    {# Gets {{ member.balance }}#}
+                                    {# {% elif member.balance < 0 %}#} {# Owes {{ member.balance|abs }}#}
+                                    {# {% else %}#} {#
                                 Settled#} {# {% endif %}#} {# </span>#}
-                                {% if group.first_member.user_id == current_user.user_id and group.first_member.user_id
+                                    {% if group.first_member.user_id == current_user.user_id and group.first_member.user_id
                                 != member.user_id %}
-                                <button onclick="event.stopPropagation(); confirmRemoveMember('{{ member.user_id }}')"
-                                    class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
-                                    title="Remove Member">
-                                    <i class="fas fa-times text-xs"></i>
-                                </button>
-                                {% endif %}
-                    </div>
-                </li>
-                {% endfor %}
-                {% else %}
-                <li class="text-gray-400 italic">No members found</li>
-                {% endif %}
-            </ul>
+                                        <button onclick="event.stopPropagation(); confirmRemoveMember('{{ member.user_id }}')"
+                                                class="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors"
+                                                title="Remove Member">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="text-gray-400 italic">No members found</li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
-</div>
-<script>
-    function copyInviteCode() {
-        const inviteCode = "{{ group.invite_code }}";
-        navigator.clipboard.writeText(inviteCode)
-            .then(() => {
-                const span = document.getElementById('inviteCodeSpan');
-                const originalTitle = span.getAttribute('title');
-                span.setAttribute('title', 'Copied!');
-                span.classList.add('bg-green-100', 'border-green-300', 'text-green-700');
-                setTimeout(() => {
-                    span.setAttribute('title', originalTitle);
-                    span.classList.remove('bg-green-100', 'border-green-300', 'text-green-700');
-                }, 2000);
-            })
-            .catch(err => {
-                console.error('Failed to copy: ', err);
+    <script>
+        function copyInviteCode() {
+            const inviteCode = "{{ group.invite_code }}";
+            navigator.clipboard.writeText(inviteCode)
+                .then(() => {
+                    const span = document.getElementById('inviteCodeSpan');
+                    const originalTitle = span.getAttribute('title');
+                    span.setAttribute('title', 'Copied!');
+                    span.classList.add('bg-green-100', 'border-green-300', 'text-green-700');
+                    setTimeout(() => {
+                        span.setAttribute('title', originalTitle);
+                        span.classList.remove('bg-green-100', 'border-green-300', 'text-green-700');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+        }
+
+        function toggleMenu(menuId) {
+            const allMenus = document.querySelectorAll('[id^="menu-"]');
+            allMenus.forEach(menu => {
+                if (menu.id !== menuId) {
+                    menu.classList.add('hidden');
+                }
             });
-    }
 
-    function toggleMenu(menuId) {
-        const allMenus = document.querySelectorAll('[id^="menu-"]');
-        allMenus.forEach(menu => {
-            if (menu.id !== menuId) {
-                menu.classList.add('hidden');
+            const menu = document.getElementById(menuId);
+            if (menu) {
+                menu.classList.toggle('hidden');
             }
-        });
-
-        const menu = document.getElementById(menuId);
-        if (menu) {
-            menu.classList.toggle('hidden');
-        }
-    }
-
-    function openEditExpenseModal(expenseId, description, amount, payerId) {
-        const allMenus = document.querySelectorAll('[id^="menu-"]');
-        allMenus.forEach(menu => menu.classList.add('hidden'));
-
-        // Populate the modal fields
-        document.getElementById('edit_expense_id').value = expenseId;
-        document.getElementById('edit_expense_description').value = description;
-        document.getElementById('edit_expense_amount').value = amount;
-
-        const payerSelect = document.getElementById('edit_expense_paid_by');
-        if (payerSelect) {
-            payerSelect.value = payerId;
         }
 
-        // Update the form action
-        const form = document.getElementById('editExpenseForm');
-        form.action = `/expenses/${expenseId}/update`;
-
-        openModal('editExpenseModal');
-    }
-
-    window.addEventListener('click', function (e) {
-        if (!e.target.matches('.fa-ellipsis-v') && !e.target.closest('button')) {
+        function openEditExpenseModal(expenseId, description, amount, payerId) {
             const allMenus = document.querySelectorAll('[id^="menu-"]');
             allMenus.forEach(menu => menu.classList.add('hidden'));
+
+            // Populate the modal fields
+            document.getElementById('edit_expense_id').value = expenseId;
+            document.getElementById('edit_expense_description').value = description;
+            document.getElementById('edit_expense_amount').value = amount;
+
+            const payerSelect = document.getElementById('edit_expense_paid_by');
+            if (payerSelect) {
+                payerSelect.value = payerId;
+            }
+
+            // Update the form action
+            const form = document.getElementById('editExpenseForm');
+            form.action = `/expenses/${expenseId}/update`;
+
+            openModal('editExpenseModal');
         }
-    });
-</script>
+
+        window.addEventListener('click', function (e) {
+            if (!e.target.matches('.fa-ellipsis-v') && !e.target.closest('button')) {
+                const allMenus = document.querySelectorAll('[id^="menu-"]');
+                allMenus.forEach(menu => menu.classList.add('hidden'));
+            }
+        });
+    </script>
 {% endblock %}

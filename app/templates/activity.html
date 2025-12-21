@@ -9,75 +9,300 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Tabs -->
+    <div class="flex space-x-6 mb-6 border-b border-gray-200">
+        <button onclick="setFilter('unread')" id="tab-unread"
+                class="pb-3 px-1 text-sm font-medium transition-colors border-b-2 border-brand-teal text-brand-teal">
+            Unread
+        </button>
+        <button onclick="setFilter('read')" id="tab-read"
+                class="pb-3 px-1 text-sm font-medium transition-colors text-gray-500 hover:text-gray-700 border-transparent border-b-2 hover:border-gray-300">
+            Read
+        </button>
+    </div>
+
     <div class="card">
-        <div class="feed-list">
-            <!-- 1. Normal Expense Notification -->
-            <div class="feed-item cursor-pointer hover:bg-gray-50 transition"
-                 onclick="showNotificationDetails('Omar added expense Gas Station (200 EGP)')">
-                <div class="flex justify-between items-center w-full">
-                    <div class="flex gap-4 items-center">
-                        <div class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-brand-teal shrink-0">
-                            <i class="fas fa-bell"></i>
+        <div class="feed-list" id="notificationList">
+            {% if notifications %}
+                {% for notification in notifications %}
+                    {% if notification.type == 'generic' %}
+                        <div class="feed-item cursor-pointer hover:bg-gray-50 transition notification-item"
+                             data-read="{{ 'true' if notification.is_read else 'false' }}"
+                             onclick="showNotificationDetails('{{ notification.message }}', '{{ url_for('NotificationController:mark_as_read', notif_id=notification.notification_id) }}')">
+                            <div class="flex justify-between items-center w-full">
+                                <div class="flex gap-4 items-center">
+                                    <div
+                                            class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-brand-teal shrink-0">
+                                        <i class="fas fa-bell"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-900">{{ notification.message | safe }}</p>
+                                        <p class="text-muted-sm">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                </div>
+                                {% if not notification.is_read %}
+                                    <button
+                                            onclick="event.stopPropagation(); markNotificationAsRead(event, this, '{{ url_for('NotificationController:mark_as_read', notif_id=notification.notification_id) }}')"
+                                            class="text-xs text-brand-teal hover:text-white hover:bg-brand-teal border border-brand-teal px-3 py-1 rounded transition-all duration-300 bg-white action-btn">
+                                        Mark Read
+                                    </button>
+                                {% else %}
+                                    <span class="text-xs text-gray-400 border border-gray-100 px-3 py-1 rounded bg-gray-50">Read</span>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Omar added expense "Gas Station"</p>
-                            <p class="text-muted-sm">2 hours ago</p>
+
+                    {% elif notification.type == 'invite' %}
+                        <div class="feed-item cursor-pointer hover:bg-gray-50 transition notification-item {{ 'accepted-state' if notification.payload.get('status') == 'accept' else ('rejected-state' if notification.payload.get('status') == 'reject' else '') }}"
+                             data-read="{{ 'true' if notification.is_read else 'false' }}"
+                             onclick="showInvitation('{{ notification.payload.get('group_name', 'Group') }}', '{{ notification.payload['group_id'] }}', '{{ notification.notification_id }}')">
+                            <div class="flex justify-between items-center w-full">
+                                <div class="flex gap-4 items-center">
+                                    <div
+                                            class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-900">{{ notification.message | safe }}</p>
+                                        <p class="text-muted-sm">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                </div>
+                                {% if not notification.is_read %}
+                                    <div class="flex gap-2">
+                                        <button
+                                                onclick="event.stopPropagation(); handleInviteResponse(event, this, 'reject', '{{ notification.payload['group_id'] }}', '{{ notification.notification_id }}')"
+                                                class="text-xs text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded transition-colors bg-white">
+                                            Reject
+                                        </button>
+                                        <button
+                                                onclick="event.stopPropagation(); handleInviteResponse(event, this, 'accept', '{{ notification.payload['group_id'] }}', '{{ notification.notification_id }}')"
+                                                class="text-xs text-green-600 hover:bg-green-50 bg-brand-teal border border-green-600 px-3 py-1 rounded hover:opacity-90 border border-brand-teal">
+                                            Accept
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    {% if notification.payload.get('status') == 'accept' %}
+                                        <button disabled
+                                                class="text-xs text-green-700 font-bold border-none bg-transparent px-3 py-1 rounded cursor-default">
+                                            Accepted
+                                        </button>
+                                    {% elif notification.payload.get('status') == 'reject' %}
+                                        <button disabled
+                                                class="text-xs text-red-800 font-bold border-none bg-transparent px-3 py-1 rounded cursor-default">
+                                            Rejected
+                                        </button>
+                                    {% else %}
+                                        <span class="text-xs text-gray-400 border border-gray-100 px-3 py-1 rounded bg-gray-50">Responded</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                    <button onclick="event.stopPropagation(); markAsRead(this)"
-                            class="text-xs text-gray-500 hover:text-brand-teal border border-gray-200 px-3 py-1 rounded transition-colors bg-white">
-                        Mark Read
-                    </button>
+
+                    {% elif notification.type == 'transaction' %}
+                        <div class="feed-item cursor-pointer hover:bg-gray-50 transition notification-item"
+                             data-read="{{ 'true' if notification.is_read else 'false' }}"
+                             onclick="showTransaction('{{ notification.message }}', '{{ url_for('NotificationController:mark_as_read', notif_id=notification.notification_id) }}')">
+                            <div class="flex justify-between items-center w-full">
+                                <div class="flex gap-4 items-center">
+                                    <div
+                                            class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-900">{{ notification.message | safe }}</p>
+                                        <p class="text-muted-sm">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                </div>
+                                {% if not notification.is_read %}
+                                    <button
+                                            onclick="event.stopPropagation(); markNotificationAsRead(event, this, '{{ url_for('NotificationController:mark_as_read', notif_id=notification.notification_id) }}')"
+                                            class="text-xs text-brand-teal hover:text-white hover:bg-brand-teal border border-brand-teal px-3 py-1 rounded transition-all duration-300 bg-white action-btn">
+                                        Ack
+                                    </button>
+                                {% else %}
+                                    <span class="text-xs text-gray-400 border border-gray-100 px-3 py-1 rounded bg-gray-50">Read</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-8 hidden">
+                <div
+                        class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400 text-2xl">
+                    <i class="fas fa-bell-slash"></i>
                 </div>
-            </div>
-            <div class="feed-item cursor-pointer hover:bg-gray-50 transition"
-                 onclick="showInvitation('Dahab Trip 2025')">
-                <div class="flex justify-between items-center w-full">
-                    <div class="flex gap-4 items-center">
-                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Invited to "Dahab Trip 2025"</p>
-                            <p class="text-muted-sm">Just now</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="event.stopPropagation(); rejectInvite(this)"
-                                class="text-xs text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded transition-colors bg-white">
-                            Reject
-                        </button>
-                        <button onclick="event.stopPropagation(); acceptInvite(this)"
-                                class="text-xs text-green-600 hover:bg-green-50 bg-brand-teal border border-green-600 px-3 py-1 rounded hover:opacity-90 border border-brand-teal">
-                            Accept
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="feed-item cursor-pointer hover:bg-gray-50 transition"
-                 onclick="showTransaction('Ahmed recorded a payment of 150 EGP to you. Please confirm.')">
-                <div class="flex justify-between items-center w-full">
-                    <div class="flex gap-4 items-center">
-                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 shrink-0">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Ahmed recorded payment (150 EGP)</p>
-                            <p class="text-muted-sm">15 mins ago</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="event.stopPropagation(); rejectInvite(this)"
-                                class="text-xs text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded transition-colors bg-white">
-                            Reject
-                        </button>
-                        <button onclick="event.stopPropagation(); acceptInvite(this)"
-                                class="text-xs text-green-600 hover:bg-green-50 bg-brand-teal border border-green-600 px-3 py-1 rounded hover:opacity-90 border border-brand-teal">
-                            Accept
-                        </button>
-                    </div>
-                </div>
+                <h3 class="text-lg font-medium text-gray-900">No Notifications</h3>
+                <p class="text-gray-500" id="emptyStateText">You're all caught up!</p>
             </div>
         </div>
     </div>
+
+    <script>
+        let currentFilter = 'unread';
+
+        async function markNotificationAsRead(event, btn, url) {
+            event.stopPropagation();
+
+            // Add loading state
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.classList.add('opacity-75', 'cursor-wait');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const item = btn.closest('.notification-item');
+                    item.setAttribute('data-read', 'true');
+
+                    // Smooth transition to Read state
+                    btn.innerHTML = 'Read';
+
+                    // Remove active styling classes
+                    btn.classList.remove('text-brand-teal', 'hover:text-white', 'hover:bg-brand-teal', 'border-brand-teal', 'bg-white');
+
+                    // Add read styling classes
+                    btn.classList.add('text-gray-400', 'border-gray-100', 'bg-gray-50', 'cursor-default', 'border');
+
+                    btn.disabled = true;
+                    btn.classList.remove('opacity-75', 'cursor-wait');
+
+                    // Re-apply filter after a short delay to let the user see the change
+                    if (currentFilter === 'unread') {
+                        setTimeout(() => {
+                            // Optional: Fade out row before removing?
+                            item.style.transition = 'opacity 0.5s';
+                            item.style.opacity = '0';
+                            setTimeout(() => {
+                                setFilter(currentFilter);
+                                item.style.opacity = '1'; // Reset for when it appears in Read tab
+                            }, 500);
+                        }, 800);
+                    } else {
+                        setFilter(currentFilter);
+                    }
+
+                } else {
+                    console.error('Failed to mark as read');
+                    btn.innerText = originalText;
+                    btn.classList.remove('opacity-75', 'cursor-wait');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                btn.innerText = originalText;
+                btn.classList.remove('opacity-75', 'cursor-wait');
+            }
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            // Update Tab Styles
+            const tabs = ['unread', 'read'];
+            tabs.forEach(tab => {
+                const el = document.getElementById('tab-' + tab);
+                if (tab === filter) {
+                    el.className = 'pb-3 px-1 text-sm font-medium transition-colors border-b-2 border-brand-teal text-brand-teal';
+                } else {
+                    el.className = 'pb-3 px-1 text-sm font-medium transition-colors text-gray-500 hover:text-gray-700 border-transparent border-b-2 hover:border-gray-300';
+                }
+            });
+
+            // Filter Items
+            const items = document.querySelectorAll('.notification-item');
+            let visibleCount = 0;
+
+            items.forEach(item => {
+                const isRead = item.getAttribute('data-read') === 'true';
+                if (filter === 'unread' && !isRead) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else if (filter === 'read' && isRead) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Handle Empty State
+            const emptyState = document.getElementById('emptyState');
+            const emptyStateText = document.getElementById('emptyStateText');
+
+            if (visibleCount === 0) {
+                emptyState.classList.remove('hidden');
+                if (filter === 'unread') {
+                    emptyStateText.innerText = "No unread notifications.";
+                } else {
+                    emptyStateText.innerText = "No read notifications.";
+                }
+            } else {
+                emptyState.classList.add('hidden');
+            }
+        }
+
+        async function handleInviteResponse(event, btn, action, groupId, notifId) {
+            event.stopPropagation();
+
+            // 1. Run visual animation from base.html (requires .feed-item class on container)
+            if (action === 'accept') {
+                if (typeof acceptInvite === 'function') acceptInvite(btn);
+            } else {
+                if (typeof rejectInvite === 'function') rejectInvite(btn);
+            }
+
+            // 2. Perform backend update
+            try {
+                const url = `/groups/${groupId}/respond`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        notification_id: notifId
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    console.error('Failed to respond:', data.message);
+                    // Optionally revert UI here if needed, but for now assuming optimistic success or reload
+                    alert("Error: " + (data.message || "Failed to update"));
+                    window.location.reload();
+                } else {
+                    // Success: The visual state is already updated by acceptInvite/rejectInvite
+                    // Ensure notification is marked as read via data attribute for filtering
+                    const item = btn.closest('.notification-item') || btn.closest('.feed-item').closest('.notification-item');
+                    if (item) {
+                        item.setAttribute('data-read', 'true');
+
+                        // If currently filtering by unread, hide this item or refresh filter
+                        if (typeof currentFilter !== 'undefined' && currentFilter === 'unread') {
+                            // Fade out and hide
+                            item.style.transition = 'opacity 0.5s';
+                            item.style.opacity = '0';
+                            setTimeout(() => {
+                                setFilter('unread');
+                                item.style.opacity = '1'; // Reset for when it appears in Read tab
+                            }, 500);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Network error");
+            }
+        }
+
+        // Initialize with unread filter
+        document.addEventListener('DOMContentLoaded', function () {
+            setFilter('unread');
+        });
+    </script>
 {% endblock %}

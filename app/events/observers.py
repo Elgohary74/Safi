@@ -14,9 +14,10 @@ def handle_involved_users(sender, expense: Expense, **extra):
     for shared_expense in expense.splits:
         if shared_expense.participant.user_id != expense.payer.user_id:
             message = (
-                f"{expense.payer.name} has paid a new expense of {expense.total_amount}EGP Total"
-                f"Description: {expense.description}. "
-                f"you should participate with {shared_expense.amount}EGP in this expense."
+                f"<b>{expense.payer.name}</b> has paid a new expense of <b>{expense.total_amount}EGP</b> "
+                f"in <b>{expense.group.group_name}</b>.<br>"
+                f"Description: {expense.description}.<br>"
+                f"You should participate with <b>{shared_expense.amount}EGP</b> in this expense."
             )
             notification = NotificationSchema(
                 user_id=shared_expense.participant.user_id,
